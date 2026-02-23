@@ -1,0 +1,93 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+.back-link {
+  color: #2d7d46;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+h2 {
+  color: #2d7d46;
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+}
+
+.empty {
+  text-align: center;
+  color: #636e72;
+  padding: 2rem 1rem;
+}
+
+.collection-list {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.found-card {
+  /* position: relative makes this the reference point for position: absolute children */
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  background: #f0f9f0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.remove-button {
+  /* position: absolute + top/right places the button in the top-right corner of the card */
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: #b2bec3;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem;
+}
+
+.remove-button:hover {
+  color: #d63031;
+}
+
+.found-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.found-info h4 {
+  margin: 0;
+  color: #2d3436;
+}
+
+.found-info .scientific {
+  font-style: italic;
+  color: #636e72;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.found-info .route {
+  color: #2d7d46;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0;
+}
+
+.found-info .date {
+  color: #636e72;
+  font-size: 0.75rem;
+  margin: 0.125rem 0 0;
+}

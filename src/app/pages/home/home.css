@@ -1,0 +1,69 @@
+:host {
+  display: block;
+}
+
+.hero {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.hero h2 {
+  font-size: 1.8rem;
+  color: #2d7d46;
+  margin: 0 0 1rem 0;
+}
+
+.hero p {
+  color: #636e72;
+  line-height: 1.6;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.primary-button {
+  display: block;
+  background: #2d7d46;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.primary-button:hover {
+  background: #236b38;
+}
+
+.secondary-button {
+  display: block;
+  background: none;
+  color: #2d7d46;
+  border: 2px solid #2d7d46;
+  border-radius: 8px;
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.secondary-button:hover {
+  background: #f0f9f0;
+}

@@ -1,0 +1,31 @@
+// Prisma Schema: like your @Entity classes in JPA/Hibernate
+// Each "model" becomes a table in PostgreSQL AND a TypeScript type
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// This is like:
+// @Entity
+// @Table(name = "found_plants")
+// public class FoundPlant {
+//   @Id @GeneratedValue Long id;
+//   String commonName;
+//   ...
+// }
+model FoundPlant {
+  id             Int      @id @default(autoincrement()) // Like @Id @GeneratedValue(strategy = IDENTITY)
+  commonName     String                                 // Like @Column String commonName
+  scientificName String                                 // Like @Column String scientificName
+  description    String                                 // Like @Column String description
+  imageUrl       String   @default("")                  // Like @Column String imageUrl = ""
+  route          String                                 // "Irun → San Sebastian"
+  foundAt        DateTime @default(now())               // Like @CreationTimestamp LocalDateTime foundAt
+
+  @@map("found_plants") // Like @Table(name = "found_plants") - table name in snake_case
+}

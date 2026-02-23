@@ -1,0 +1,70 @@
+<a routerLink="/" class="back-link">Volver al inicio</a>
+
+<h2>Nueva ruta</h2>
+
+<form class="route-form" (ngSubmit)="onSearch()">
+  <div class="field">
+    <label for="origin">Origen</label>
+    <input
+      id="origin"
+      type="text"
+      placeholder="Ej: Irun"
+      [ngModel]="origin()"
+      (ngModelChange)="origin.set($event)"
+      name="origin"
+      required
+    />
+  </div>
+
+  <div class="field">
+    <label for="destination">Destino</label>
+    <input
+      id="destination"
+      type="text"
+      placeholder="Ej: San Sebastian"
+      [ngModel]="destination()"
+      (ngModelChange)="destination.set($event)"
+      name="destination"
+      required
+    />
+  </div>
+
+  <button type="submit" class="primary-button" [disabled]="loading()">
+    @if (loading()) {
+      Buscando...
+    } @else {
+      Buscar plantas
+    }
+  </button>
+</form>
+
+@if (error()) {
+  <p class="error-message">{{ error() }}</p>
+}
+
+@if (plants().length > 0) {
+  <section class="results">
+    <h3>Plantas en tu camino</h3>
+
+    @for (plant of plants(); track plant.scientificName) {
+      <article class="plant-card">
+        <img [src]="plant.imageUrl" [alt]="plant.commonName" />
+        <div class="plant-info">
+          <h4>{{ plant.commonName }}</h4>
+          <p class="scientific">{{ plant.scientificName }}</p>
+          <p>{{ plant.description }}</p>
+          <!-- [disabled] makes the button unclickable when the condition is true -->
+          @if (isInCollection(plant)) {
+            <button class="found-button collected" disabled>
+              Ya en tu coleccion
+            </button>
+          } @else {
+            <button class="found-button" (click)="onPlantFound(plant)">
+              La he encontrado!
+            </button>
+          }
+        </div>
+      </article>
+    }
+  </section>
+}

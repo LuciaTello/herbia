@@ -1,0 +1,23 @@
+# Docker Compose: defines the infrastructure your app needs
+# Like application.properties but for services (databases, queues, etc.)
+# Run with: docker compose up -d
+
+services:
+  # PostgreSQL database (same as what you use in Java/Spring projects)
+  postgres:
+    image: postgres:17           # Official PostgreSQL image from Docker Hub
+    container_name: herbia-db    # Name for easy identification (like a hostname)
+    restart: unless-stopped      # Auto-restart if it crashes (like a systemd service)
+    environment:
+      POSTGRES_DB: herbia        # Creates this database on first start
+      POSTGRES_USER: herbia      # The username (like spring.datasource.username)
+      POSTGRES_PASSWORD: herbia  # The password (like spring.datasource.password)
+    ports:
+      - "5432:5432"              # Expose port 5432 on your machine (standard PostgreSQL port)
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Persist data even if container is deleted
+
+# Named volumes: Docker manages the storage location for you
+# This is what makes the data "perenne" (persistent) - survives container restarts and deletions
+volumes:
+  pgdata:

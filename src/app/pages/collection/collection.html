@@ -1,0 +1,25 @@
+<a routerLink="/" class="back-link">Volver al inicio</a>
+
+<h2>Mi coleccion</h2>
+
+@if (collection().length === 0) {
+  <div class="empty">
+    <p>Todavia no has encontrado ninguna planta.</p>
+    <p>Ve a una ruta y empieza a buscar!</p>
+  </div>
+} @else {
+  <div class="collection-list">
+    @for (found of collection(); track found.id) {
+      <article class="found-card">
+        <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
+        <img [src]="found.imageUrl" [alt]="found.commonName" />
+        <div class="found-info">
+          <h4>{{ found.commonName }}</h4>
+          <p class="scientific">{{ found.scientificName }}</p>
+          <p class="route">{{ found.route }}</p>
+          <p class="date">{{ found.foundAt }}</p>
+        </div>
+      </article>
+    }
+  </div>
+}
