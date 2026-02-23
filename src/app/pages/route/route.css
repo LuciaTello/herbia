@@ -173,22 +173,7 @@ h2 {
   margin: 0.5rem 0 0;
 }
 
-.found-button {
-  background: #e17055;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1.25rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  margin-top: 0.75rem;
-}
-
-.found-button:hover {
-  background: #d35400;
-}
-
-.found-button.collected {
-  background: #b2bec3;
-  cursor: default;
+.start-trek-button {
+  width: 100%;
+  margin-top: 1rem;
 }

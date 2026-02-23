@@ -1,11 +1,13 @@
 export interface Translations {
   app: {
     subtitle: string;
+    logout: string;
   };
   home: {
     title: string;
     description: string;
     startRoute: string;
+    myTreks: string;
     myCollection: string;
   };
   route: {
@@ -19,10 +21,19 @@ export interface Translations {
     search: string;
     loadingHint: string;
     resultsTitle: string;
-    alreadyCollected: string;
-    foundIt: string;
+    startTrek: string;
+    saving: string;
     error: string;
     loadingMessages: string[];
+  };
+  myTreks: {
+    back: string;
+    title: string;
+    loading: string;
+    emptyLine1: string;
+    emptyLine2: string;
+    found: string;
+    markFound: string;
   };
   collection: {
     back: string;
@@ -30,6 +41,22 @@ export interface Translations {
     loading: string;
     emptyLine1: string;
     emptyLine2: string;
+  };
+  login: {
+    loginTitle: string;
+    registerTitle: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    passwordLabel: string;
+    passwordPlaceholder: string;
+    loginButton: string;
+    registerButton: string;
+    submitting: string;
+    hasAccount: string;
+    switchToLogin: string;
+    noAccount: string;
+    switchToRegister: string;
+    genericError: string;
   };
 }
 

@@ -3,12 +3,14 @@ import { Translations } from './translations';
 export const FR: Translations = {
   app: {
     subtitle: 'Votre compagnon de découverte des plantes',
+    logout: 'Déconnexion',
   },
   home: {
     title: 'Découvrez les plantes de votre chemin',
     description:
       'Dites-nous où vous partez et où vous allez, et nous vous suggérerons des plantes que vous pourrez trouver en chemin.',
     startRoute: 'Commencer un itinéraire',
+    myTreks: 'Mes treks',
     myCollection: 'Ma collection',
   },
   route: {
@@ -23,8 +25,8 @@ export const FR: Translations = {
     loadingHint:
       'La première recherche peut prendre ~30s (le serveur fait la sieste)',
     resultsTitle: 'Plantes sur votre chemin',
-    alreadyCollected: 'Déjà dans votre collection',
-    foundIt: 'Je l\'ai trouvée !',
+    startTrek: 'Commencer ce trek !',
+    saving: 'Enregistrement...',
     error: 'Erreur lors de la recherche. Vérifiez que le serveur est démarré.',
     loadingMessages: [
       'On interroge les botanistes du chemin...',
@@ -39,11 +41,36 @@ export const FR: Translations = {
       'Déchiffrage du langage des fleurs...',
     ],
   },
+  myTreks: {
+    back: "Retour à l'accueil",
+    title: 'Mes treks',
+    loading: 'Chargement de vos treks...',
+    emptyLine1: "Vous n'avez encore aucun trek.",
+    emptyLine2: 'Partez en itinéraire et commencez à chercher !',
+    found: 'Trouvée',
+    markFound: 'Je l\'ai trouvée !',
+  },
   collection: {
     back: "Retour à l'accueil",
     title: 'Ma collection',
     loading: 'Ouverture de votre herbier...',
     emptyLine1: "Vous n'avez encore trouvé aucune plante.",
     emptyLine2: 'Partez en itinéraire et commencez à chercher !',
+  },
+  login: {
+    loginTitle: 'Se connecter',
+    registerTitle: 'Créer un compte',
+    emailLabel: 'Email',
+    emailPlaceholder: 'votre@email.com',
+    passwordLabel: 'Mot de passe',
+    passwordPlaceholder: 'Minimum 6 caractères',
+    loginButton: 'Se connecter',
+    registerButton: 'Créer un compte',
+    submitting: 'Chargement...',
+    hasAccount: 'Vous avez déjà un compte ? ',
+    switchToLogin: 'Connectez-vous',
+    noAccount: 'Pas encore de compte ? ',
+    switchToRegister: 'Inscrivez-vous',
+    genericError: 'Une erreur est survenue. Réessayez.',
   },
 };

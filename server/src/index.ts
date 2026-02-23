@@ -8,6 +8,9 @@ import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { plantRouter } from './routes/plant.routes';
 import { collectionRouter } from './routes/collection.routes';
+import { trekRouter } from './routes/trek.routes';
+import { authRouter } from './routes/auth.routes';
+import { authMiddleware } from './middleware/auth.middleware';
 import { initPlantService } from './services/plant.service';
 
 // Load .env file (like Spring's application.properties)
@@ -36,9 +39,18 @@ app.use(cors({
 app.use(express.json());
 
 // --- Route registration (like @ComponentScan finding your @RestControllers) ---
+// Think of this as Spring Security's SecurityFilterChain:
+//   .requestMatchers("/api/auth/**").permitAll()
+//   .requestMatchers("/api/**").authenticated()
 
-app.use('/api/plants', plantRouter);
-app.use('/api/collection', collectionRouter(prisma));
+// Public routes (like .permitAll() - no token needed)
+app.use('/api/auth', authRouter(prisma));
+
+// Protected routes (like .authenticated() - authMiddleware checks JWT first)
+// If JWT is invalid, authMiddleware returns 401 and the route handler never runs
+app.use('/api/plants', authMiddleware, plantRouter);
+app.use('/api/collection', authMiddleware, collectionRouter(prisma));
+app.use('/api/treks', authMiddleware, trekRouter(prisma));
 
 // --- Start server (like SpringApplication.run()) ---
 

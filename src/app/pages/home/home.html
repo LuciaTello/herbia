@@ -4,6 +4,11 @@
 </section>
 
 <section class="actions">
-  <a routerLink="/route" class="primary-button">{{ i18n.t().home.startRoute }}</a>
-  <a routerLink="/collection" class="secondary-button">{{ i18n.t().home.myCollection }}</a>
+  @if (auth.isLoggedIn()) {
+    <a routerLink="/route" class="primary-button">{{ i18n.t().home.startRoute }}</a>
+    <a routerLink="/my-treks" class="secondary-button">{{ i18n.t().home.myTreks }}</a>
+    <a routerLink="/collection" class="secondary-button">{{ i18n.t().home.myCollection }}</a>
+  } @else {
+    <a routerLink="/login" class="primary-button">{{ i18n.t().login.loginButton }}</a>
+  }
 </section>

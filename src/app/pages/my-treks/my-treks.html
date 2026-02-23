@@ -1,0 +1,49 @@
+<a routerLink="/" class="back-link">{{ i18n.t().myTreks.back }}</a>
+
+<h2>{{ i18n.t().myTreks.title }}</h2>
+
+@if (loading()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-message">{{ i18n.t().myTreks.loading }}</p>
+  </div>
+} @else if (treks().length === 0) {
+  <div class="empty">
+    <p>{{ i18n.t().myTreks.emptyLine1 }}</p>
+    <p>{{ i18n.t().myTreks.emptyLine2 }}</p>
+  </div>
+} @else {
+  <div class="treks-list">
+    @for (trek of treks(); track trek.id) {
+      <section class="trek-card">
+        <div class="trek-header">
+          <div class="trek-route">
+            <h3>{{ trek.origin }} → {{ trek.destination }}</h3>
+            <p class="trek-date">{{ trek.createdAt | date }}</p>
+          </div>
+          <button class="delete-button" (click)="deleteTrek(trek.id)">&times;</button>
+        </div>
+
+        <div class="trek-plants">
+          @for (plant of trek.plants; track plant.id) {
+            <article class="plant-card" [class.found]="plant.found">
+              <img [src]="plant.imageUrl" [alt]="plant.commonName" />
+              <div class="plant-info">
+                <h4>{{ plant.commonName }}</h4>
+                <p class="scientific">{{ plant.scientificName }}</p>
+                <p class="description">{{ plant.description }}</p>
+                @if (plant.found) {
+                  <span class="found-badge">{{ i18n.t().myTreks.found }}</span>
+                } @else {
+                  <button class="found-button" (click)="markFound(plant.id)">
+                    {{ i18n.t().myTreks.markFound }}
+                  </button>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  </div>
+}

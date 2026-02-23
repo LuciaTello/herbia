@@ -21,7 +21,7 @@
         <div class="found-info">
           <h4>{{ found.commonName }}</h4>
           <p class="scientific">{{ found.scientificName }}</p>
-          <p class="route">{{ found.route }}</p>
+          <p class="route">{{ found.trek?.origin }} → {{ found.trek?.destination }}</p>
           <p class="date">{{ found.foundAt }}</p>
         </div>
       </article>

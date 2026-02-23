@@ -1,0 +1,88 @@
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+h2 {
+  color: #2d7d46;
+  text-align: center;
+  margin: 0 0 1.5rem 0;
+}
+
+.login-form {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #2d3436;
+}
+
+.field input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #2d7d46;
+}
+
+.primary-button {
+  display: block;
+  background: #2d7d46;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.primary-button:hover {
+  background: #236b38;
+}
+
+.primary-button:disabled {
+  background: #b2bec3;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #d63031;
+  text-align: center;
+  background: #ffeaa7;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.toggle-mode {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #636e72;
+}
+
+.toggle-mode a {
+  color: #2d7d46;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.toggle-mode a:hover {
+  text-decoration: underline;
+}

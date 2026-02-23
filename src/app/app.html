@@ -2,7 +2,14 @@
   <header>
     <div class="header-top">
       <h1>herbia</h1>
-      <app-lang-selector />
+      <div class="header-actions">
+        <app-lang-selector />
+        @if (auth.isLoggedIn()) {
+          <button class="logout-button" (click)="auth.logout()">
+            {{ i18n.t().app.logout }}
+          </button>
+        }
+      </div>
     </div>
     <p>{{ i18n.t().app.subtitle }}</p>
   </header>
