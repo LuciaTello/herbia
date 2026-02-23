@@ -1,7 +1,10 @@
 <main>
   <header>
-    <h1>{{ title() }}</h1>
-    <p>Your plant discovery companion</p>
+    <div class="header-top">
+      <h1>herbia</h1>
+      <app-lang-selector />
+    </div>
+    <p>{{ i18n.t().app.subtitle }}</p>
   </header>
 
   <router-outlet />

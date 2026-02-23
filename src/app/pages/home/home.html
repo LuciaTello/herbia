@@ -1,12 +1,9 @@
 <section class="hero">
-  <h2>Descubre las plantas de tu camino</h2>
-  <p>
-    Dinos donde empiezas y a donde vas, y te sugeriremos plantas que puedes
-    encontrar por el camino.
-  </p>
+  <h2>{{ i18n.t().home.title }}</h2>
+  <p>{{ i18n.t().home.description }}</p>
 </section>
 
 <section class="actions">
-  <a routerLink="/route" class="primary-button">Empezar una ruta</a>
-  <a routerLink="/collection" class="secondary-button">Mi coleccion</a>
+  <a routerLink="/route" class="primary-button">{{ i18n.t().home.startRoute }}</a>
+  <a routerLink="/collection" class="secondary-button">{{ i18n.t().home.myCollection }}</a>
 </section>

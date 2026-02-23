@@ -11,11 +11,11 @@ export class PlantService {
   // In prod: 'https://herbia-server.onrender.com/api' (Render URL)
   private readonly apiUrl = `${environment.apiUrl}`;
 
-  async getSuggestedPlants(origin: string, destination: string): Promise<Plant[]> {
+  async getSuggestedPlants(origin: string, destination: string, lang: string): Promise<Plant[]> {
     // firstValueFrom converts an Observable to a Promise (so we can use async/await)
     // This is like calling restTemplate.postForObject() in Spring
     return firstValueFrom(
-      this.http.post<Plant[]>(`${this.apiUrl}/plants/suggest`, { origin, destination })
+      this.http.post<Plant[]>(`${this.apiUrl}/plants/suggest`, { origin, destination, lang })
     );
   }
 }

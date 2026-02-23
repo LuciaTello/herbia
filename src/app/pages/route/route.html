@@ -1,14 +1,14 @@
-<a routerLink="/" class="back-link">Volver al inicio</a>
+<a routerLink="/" class="back-link">{{ i18n.t().route.back }}</a>
 
-<h2>Nueva ruta</h2>
+<h2>{{ i18n.t().route.title }}</h2>
 
 <form class="route-form" (ngSubmit)="onSearch()">
   <div class="field">
-    <label for="origin">Origen</label>
+    <label for="origin">{{ i18n.t().route.originLabel }}</label>
     <input
       id="origin"
       type="text"
-      placeholder="Ej: Irun"
+      [placeholder]="i18n.t().route.originPlaceholder"
       [ngModel]="origin()"
       (ngModelChange)="origin.set($event)"
       name="origin"
@@ -17,11 +17,11 @@
   </div>
 
   <div class="field">
-    <label for="destination">Destino</label>
+    <label for="destination">{{ i18n.t().route.destinationLabel }}</label>
     <input
       id="destination"
       type="text"
-      placeholder="Ej: San Sebastian"
+      [placeholder]="i18n.t().route.destinationPlaceholder"
       [ngModel]="destination()"
       (ngModelChange)="destination.set($event)"
       name="destination"
@@ -31,12 +31,20 @@
 
   <button type="submit" class="primary-button" [disabled]="loading()">
     @if (loading()) {
-      Buscando...
+      {{ i18n.t().route.searching }}
     } @else {
-      Buscar plantas
+      {{ i18n.t().route.search }}
     }
   </button>
 </form>
+
+@if (loading()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-message">{{ loadingMessage() }}</p>
+    <p class="loading-hint">{{ i18n.t().route.loadingHint }}</p>
+  </div>
+}
 
 @if (error()) {
   <p class="error-message">{{ error() }}</p>
@@ -44,7 +52,7 @@
 
 @if (plants().length > 0) {
   <section class="results">
-    <h3>Plantas en tu camino</h3>
+    <h3>{{ i18n.t().route.resultsTitle }}</h3>
 
     @for (plant of plants(); track plant.scientificName) {
       <article class="plant-card">
@@ -53,14 +61,13 @@
           <h4>{{ plant.commonName }}</h4>
           <p class="scientific">{{ plant.scientificName }}</p>
           <p>{{ plant.description }}</p>
-          <!-- [disabled] makes the button unclickable when the condition is true -->
           @if (isInCollection(plant)) {
             <button class="found-button collected" disabled>
-              Ya en tu coleccion
+              {{ i18n.t().route.alreadyCollected }}
             </button>
           } @else {
             <button class="found-button" (click)="onPlantFound(plant)">
-              La he encontrado!
+              {{ i18n.t().route.foundIt }}
             </button>
           }
         </div>

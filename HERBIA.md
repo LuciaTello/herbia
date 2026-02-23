@@ -8,8 +8,8 @@
 identificar plantas a lo largo de su camino. El nombre es un juego de palabras entre "herbe"
 (hierba/planta en frances) e "IA" (Inteligencia Artificial).
 
-El caso de uso principal: Estas caminando el **Camino de Santiago** (o cualquier ruta de viaje).
-Le dices a la app donde estas y a donde vas hoy. La app usa IA para sugerirte 3-4 plantas que
+El caso de uso principal: Estás caminando el **Camino de Santiago** (o cualquier ruta de viaje).
+Le dices a la app donde estás y a donde vas hoy. La app usa IA para sugerirte 3-4 plantas que
 probablemente encuentres por el camino. Durante tu caminata, puedes fotografiar las plantas que
 encuentres, y la IA te dira si has encontrado la correcta.
 
