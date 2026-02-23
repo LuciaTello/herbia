@@ -47,7 +47,7 @@ app.use(express.static(angularDist));
 
 // For any route not starting with /api, serve Angular's index.html
 // This lets Angular Router handle client-side routing (like /route, /collection)
-app.get('*', (_req, res) => {
+app.get('{*path}', (_req, res) => {
   res.sendFile(path.join(angularDist, 'index.html'));
 });
 
