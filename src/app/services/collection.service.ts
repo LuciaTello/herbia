@@ -2,11 +2,12 @@ import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { FoundPlant, Plant } from '../models/plant.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class CollectionService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/collection';
+  private readonly apiUrl = `${environment.apiUrl}/collection`;
 
   // The signal still holds the local "cache" of the collection for instant UI updates
   // But the source of truth is now PostgreSQL, not localStorage

@@ -3,7 +3,6 @@
 
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import dotenv from 'dotenv';
 import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -29,27 +28,17 @@ const prisma = new PrismaClient({ adapter });
 
 // --- Middleware (like Spring filters) ---
 
-app.use(cors());
+// CORS: allow the frontend (Cloudflare Pages) to call this backend (Render)
+// In Spring this would be @CrossOrigin or a CorsFilter
+app.use(cors({
+  origin: process.env['FRONTEND_URL'] || 'http://localhost:4200',
+}));
 app.use(express.json());
 
 // --- Route registration (like @ComponentScan finding your @RestControllers) ---
-// app.use('/prefix', router) mounts a router at a path prefix
-// So plantRouter's '/suggest' becomes '/api/plants/suggest'
 
 app.use('/api/plants', plantRouter);
-app.use('/api/collection', collectionRouter(prisma)); // We inject prisma here!
-
-// --- Serve Angular frontend in production ---
-// In dev, Angular CLI serves the frontend (ng serve + proxy)
-// In prod, Express serves the compiled Angular files directly
-const angularDist = path.join(__dirname, '../../dist/untitled/browser');
-app.use(express.static(angularDist));
-
-// For any route not starting with /api, serve Angular's index.html
-// This lets Angular Router handle client-side routing (like /route, /collection)
-app.get('{*path}', (_req, res) => {
-  res.sendFile(path.join(angularDist, 'index.html'));
-});
+app.use('/api/collection', collectionRouter(prisma));
 
 // --- Start server (like SpringApplication.run()) ---
 
