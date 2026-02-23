@@ -6,14 +6,24 @@ export interface Plant {
   imageUrl: string;
 }
 
-// FoundPlant: what PostgreSQL returns (a saved plant, with id and metadata)
-// Flat structure that matches the database table directly (like a JPA entity)
-export interface FoundPlant {
+// SuggestedPlant: a plant tied to a trek in PostgreSQL (with found state)
+export interface SuggestedPlant {
   id: number;
   commonName: string;
   scientificName: string;
   description: string;
   imageUrl: string;
-  route: string;
-  foundAt: string;
+  found: boolean;
+  foundAt: string | null;
+  trekId: number;
+  trek?: { origin: string; destination: string };
+}
+
+// Trek: a search (origin → destination) with its suggested plants
+export interface Trek {
+  id: number;
+  origin: string;
+  destination: string;
+  createdAt: string;
+  plants: SuggestedPlant[];
 }

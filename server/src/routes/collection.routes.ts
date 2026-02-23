@@ -1,18 +1,24 @@
 // CollectionRoutes: like a @RestController for the plant collection in Spring
-// Handles CRUD operations, delegates database access to Prisma
+// The collection = all SuggestedPlants where found=true (your herbarium)
 
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
 
 // We receive prisma as a parameter (like constructor injection with @Autowired in Spring)
-// This is a function that RETURNS a router, not a router directly
 export function collectionRouter(prisma: PrismaClient): Router {
   const router = Router();
 
-  // GET /api/collection - like @GetMapping + repository.findAll()
-  router.get('/', async (_req, res) => {
+  // GET /api/collection - all found plants across all treks for this user
+  router.get('/', async (req, res) => {
     try {
-      const plants = await prisma.foundPlant.findMany({
+      const plants = await prisma.suggestedPlant.findMany({
+        where: {
+          found: true,
+          trek: { userId: req.userId! },
+        },
+        include: {
+          trek: { select: { origin: true, destination: true } },
+        },
         orderBy: { foundAt: 'desc' },
       });
       res.json(plants);
@@ -22,29 +28,32 @@ export function collectionRouter(prisma: PrismaClient): Router {
     }
   });
 
-  // POST /api/collection - like @PostMapping + repository.save()
-  router.post('/', async (req, res) => {
-    try {
-      const { commonName, scientificName, description, imageUrl, route } = req.body;
-      const plant = await prisma.foundPlant.create({
-        data: { commonName, scientificName, description, imageUrl, route },
-      });
-      res.status(201).json(plant);
-    } catch (error) {
-      console.error('Error adding to collection:', error);
-      res.status(500).json({ error: 'Failed to add plant to collection' });
-    }
-  });
-
-  // DELETE /api/collection/:id - like @DeleteMapping("/{id}") + repository.deleteById()
+  // DELETE /api/collection/:id - soft-toggle: mark plant as not found
+  // Like a soft delete - we don't remove the plant, just reset its found state
   router.delete('/:id', async (req, res) => {
     try {
       const id = parseInt(req.params['id']);
-      await prisma.foundPlant.delete({ where: { id } });
+
+      // Verify ownership via trek.userId
+      const plant = await prisma.suggestedPlant.findUnique({
+        where: { id },
+        include: { trek: { select: { userId: true } } },
+      });
+
+      if (!plant || plant.trek.userId !== req.userId!) {
+        res.status(404).json({ error: 'Plant not found' });
+        return;
+      }
+
+      await prisma.suggestedPlant.update({
+        where: { id },
+        data: { found: false, foundAt: null },
+      });
+
       res.status(204).send();
     } catch (error) {
-      console.error('Error deleting from collection:', error);
-      res.status(500).json({ error: 'Failed to delete plant from collection' });
+      console.error('Error removing from collection:', error);
+      res.status(500).json({ error: 'Failed to remove plant from collection' });
     }
   });
 

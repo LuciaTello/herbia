@@ -61,17 +61,20 @@
           <h4>{{ plant.commonName }}</h4>
           <p class="scientific">{{ plant.scientificName }}</p>
           <p>{{ plant.description }}</p>
-          @if (isInCollection(plant)) {
-            <button class="found-button collected" disabled>
-              {{ i18n.t().route.alreadyCollected }}
-            </button>
-          } @else {
-            <button class="found-button" (click)="onPlantFound(plant)">
-              {{ i18n.t().route.foundIt }}
-            </button>
-          }
         </div>
       </article>
     }
+
+    <button
+      class="primary-button start-trek-button"
+      (click)="onStartTrek()"
+      [disabled]="saving()"
+    >
+      @if (saving()) {
+        {{ i18n.t().route.saving }}
+      } @else {
+        {{ i18n.t().route.startTrek }}
+      }
+    </button>
   </section>
 }

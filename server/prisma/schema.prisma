@@ -10,22 +10,54 @@ datasource db {
   provider = "postgresql"
 }
 
-// This is like:
-// @Entity
-// @Table(name = "found_plants")
-// public class FoundPlant {
-//   @Id @GeneratedValue Long id;
-//   String commonName;
-//   ...
-// }
-model FoundPlant {
-  id             Int      @id @default(autoincrement()) // Like @Id @GeneratedValue(strategy = IDENTITY)
-  commonName     String                                 // Like @Column String commonName
-  scientificName String                                 // Like @Column String scientificName
-  description    String                                 // Like @Column String description
-  imageUrl       String   @default("")                  // Like @Column String imageUrl = ""
-  route          String                                 // "Irun → San Sebastian"
-  foundAt        DateTime @default(now())               // Like @CreationTimestamp LocalDateTime foundAt
+// Like @Entity User in JPA
+// In Spring Security, this is often called "AppUser" to avoid conflicts
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique                        // Like @Column(unique = true)
+  passwordHash String   @map("password_hash")          // NEVER store plain passwords!
+  createdAt    DateTime @default(now())
 
-  @@map("found_plants") // Like @Table(name = "found_plants") - table name in snake_case
+  // One-to-many: a user has many treks
+  // Like @OneToMany(mappedBy = "user") List<Trek> treks;
+  treks        Trek[]
+
+  @@map("users")
+}
+
+// A trek represents a search (origin → destination) with its suggested plants
+// Like @Entity Trek in JPA
+model Trek {
+  id          Int              @id @default(autoincrement())
+  origin      String
+  destination String
+  createdAt   DateTime         @default(now())
+
+  // Foreign key to User
+  userId      Int              @map("user_id")
+  user        User             @relation(fields: [userId], references: [id])
+
+  // One-to-many: a trek has many suggested plants
+  // cascade delete handled by Prisma (onDelete: Cascade)
+  plants      SuggestedPlant[]
+
+  @@map("treks")
+}
+
+// A plant suggested by Gemini for a specific trek
+// Like @Entity SuggestedPlant in JPA
+model SuggestedPlant {
+  id             Int       @id @default(autoincrement())
+  commonName     String
+  scientificName String
+  description    String
+  imageUrl       String    @default("")
+  found          Boolean   @default(false)
+  foundAt        DateTime?
+
+  // Foreign key to Trek (like @ManyToOne @JoinColumn(name = "trek_id") Trek trek;)
+  trekId         Int       @map("trek_id")
+  trek           Trek      @relation(fields: [trekId], references: [id], onDelete: Cascade)
+
+  @@map("suggested_plants")
 }

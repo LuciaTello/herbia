@@ -3,12 +3,14 @@ import { Translations } from './translations';
 export const ES: Translations = {
   app: {
     subtitle: 'Tu compañera de descubrimiento de plantas',
+    logout: 'Salir',
   },
   home: {
     title: 'Descubre las plantas de tu camino',
     description:
       'Dinos donde empiezas y a donde vas, y te sugeriremos plantas que puedes encontrar por el camino.',
     startRoute: 'Empezar una ruta',
+    myTreks: 'Mis treks',
     myCollection: 'Mi colección',
   },
   route: {
@@ -23,8 +25,8 @@ export const ES: Translations = {
     loadingHint:
       'La primera búsqueda puede tardar ~30s (el servidor duerme la siesta)',
     resultsTitle: 'Plantas en tu camino',
-    alreadyCollected: 'Ya en tu colección',
-    foundIt: '¡La he encontrado!',
+    startTrek: '¡Empezar esta ruta!',
+    saving: 'Guardando...',
     error: 'Error al buscar plantas. Verifica que el servidor está arrancado.',
     loadingMessages: [
       'Preguntando a los botánicos del camino...',
@@ -39,11 +41,36 @@ export const ES: Translations = {
       'Descifrando el lenguaje de las flores...',
     ],
   },
+  myTreks: {
+    back: 'Volver al inicio',
+    title: 'Mis treks',
+    loading: 'Cargando tus treks...',
+    emptyLine1: 'Todavía no tienes ningún trek.',
+    emptyLine2: '¡Ve a una ruta y empieza a buscar!',
+    found: 'Encontrada',
+    markFound: '¡La he encontrado!',
+  },
   collection: {
     back: 'Volver al inicio',
     title: 'Mi colección',
     loading: 'Abriendo tu herbario...',
     emptyLine1: 'Todavía no has encontrado ninguna planta.',
     emptyLine2: '¡Ve a una ruta y empieza a buscar!',
+  },
+  login: {
+    loginTitle: 'Iniciar sesión',
+    registerTitle: 'Crear cuenta',
+    emailLabel: 'Email',
+    emailPlaceholder: 'tu@email.com',
+    passwordLabel: 'Contraseña',
+    passwordPlaceholder: 'Mínimo 6 caracteres',
+    loginButton: 'Entrar',
+    registerButton: 'Crear cuenta',
+    submitting: 'Cargando...',
+    hasAccount: '¿Ya tienes cuenta? ',
+    switchToLogin: 'Inicia sesión',
+    noAccount: '¿No tienes cuenta? ',
+    switchToRegister: 'Regístrate',
+    genericError: 'Ha ocurrido un error. Inténtalo de nuevo.',
   },
 };
