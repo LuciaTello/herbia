@@ -1,10 +1,10 @@
-# her-b-ia
+# herbia
 
 > Tu companera de descubrimiento botanico para viajeros y peregrinos.
 
 ## Vision del Proyecto
 
-**her-b-ia** es una aplicacion web adaptada a moviles que ayuda a los viajeros a descubrir e
+**herbia** es una aplicacion web adaptada a moviles que ayuda a los viajeros a descubrir e
 identificar plantas a lo largo de su camino. El nombre es un juego de palabras entre "herbe"
 (hierba/planta en frances) e "IA" (Inteligencia Artificial).
 
@@ -95,7 +95,7 @@ Es como una **busqueda del tesoro botanica** impulsada por IA.
 
 ```
 ┌─────────────────────────────────────────────────┐
-│                  her-b-ia App                    │
+│                  herbia App                    │
 ├─────────────────────────────────────────────────┤
 │                                                 │
 │  ┌──────────┐  ┌──────────┐  ┌──────────────┐  │
@@ -216,7 +216,7 @@ src/
   - Router preconfigurado
 - Creada la documentacion del proyecto (este fichero)
 - Creado el curriculum de aprendizaje (LEARNING.md)
-- Renombrado el proyecto de "untitled" a "her-b-ia" en todos los ficheros
+- Renombrado el proyecto de "untitled" a "herbia" en todos los ficheros
 - Reemplazado el template placeholder por pagina de bienvenida propia
 - Creado componente `HomePage` (`/`) con botones de navegacion
 - Creado componente `RoutePage` (`/route`) con formulario origen/destino

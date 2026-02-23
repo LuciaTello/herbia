@@ -2,7 +2,7 @@
 
 **Alumno:** Desarrollador Backend Senior en Java
 **Objetivo:** Convertirse en desarrollador fullstack con Angular/TypeScript
-**Proyecto:** her-b-ia (app guia de plantas)
+**Proyecto:** herbia (app guia de plantas)
 **Inicio:** 2026-02-22
 **Idioma del curso:** Espanol (el codigo siempre en ingles)
 
@@ -148,7 +148,7 @@ Cada tema se marcara como completado a medida que lo aprendamos en nuestras sesi
 
 ### Modulo 5: Trabajando con APIs de IA
 
-> **Por que es importante:** her-b-ia usa IA para sugerencias y reconocimiento de plantas.
+> **Por que es importante:** herbia usa IA para sugerencias y reconocimiento de plantas.
 > Aprenderas a llamar APIs externas desde Angular.
 
 - [ ] **5.1 Integracion con APIs REST**
@@ -163,11 +163,11 @@ Cada tema se marcara como completado a medida que lo aprendamos en nuestras sesi
 
 ### Modulo 6: Movil y PWA
 
-> **Por que es importante:** Quieres que her-b-ia funcione en moviles durante las caminatas.
+> **Por que es importante:** Quieres que herbia funcione en moviles durante las caminatas.
 > PWA (Progressive Web App) hace que una app web se sienta como una app nativa.
 
 - [ ] **6.1 Progressive Web App (PWA)**
-  - Que es una PWA y por que es perfecta para her-b-ia
+  - Que es una PWA y por que es perfecta para herbia
   - Service Workers (capacidad offline)
   - App manifest (instalable en el movil)
   - Estrategias de almacenamiento offline
@@ -239,7 +239,7 @@ Cada tema se marcara como completado a medida que lo aprendamos en nuestras sesi
 - Creamos la documentacion del proyecto (HER-B-IA.md)
 - Creamos este curriculum de aprendizaje (LEARNING.md)
 - Discutimos los objetivos del proyecto y la arquitectura
-- Renombramos el proyecto de "untitled" a "her-b-ia" en 5 ficheros
+- Renombramos el proyecto de "untitled" a "herbia" en 5 ficheros
 - Reemplazamos el template placeholder de Angular por nuestra propia pagina de bienvenida
 - Anadimos estilos CSS basicos al componente raiz
 
@@ -271,7 +271,7 @@ Cada tema se marcara como completado a medida que lo aprendamos en nuestras sesi
 - Mirar `src/app/app.css` y entender como `:host`, `margin: 0 auto` y `rem` funcionan
 
 **Preguntas para reflexionar:**
-1. En `app.ts`, por que usamos `signal('her-b-ia')` en vez de simplemente `title = 'her-b-ia'`?
+1. En `app.ts`, por que usamos `signal('herbia')` en vez de simplemente `title = 'herbia'`?
 2. En `app.config.ts`, a que te recuerda `provideRouter(routes)` en Spring?
 3. Cual es el papel de `app.html`? A que concepto de Java se parece? (Pista: piensa en JSP/Thymeleaf)
 4. Por que los estilos en `app.css` solo afectan a este componente y no a toda la pagina?
