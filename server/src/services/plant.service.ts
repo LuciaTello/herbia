@@ -10,7 +10,13 @@ let model: GenerativeModel;
 
 // --- Private functions (not exported = private, like private methods in Java) ---
 
-function buildPlantPrompt(origin: string, destination: string): string {
+const LANG_NAMES: Record<string, string> = {
+  es: 'Spanish',
+  fr: 'French',
+};
+
+function buildPlantPrompt(origin: string, destination: string, lang: string): string {
+  const langName = LANG_NAMES[lang] || 'Spanish';
   return `You are a botanist expert on the flora in Europe.
 A pilgrim is walking from ${origin} to ${destination} (likely on the Camino de Santiago or a similar route).
 
@@ -20,9 +26,9 @@ Consider the region, climate, and typical vegetation.
 Respond ONLY with a JSON array (no markdown, no backticks, no explanation), with this exact format:
 [
   {
-    "commonName": "name in Spanish",
+    "commonName": "name in ${langName}",
     "scientificName": "Latin name",
-    "description": "Brief description in Spanish (2-3 sentences). Mention what it looks like and where to find it."
+    "description": "Brief description in ${langName} (2-3 sentences). Mention what it looks like and where to find it."
   }
 ]`;
 }
@@ -57,8 +63,8 @@ export function initPlantService(apiKey: string): void {
   model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 }
 
-export async function getSuggestedPlants(origin: string, destination: string): Promise<any[]> {
-  const prompt = buildPlantPrompt(origin, destination);
+export async function getSuggestedPlants(origin: string, destination: string, lang: string = 'es'): Promise<any[]> {
+  const prompt = buildPlantPrompt(origin, destination, lang);
   const result = await model.generateContent(prompt);
   const text = result.response.text();
   const plants = JSON.parse(text);

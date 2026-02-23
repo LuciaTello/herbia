@@ -1,11 +1,16 @@
-<a routerLink="/" class="back-link">Volver al inicio</a>
+<a routerLink="/" class="back-link">{{ i18n.t().collection.back }}</a>
 
-<h2>Mi coleccion</h2>
+<h2>{{ i18n.t().collection.title }}</h2>
 
-@if (collection().length === 0) {
+@if (loading()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-message">{{ i18n.t().collection.loading }}</p>
+  </div>
+} @else if (collection().length === 0) {
   <div class="empty">
-    <p>Todavia no has encontrado ninguna planta.</p>
-    <p>Ve a una ruta y empieza a buscar!</p>
+    <p>{{ i18n.t().collection.emptyLine1 }}</p>
+    <p>{{ i18n.t().collection.emptyLine2 }}</p>
   </div>
 } @else {
   <div class="collection-list">
