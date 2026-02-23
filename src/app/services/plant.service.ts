@@ -7,7 +7,9 @@ import { Plant } from '../models/plant.model';
 export class PlantService {
   // HttpClient is like Java's RestTemplate / WebClient
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api';
+  // Relative URL: in production, Angular and Express run on the same server
+  // In local dev, Angular CLI proxies /api to localhost:3000 (see proxy.conf.json)
+  private readonly apiUrl = '/api';
 
   async getSuggestedPlants(origin: string, destination: string): Promise<Plant[]> {
     // firstValueFrom converts an Observable to a Promise (so we can use async/await)

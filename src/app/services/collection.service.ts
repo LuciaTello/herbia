@@ -6,7 +6,7 @@ import { FoundPlant, Plant } from '../models/plant.model';
 @Injectable({ providedIn: 'root' })
 export class CollectionService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api/collection';
+  private readonly apiUrl = '/api/collection';
 
   // The signal still holds the local "cache" of the collection for instant UI updates
   // But the source of truth is now PostgreSQL, not localStorage

@@ -3,6 +3,7 @@
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import dotenv from 'dotenv';
 import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -37,6 +38,18 @@ app.use(express.json());
 
 app.use('/api/plants', plantRouter);
 app.use('/api/collection', collectionRouter(prisma)); // We inject prisma here!
+
+// --- Serve Angular frontend in production ---
+// In dev, Angular CLI serves the frontend (ng serve + proxy)
+// In prod, Express serves the compiled Angular files directly
+const angularDist = path.join(__dirname, '../../dist/untitled/browser');
+app.use(express.static(angularDist));
+
+// For any route not starting with /api, serve Angular's index.html
+// This lets Angular Router handle client-side routing (like /route, /collection)
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(angularDist, 'index.html'));
+});
 
 // --- Start server (like SpringApplication.run()) ---
 
