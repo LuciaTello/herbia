@@ -2,6 +2,7 @@
 export interface Plant {
   commonName: string;
   scientificName: string;
+  chancePercent: number;
   description: string;
   imageUrl: string;
 }
@@ -11,6 +12,7 @@ export interface SuggestedPlant {
   id: number;
   commonName: string;
   scientificName: string;
+  chancePercent: number;
   description: string;
   imageUrl: string;
   found: boolean;

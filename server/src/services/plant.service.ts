@@ -17,18 +17,24 @@ const LANG_NAMES: Record<string, string> = {
 
 function buildPlantPrompt(origin: string, destination: string, lang: string): string {
   const langName = LANG_NAMES[lang] || 'Spanish';
-  return `You are a botanist expert on the flora in Europe.
+  return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
 A pilgrim is walking from ${origin} to ${destination} (likely on the Camino de Santiago or a similar route).
 
-Suggest exactly 3 plants that are common and easy to find along this path.
+Suggest exactly 10 plants that can be found along this path.
 Consider the region, climate, and typical vegetation.
+
+For each plant, estimate a realistic percentage chance (0-100%) that a pilgrim would actually spot it on this specific route.
+Sort the results in ASCENDING order by this percentage (rarest first, most common last).
+
+The description should be informative but also fun and slightly humorous — a joke, a pun, a witty remark about the plant or the pilgrim's suffering. Keep it light but still useful.
 
 Respond ONLY with a JSON array (no markdown, no backticks, no explanation), with this exact format:
 [
   {
     "commonName": "name in ${langName}",
     "scientificName": "Latin name",
-    "description": "Brief description in ${langName} (2-3 sentences). Mention what it looks like and where to find it."
+    "chancePercent": 42,
+    "description": "Brief description in ${langName} (2-3 sentences). Mention what it looks like, where to find it, and include a touch of humor."
   }
 ]`;
 }

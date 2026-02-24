@@ -28,6 +28,7 @@ export function trekRouter(prisma: PrismaClient): Router {
               scientificName: p.scientificName,
               description: p.description,
               imageUrl: p.imageUrl || '',
+              chancePercent: p.chancePercent || 0,
             })),
           },
         },

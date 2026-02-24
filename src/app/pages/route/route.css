@@ -166,6 +166,13 @@ h2 {
   margin: 0.25rem 0;
 }
 
+.plant-info .chance {
+  color: #e17055;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
 .plant-info p {
   font-size: 0.875rem;
   color: #636e72;
