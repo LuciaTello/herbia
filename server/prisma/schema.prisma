@@ -52,6 +52,7 @@ model SuggestedPlant {
   scientificName String
   description    String
   imageUrl       String    @default("")
+  chancePercent  Int       @default(0)    @map("chance_percent")
   found          Boolean   @default(false)
   foundAt        DateTime?
 

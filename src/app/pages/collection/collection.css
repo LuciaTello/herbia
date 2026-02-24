@@ -104,6 +104,13 @@ h2 {
   margin: 0.25rem 0 0;
 }
 
+.found-info .chance {
+  color: #e17055;
+  font-weight: 600;
+  font-size: 0.8rem;
+  margin: 0.25rem 0 0;
+}
+
 .found-info .route {
   color: #2d7d46;
   font-size: 0.875rem;

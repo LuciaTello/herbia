@@ -31,6 +31,7 @@
               <div class="plant-info">
                 <h4>{{ plant.commonName }}</h4>
                 <p class="scientific">{{ plant.scientificName }}</p>
+                <p class="chance">{{ plant.chancePercent }}%</p>
                 <p class="description">{{ plant.description }}</p>
                 @if (plant.found) {
                   <span class="found-badge">{{ i18n.t().myTreks.found }}</span>
