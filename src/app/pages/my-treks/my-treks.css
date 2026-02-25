@@ -122,14 +122,12 @@ h2 {
   background: #e8f5e9;
 }
 
-.photo-strip {
-  display: flex;
-  gap: 0.25rem;
-  overflow-x: auto;
+.plant-thumbnail {
   flex-shrink: 0;
+  cursor: pointer;
 }
 
-.photo-strip img {
+.plant-thumbnail img {
   width: 70px;
   height: 70px;
   border-radius: 8px;

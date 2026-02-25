@@ -55,7 +55,10 @@ async function getINaturalistImages(scientificName: string): Promise<string[]> {
   try {
     const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(scientificName)}&photos=true&per_page=5&quality_grade=research&order_by=votes`;
     const response = await fetch(url);
-    if (!response.ok) { return []; }
+    if (!response.ok) {
+      console.warn(`iNaturalist returned ${response.status} for "${scientificName}"`);
+      return [];
+    }
     const data = await response.json();
 
     // Each observation has a photos array; take the first photo from each observation
@@ -67,13 +70,16 @@ async function getINaturalistImages(scientificName: string): Promise<string[]> {
         urls.push(photo.url.replace('square', 'medium'));
       }
     }
+    console.log(`iNaturalist: ${urls.length} photos for "${scientificName}"`);
     return urls;
-  } catch {
+  } catch (e) {
+    console.error(`iNaturalist error for "${scientificName}":`, e);
     return [];
   }
 }
 
 async function enrichPlantsWithImages(plants: any[]): Promise<any[]> {
+  if (!Array.isArray(plants)) return [];
   return Promise.all(
     plants.map(async (plant: any) => {
       const imageUrls = await getINaturalistImages(plant.scientificName);

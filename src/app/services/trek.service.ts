@@ -46,6 +46,13 @@ export class TrekService {
     );
   }
 
+  // Update a trek's plants in the local signal (used for client-side image enrichment)
+  updateTrekPlants(trekId: number, plants: any[]): void {
+    this.treks.update(list =>
+      list.map(trek => trek.id === trekId ? { ...trek, plants } : trek)
+    );
+  }
+
   async deleteTrek(id: number): Promise<void> {
     await firstValueFrom(
       this.http.delete(`${this.apiUrl}/${id}`)
