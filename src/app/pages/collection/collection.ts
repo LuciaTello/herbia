@@ -4,6 +4,7 @@ import { PlantPhoto } from '../../models/plant.model';
 import { CollectionService } from '../../services/collection.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
+import { getRarity } from '../../utils/rarity';
 
 @Component({
   selector: 'app-collection',
@@ -18,6 +19,8 @@ export class CollectionPage implements OnInit {
   protected readonly loading = signal(true);
   protected readonly galleryImages = signal<string[]>([]);
   protected readonly galleryPlantName = signal('');
+
+  protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
 
   async ngOnInit(): Promise<void> {
     try {

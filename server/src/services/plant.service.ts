@@ -27,33 +27,35 @@ function buildPlantPrompt(origin: string, destination: string, lang: string, mon
   const langName = LANG_NAMES[lang] || 'Spanish';
   const monthName = MONTH_NAMES[month];
 
-  const travelerName = lang === 'fr' ? 'voyageuse' : 'viajera';
-
   const exclusionBlock = exclude.length > 0
-    ? `\n\nIMPORTANT: The ${travelerName} has already found these species on previous treks. Do NOT suggest any of them:\n${exclude.join(', ')}\n`
+    ? `\n\nIMPORTANT: The traveler has already found these species on previous treks. Do NOT suggest any of them:\n${exclude.join(', ')}\n`
     : '';
 
   return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
-A ${travelerName} (female traveler) is walking from ${origin} to ${destination} (likely on the Camino de Santiago or a similar route).
+A person is walking from ${origin} to ${destination}.
 The current month is ${monthName}. Only suggest plants that are visible, blooming, or identifiable during this time of year.
-IMPORTANT: Always use feminine gender when referring to the traveler ("${travelerName}") in ${langName} text.
+IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
 ${exclusionBlock}
 Suggest exactly 10 plants that can be found along this path in ${monthName}.
 Consider the region, climate, season, and typical vegetation.
 
-For each plant, estimate a realistic percentage chance (0-100%) that the ${travelerName} would actually spot it on this specific route.
-Sort the results in DESCENDING order by this percentage (most common first, rarest last).
+For each plant, assign a rarity category:
+- "common": easy to find, you'll likely spot it without trying
+- "rare": you'll need to look carefully
+- "veryRare": with a bit of luck you might find it
 
-The description should be informative but also fun and slightly humorous — a joke, a pun, a witty remark about the plant or the ${travelerName}'s suffering. Keep it light but still useful.
+Sort the results from most common to rarest.
+
+The description should be informative but also fun and slightly humorous — a joke, a pun, a witty remark about the plant or the user's suffering. Keep it light but still useful.
 
 Respond ONLY with a JSON object (no markdown, no backticks, no explanation), with this exact format:
 {
-  "description": "A brief overview in ${langName} (2-3 sentences) about the general vegetation and conditions along this route in ${monthName}. Is it lush? Dry? What should the ${travelerName} expect?",
+  "description": "A brief overview in ${langName} (2-3 sentences) about the general vegetation and conditions along this route in ${monthName}. Is it lush? Dry? What should the user expect?",
   "plants": [
     {
       "commonName": "name in ${langName}",
       "scientificName": "Latin name",
-      "chancePercent": 42,
+      "rarity": "common",
       "description": "Brief description in ${langName} (2-3 sentences). Mention what it looks like, where to find it, and include a touch of humor."
     }
   ]

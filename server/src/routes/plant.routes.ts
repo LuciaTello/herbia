@@ -28,8 +28,15 @@ export function plantRouter(prisma: PrismaClient): Router {
       const exclude = existing.map(p => p.scientificName);
 
       const result = await getSuggestedPlants(origin, destination, lang || 'es', undefined, exclude);
-      // Return description + plants (plants already come with photos[], filtered)
-      res.json({ description: result.description, plants: result.plants || [] });
+
+      // Hard filter: remove any plant whose scientificName is already in the user's collection
+      // (the LLM prompt asks to exclude them, but it can ignore the instruction)
+      const excludeLower = new Set(exclude.map(name => name.toLowerCase()));
+      const filteredPlants = (result.plants || [])
+        .filter((p: any) => !excludeLower.has(p.scientificName.toLowerCase()))
+        .sort((a: any, b: any) => (a.rarity || 'common').localeCompare(b.rarity || 'common'));
+
+      res.json({ description: result.description, plants: filteredPlants });
     } catch (error) {
       console.error('Error calling Gemini:', error);
       res.status(500).json({ error: 'Failed to get plant suggestions' });

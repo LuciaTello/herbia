@@ -58,6 +58,11 @@ export const FR: Translations = {
     emptyLine1: "Vous n'avez encore trouvé aucune plante.",
     emptyLine2: 'Partez en itinéraire et commencez à chercher !',
   },
+  rarity: {
+    common: 'Commun',
+    rare: 'Rare',
+    veryRare: 'Très rare',
+  },
   login: {
     loginTitle: 'Se connecter',
     registerTitle: 'Créer un compte',
