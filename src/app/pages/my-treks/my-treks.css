@@ -96,6 +96,14 @@ h2 {
   color: #d63031;
 }
 
+.trek-description {
+  color: #636e72;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin: 0 0 1rem;
+  font-style: italic;
+}
+
 .trek-plants {
   display: flex;
   flex-direction: column;

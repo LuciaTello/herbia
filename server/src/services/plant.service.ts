@@ -15,28 +15,38 @@ const LANG_NAMES: Record<string, string> = {
   fr: 'French',
 };
 
-function buildPlantPrompt(origin: string, destination: string, lang: string): string {
+const MONTH_NAMES = [
+  '', 'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+function buildPlantPrompt(origin: string, destination: string, lang: string, month: number): string {
   const langName = LANG_NAMES[lang] || 'Spanish';
+  const monthName = MONTH_NAMES[month];
   return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
 A pilgrim is walking from ${origin} to ${destination} (likely on the Camino de Santiago or a similar route).
+The current month is ${monthName}. Only suggest plants that are visible, blooming, or identifiable during this time of year.
 
-Suggest exactly 10 plants that can be found along this path.
-Consider the region, climate, and typical vegetation.
+Suggest exactly 10 plants that can be found along this path in ${monthName}.
+Consider the region, climate, season, and typical vegetation.
 
 For each plant, estimate a realistic percentage chance (0-100%) that a pilgrim would actually spot it on this specific route.
-Sort the results in ASCENDING order by this percentage (rarest first, most common last).
+Sort the results in DESCENDING order by this percentage (most common first, rarest last).
 
 The description should be informative but also fun and slightly humorous — a joke, a pun, a witty remark about the plant or the pilgrim's suffering. Keep it light but still useful.
 
-Respond ONLY with a JSON array (no markdown, no backticks, no explanation), with this exact format:
-[
-  {
-    "commonName": "name in ${langName}",
-    "scientificName": "Latin name",
-    "chancePercent": 42,
-    "description": "Brief description in ${langName} (2-3 sentences). Mention what it looks like, where to find it, and include a touch of humor."
-  }
-]`;
+Respond ONLY with a JSON object (no markdown, no backticks, no explanation), with this exact format:
+{
+  "description": "A brief overview in ${langName} (2-3 sentences) about the general vegetation and conditions along this route in ${monthName}. Is it lush? Dry? What should the pilgrim expect?",
+  "plants": [
+    {
+      "commonName": "name in ${langName}",
+      "scientificName": "Latin name",
+      "chancePercent": 42,
+      "description": "Brief description in ${langName} (2-3 sentences). Mention what it looks like, where to find it, and include a touch of humor."
+    }
+  ]
+}`;
 }
 
 async function getWikipediaImage(scientificName: string): Promise<string> {
@@ -69,10 +79,19 @@ export function initPlantService(apiKey: string): void {
   model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 }
 
-export async function getSuggestedPlants(origin: string, destination: string, lang: string = 'es'): Promise<any[]> {
-  const prompt = buildPlantPrompt(origin, destination, lang);
+export interface SuggestedPlantsResult {
+  description: string;
+  plants: any[];
+}
+
+export async function getSuggestedPlants(origin: string, destination: string, lang: string = 'es', month?: number): Promise<SuggestedPlantsResult> {
+  // getMonth() returns 0-11 (Jan=0), so +1 to get 1-12 like our DB stores
+  const currentMonth = month || (new Date().getMonth() + 1);
+  const prompt = buildPlantPrompt(origin, destination, lang, currentMonth);
   const result = await model.generateContent(prompt);
-  const text = result.response.text();
-  const plants = JSON.parse(text);
-  return enrichPlantsWithImages(plants);
+  // Gemini sometimes wraps JSON in ```json ... ``` markdown blocks — strip them
+  const text = result.response.text().replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+  const parsed = JSON.parse(text);
+  const plants = await enrichPlantsWithImages(parsed.plants);
+  return { description: parsed.description, plants };
 }

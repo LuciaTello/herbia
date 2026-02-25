@@ -24,6 +24,7 @@ export interface Translations {
     startTrek: string;
     saving: string;
     error: string;
+    dailyLimitReached: string;
     loadingMessages: string[];
   };
   myTreks: {

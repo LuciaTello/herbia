@@ -28,6 +28,7 @@ export const FR: Translations = {
     startTrek: 'Commencer ce trek !',
     saving: 'Enregistrement...',
     error: 'Erreur lors de la recherche. Vérifiez que le serveur est démarré.',
+    dailyLimitReached: 'Vous avez atteint la limite de 30 recherches pour aujourd\'hui. Revenez demain !',
     loadingMessages: [
       'On interroge les botanistes du chemin...',
       'Exploration parmi les buissons et les fougères...',

@@ -17,8 +17,8 @@ plantRouter.post('/suggest', async (req, res) => {
       return;
     }
 
-    const plants = await getSuggestedPlants(origin, destination, lang || 'es');
-    res.json(plants);
+    const result = await getSuggestedPlants(origin, destination, lang || 'es');
+    res.json(result.plants);
   } catch (error) {
     console.error('Error calling Gemini:', error);
     res.status(500).json({ error: 'Failed to get plant suggestions' });

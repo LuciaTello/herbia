@@ -5,25 +5,65 @@ import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
 import { getSuggestedPlants } from '../services/plant.service';
 
+const DAILY_TREK_LIMIT = 30;
+
 // Factory function (same pattern as collectionRouter/authRouter)
 export function trekRouter(prisma: PrismaClient): Router {
   const router = Router();
 
-  // POST /api/treks - Create a new trek with suggested plants from Gemini
+  // POST /api/treks - Create a new trek or return existing one for this month
   router.post('/', async (req, res) => {
     try {
       const { origin, destination, lang } = req.body;
-      const plants = await getSuggestedPlants(origin, destination, lang);
+      const now = new Date();
+      const month = now.getMonth() + 1; // 1-12
+      const year = now.getFullYear();
 
-      // Nested create: creates Trek + 3 SuggestedPlants in one query
-      // Like cascade persist in JPA
+      // Normalize origin/destination for comparison (trim + lowercase)
+      const normalizedOrigin = origin.trim().toLowerCase();
+      const normalizedDestination = destination.trim().toLowerCase();
+
+      // Check if a trek already exists for this user + route + month
+      // Like findByUserIdAndOriginAndDestinationAndMonthAndYear in JPA
+      const existing = await prisma.trek.findFirst({
+        where: {
+          userId: req.userId!,
+          origin: normalizedOrigin,
+          destination: normalizedDestination,
+          month,
+          year,
+        },
+        include: { plants: true },
+      });
+
+      if (existing) {
+        res.json(existing);
+        return;
+      }
+
+      // Rate limit: max 30 NEW treks per user per day (protects Gemini API quota)
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const todayCount = await prisma.trek.count({
+        where: { userId: req.userId!, createdAt: { gte: startOfDay } },
+      });
+      if (todayCount >= DAILY_TREK_LIMIT) {
+        res.status(429).json({ error: 'Daily search limit reached' });
+        return;
+      }
+
+      const result = await getSuggestedPlants(normalizedOrigin, normalizedDestination, lang, month);
+
       const trek = await prisma.trek.create({
         data: {
-          origin,
-          destination,
+          origin: normalizedOrigin,
+          destination: normalizedDestination,
+          description: result.description,
+          month,
+          year,
           userId: req.userId!,
           plants: {
-            create: plants.map(p => ({
+            create: result.plants.map(p => ({
               commonName: p.commonName,
               scientificName: p.scientificName,
               description: p.description,
