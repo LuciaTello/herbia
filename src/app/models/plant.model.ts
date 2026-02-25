@@ -4,7 +4,7 @@ export interface Plant {
   scientificName: string;
   chancePercent: number;
   description: string;
-  imageUrl: string;
+  imageUrls: string[];
 }
 
 // SuggestedPlant: a plant tied to a trek in PostgreSQL (with found state)
@@ -14,7 +14,7 @@ export interface SuggestedPlant {
   scientificName: string;
   chancePercent: number;
   description: string;
-  imageUrl: string;
+  imageUrls: string[];
   found: boolean;
   foundAt: string | null;
   trekId: number;

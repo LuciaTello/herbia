@@ -122,12 +122,30 @@ h2 {
   background: #e8f5e9;
 }
 
-.plant-card img {
+.photo-strip {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.photo-strip img {
   width: 70px;
   height: 70px;
   border-radius: 8px;
   object-fit: cover;
-  flex-shrink: 0;
+}
+
+.no-photo {
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  background: #dfe6e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b2bec3;
+  font-size: 1.5rem;
 }
 
 .plant-info {

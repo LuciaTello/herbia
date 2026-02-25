@@ -67,7 +67,7 @@ export function trekRouter(prisma: PrismaClient): Router {
               commonName: p.commonName,
               scientificName: p.scientificName,
               description: p.description,
-              imageUrl: p.imageUrl || '',
+              imageUrls: p.imageUrls || [],
               chancePercent: p.chancePercent || 0,
             })),
           },

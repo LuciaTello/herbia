@@ -54,7 +54,7 @@ model SuggestedPlant {
   commonName     String
   scientificName String
   description    String
-  imageUrl       String    @default("")
+  imageUrls      String[]  @default([])   @map("image_urls")
   chancePercent  Int       @default(0)    @map("chance_percent")
   found          Boolean   @default(false)
   foundAt        DateTime?

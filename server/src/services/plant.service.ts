@@ -49,23 +49,35 @@ Respond ONLY with a JSON object (no markdown, no backticks, no explanation), wit
 }`;
 }
 
-async function getWikipediaImage(scientificName: string): Promise<string> {
+// Fetch up to 5 real photos from iNaturalist observations (free, no API key needed)
+// Each observation has photos taken by real people in the field — much better than Wikipedia thumbnails
+async function getINaturalistImages(scientificName: string): Promise<string[]> {
   try {
-    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(scientificName)}`;
+    const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(scientificName)}&photos=true&per_page=5&quality_grade=research&order_by=votes`;
     const response = await fetch(url);
-    if (!response.ok) { return ''; }
+    if (!response.ok) { return []; }
     const data = await response.json();
-    return data.thumbnail?.source || '';
+
+    // Each observation has a photos array; take the first photo from each observation
+    // Replace "square" with "medium" for better resolution
+    const urls: string[] = [];
+    for (const obs of data.results || []) {
+      const photo = obs.photos?.[0];
+      if (photo?.url) {
+        urls.push(photo.url.replace('square', 'medium'));
+      }
+    }
+    return urls;
   } catch {
-    return '';
+    return [];
   }
 }
 
 async function enrichPlantsWithImages(plants: any[]): Promise<any[]> {
   return Promise.all(
     plants.map(async (plant: any) => {
-      const imageUrl = await getWikipediaImage(plant.scientificName);
-      return { ...plant, imageUrl };
+      const imageUrls = await getINaturalistImages(plant.scientificName);
+      return { ...plant, imageUrls };
     })
   );
 }
