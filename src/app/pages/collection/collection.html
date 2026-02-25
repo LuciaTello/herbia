@@ -17,11 +17,9 @@
     @for (found of collection(); track found.id) {
       <article class="found-card">
         <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
-        <div class="photo-strip">
-          @if (found.imageUrls.length > 0) {
-            @for (url of found.imageUrls; track url) {
-              <img [src]="url" [alt]="found.commonName" />
-            }
+        <div class="plant-thumbnail" (click)="openGallery(found.imageUrls, found.commonName)">
+          @if (found.imageUrls?.length) {
+            <img [src]="found.imageUrls[0]" [alt]="found.commonName" />
           } @else {
             <div class="no-photo">?</div>
           }
@@ -36,4 +34,12 @@
       </article>
     }
   </div>
+}
+
+@if (galleryImages().length) {
+  <app-photo-gallery
+    [images]="galleryImages()"
+    [plantName]="galleryPlantName()"
+    (closeGallery)="closeGallery()"
+  />
 }

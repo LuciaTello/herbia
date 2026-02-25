@@ -85,14 +85,12 @@ h2 {
   color: #d63031;
 }
 
-.photo-strip {
-  display: flex;
-  gap: 0.25rem;
-  overflow-x: auto;
+.plant-thumbnail {
   flex-shrink: 0;
+  cursor: pointer;
 }
 
-.photo-strip img {
+.plant-thumbnail img {
   width: 80px;
   height: 80px;
   border-radius: 8px;

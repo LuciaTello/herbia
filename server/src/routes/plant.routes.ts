@@ -18,7 +18,12 @@ plantRouter.post('/suggest', async (req, res) => {
     }
 
     const result = await getSuggestedPlants(origin, destination, lang || 'es');
-    res.json(result.plants);
+    // Ensure every plant has imageUrls (fallback to [] if iNaturalist failed)
+    const plants = (result.plants || []).map((p: any) => ({
+      ...p,
+      imageUrls: p.imageUrls || [],
+    }));
+    res.json(plants);
   } catch (error) {
     console.error('Error calling Gemini:', error);
     res.status(500).json({ error: 'Failed to get plant suggestions' });

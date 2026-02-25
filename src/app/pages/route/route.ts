@@ -5,17 +5,20 @@ import { Router, RouterLink } from '@angular/router';
 import { Plant } from '../../models/plant.model';
 import { PlantService } from '../../services/plant.service';
 import { TrekService } from '../../services/trek.service';
+import { ImageService } from '../../services/image.service';
 import { I18nService } from '../../i18n';
+import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 
 @Component({
   selector: 'app-route',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, PhotoGalleryComponent],
   templateUrl: './route.html',
   styleUrl: './route.css',
 })
 export class RoutePage {
   private readonly plantService = inject(PlantService);
   private readonly trekService = inject(TrekService);
+  private readonly imageService = inject(ImageService);
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
 
@@ -26,6 +29,8 @@ export class RoutePage {
   protected readonly saving = signal(false);
   protected readonly error = signal('');
   protected readonly loadingMessage = signal('');
+  protected readonly galleryImages = signal<string[]>([]);
+  protected readonly galleryPlantName = signal('');
 
   // setInterval returns a handle we need to clear later (like ScheduledFuture in Java)
   private messageInterval: ReturnType<typeof setInterval> | null = null;
@@ -51,6 +56,18 @@ export class RoutePage {
     return messages[index];
   }
 
+  protected openGallery(images: string[] | undefined, name: string): void {
+    if (images?.length) {
+      this.galleryImages.set(images);
+      this.galleryPlantName.set(name);
+    }
+  }
+
+  protected closeGallery(): void {
+    this.galleryImages.set([]);
+    this.galleryPlantName.set('');
+  }
+
   async onSearch(): Promise<void> {
     this.loading.set(true);
     this.error.set('');
@@ -61,7 +78,9 @@ export class RoutePage {
         this.destination(),
         this.i18n.currentLang(),
       );
+      // Show plants immediately, then enrich with images from iNaturalist (client-side)
       this.plants.set(results);
+      this.imageService.enrichWithImages(results).then(enriched => this.plants.set(enriched));
     } catch (e) {
       this.error.set(this.i18n.t().route.error);
     } finally {

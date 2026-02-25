@@ -1,0 +1,24 @@
+<div class="gallery-overlay" (click)="close()">
+  <div class="gallery-content" (click)="$event.stopPropagation()">
+    <button class="close-button" (click)="close()">&times;</button>
+
+    <div class="gallery-image-container">
+      @if (images.length > 1) {
+        <button class="nav-button prev" (click)="prev()">&#8249;</button>
+      }
+
+      <img [src]="images[currentIndex()]" [alt]="plantName" class="gallery-image" />
+
+      @if (images.length > 1) {
+        <button class="nav-button next" (click)="next()">&#8250;</button>
+      }
+    </div>
+
+    <div class="gallery-footer">
+      <p class="plant-name">{{ plantName }}</p>
+      @if (images.length > 1) {
+        <p class="counter">{{ currentIndex() + 1 }} / {{ images.length }}</p>
+      }
+    </div>
+  </div>
+</div>
