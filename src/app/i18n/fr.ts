@@ -27,6 +27,7 @@ export const FR: Translations = {
     resultsTitle: 'Plantes sur votre chemin',
     startTrek: 'Commencer ce trek !',
     saving: 'Enregistrement...',
+    tooFar: 'Cet itinéraire traverse plusieurs climats — essayez un trek plus court pour de meilleurs résultats.',
     error: 'Erreur lors de la recherche. Vérifiez que le serveur est démarré.',
     dailyLimitReached: 'Vous avez atteint la limite de 30 recherches pour aujourd\'hui. Revenez demain !',
     loadingMessages: [

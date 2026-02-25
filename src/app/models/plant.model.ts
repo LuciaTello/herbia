@@ -30,6 +30,7 @@ export interface SuggestedPlant {
 
 // SuggestResult: what POST /api/plants/suggest returns (description + plants)
 export interface SuggestResult {
+  tooFar: boolean;
   description: string;
   plants: Plant[];
 }

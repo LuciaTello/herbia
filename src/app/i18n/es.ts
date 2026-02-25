@@ -27,6 +27,7 @@ export const ES: Translations = {
     resultsTitle: 'Plantas en tu camino',
     startTrek: '¡Empezar esta ruta!',
     saving: 'Guardando...',
+    tooFar: 'Esa ruta cruza múltiples climas — prueba con un trek más corto para mejores resultados.',
     error: 'Error al buscar plantas. Verifica que el servidor está arrancado.',
     dailyLimitReached: 'Has alcanzado el límite de 30 búsquedas por hoy. ¡Vuelve mañana!',
     loadingMessages: [

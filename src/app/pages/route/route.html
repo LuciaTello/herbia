@@ -50,6 +50,15 @@
   <p class="error-message">{{ error() }}</p>
 }
 
+@if (tooFar()) {
+  <section class="too-far">
+    <p class="error-message">{{ i18n.t().route.tooFar }}</p>
+    @if (description()) {
+      <p class="trek-description">{{ description() }}</p>
+    }
+  </section>
+}
+
 @if (plants().length > 0) {
   <section class="results">
     <h3>{{ i18n.t().route.resultsTitle }}</h3>
