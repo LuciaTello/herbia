@@ -10,6 +10,7 @@ import { plantRouter } from './routes/plant.routes';
 import { collectionRouter } from './routes/collection.routes';
 import { trekRouter } from './routes/trek.routes';
 import { authRouter } from './routes/auth.routes';
+import { configRouter } from './routes/config.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { initPlantService } from './services/plant.service';
 
@@ -45,6 +46,7 @@ app.use(express.json());
 
 // Public routes (like .permitAll() - no token needed)
 app.use('/api/auth', authRouter(prisma));
+app.use('/api/config', configRouter());
 
 // Protected routes (like .authenticated() - authMiddleware checks JWT first)
 // If JWT is invalid, authMiddleware returns 401 and the route handler never runs

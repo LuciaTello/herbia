@@ -1,1 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Google Places autocomplete dropdown (injected into <body> by Google, outside Angular) */
+.pac-container {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: inherit;
+  margin-top: 4px;
+  z-index: 10000;
+}
+
+.pac-item {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.pac-item:hover {
+  background: #f0f9f0;
+}
+
+.pac-item-query {
+  color: #2d3436;
+  font-weight: 600;
+}
