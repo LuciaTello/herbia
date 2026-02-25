@@ -23,6 +23,7 @@ export interface Translations {
     resultsTitle: string;
     startTrek: string;
     saving: string;
+    tooFar: string;
     error: string;
     dailyLimitReached: string;
     loadingMessages: string[];

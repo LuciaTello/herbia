@@ -25,6 +25,7 @@ export class RoutePage {
   protected readonly destination = signal('');
   protected readonly plants = signal<Plant[]>([]);
   protected readonly description = signal('');
+  protected readonly tooFar = signal(false);
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly error = signal('');
@@ -80,10 +81,14 @@ export class RoutePage {
         this.destination(),
         this.i18n.currentLang(),
       );
-      // Plants already come with photos from the server (Wikipedia + iNaturalist)
+      this.tooFar.set(result.tooFar);
       this.description.set(result.description);
-      const sorted = [...result.plants].sort((a, b) => (a.rarity || 'common').localeCompare(b.rarity || 'common'));
-      this.plants.set(sorted);
+      if (!result.tooFar) {
+        const sorted = [...result.plants].sort((a, b) => (a.rarity || 'common').localeCompare(b.rarity || 'common'));
+        this.plants.set(sorted);
+      } else {
+        this.plants.set([]);
+      }
     } catch (e) {
       this.error.set(this.i18n.t().route.error);
     } finally {

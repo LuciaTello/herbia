@@ -36,7 +36,7 @@ export function plantRouter(prisma: PrismaClient): Router {
         .filter((p: any) => !excludeLower.has(p.scientificName.toLowerCase()))
         .sort((a: any, b: any) => (a.rarity || 'common').localeCompare(b.rarity || 'common'));
 
-      res.json({ description: result.description, plants: filteredPlants });
+      res.json({ tooFar: result.tooFar, description: result.description, plants: filteredPlants });
     } catch (error) {
       console.error('Error calling Gemini:', error);
       res.status(500).json({ error: 'Failed to get plant suggestions' });

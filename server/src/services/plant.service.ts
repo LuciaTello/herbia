@@ -36,6 +36,8 @@ A person is walking from ${origin} to ${destination}.
 The current month is ${monthName}. Only suggest plants that are visible, blooming, or identifiable during this time of year.
 IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
 ${exclusionBlock}
+IMPORTANT: If the origin and destination are very far apart (different countries, different climate zones, or more than ~100 km), set "tooFar" to true in your response and leave plants as an empty array. The description should explain in ${langName} that the trek crosses multiple climates and suggest picking a shorter route.
+
 Suggest exactly 10 plants that can be found along this path in ${monthName}.
 Consider the region, climate, season, and typical vegetation.
 
@@ -50,7 +52,8 @@ The description should be informative but also fun and slightly humorous — a j
 
 Respond ONLY with a JSON object (no markdown, no backticks, no explanation), with this exact format:
 {
-  "description": "A brief overview in ${langName} (2-3 sentences) about the general vegetation and conditions along this route in ${monthName}. Is it lush? Dry? What should the user expect?",
+  "tooFar": false,
+  "description": "A brief overview in ${langName} (2-3 sentences) about the landscape and environment along this route in ${monthName}. Mention if the path goes through parks (name them!), forests, urban areas, farmland, coastal areas, etc. Is it lush? Dry? What should the user expect?",
   "plants": [
     {
       "commonName": "name in ${langName}",
@@ -152,6 +155,7 @@ export function initPlantService(apiKey: string): void {
 }
 
 export interface SuggestedPlantsResult {
+  tooFar: boolean;
   description: string;
   plants: any[];
 }
@@ -170,6 +174,11 @@ export async function getSuggestedPlants(origin: string, destination: string, la
   const text = (completion.choices[0]?.message?.content || '')
     .replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
   const parsed = JSON.parse(text);
+
+  if (parsed.tooFar) {
+    return { tooFar: true, description: parsed.description, plants: [] };
+  }
+
   const plants = await enrichPlantsWithPhotos(parsed.plants);
-  return { description: parsed.description, plants };
+  return { tooFar: false, description: parsed.description, plants };
 }
