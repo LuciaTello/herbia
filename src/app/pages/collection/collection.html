@@ -17,7 +17,15 @@
     @for (found of collection(); track found.id) {
       <article class="found-card">
         <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
-        <img [src]="found.imageUrl" [alt]="found.commonName" />
+        <div class="photo-strip">
+          @if (found.imageUrls.length > 0) {
+            @for (url of found.imageUrls; track url) {
+              <img [src]="url" [alt]="found.commonName" />
+            }
+          } @else {
+            <div class="no-photo">?</div>
+          }
+        </div>
         <div class="found-info">
           <h4>{{ found.commonName }}</h4>
           <p class="scientific">{{ found.scientificName }}</p>

@@ -56,7 +56,15 @@
 
     @for (plant of plants(); track plant.scientificName) {
       <article class="plant-card">
-        <img [src]="plant.imageUrl" [alt]="plant.commonName" />
+        <div class="photo-strip">
+          @if (plant.imageUrls.length > 0) {
+            @for (url of plant.imageUrls; track url) {
+              <img [src]="url" [alt]="plant.commonName" />
+            }
+          } @else {
+            <div class="no-photo">{{ plant.commonName }}</div>
+          }
+        </div>
         <div class="plant-info">
           <h4>{{ plant.commonName }}</h4>
           <p class="scientific">{{ plant.scientificName }}</p>

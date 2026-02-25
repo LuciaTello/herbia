@@ -85,11 +85,30 @@ h2 {
   color: #d63031;
 }
 
-.found-card img {
+.photo-strip {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.photo-strip img {
   width: 80px;
   height: 80px;
   border-radius: 8px;
   object-fit: cover;
+}
+
+.no-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  background: #dfe6e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b2bec3;
+  font-size: 1.5rem;
 }
 
 .found-info h4 {
