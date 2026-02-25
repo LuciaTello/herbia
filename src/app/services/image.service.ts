@@ -31,9 +31,20 @@ export class ImageService {
     return urls;
   }
 
+  // Clean botanical notation that Wikipedia doesn't understand:
+  // "Helleborus niger/orientalis" → "Helleborus niger"
+  // "Taraxacum officinale agg." → "Taraxacum officinale"
+  private cleanForWikipedia(name: string): string {
+    return name
+      .split('/')[0]              // take first part before slash
+      .replace(/\s+(agg|s\.l|s\.s|var|subsp)\.?.*$/i, '')  // strip botanical suffixes
+      .trim();
+  }
+
   private async fetchFromWikipedia(scientificName: string): Promise<string> {
     try {
-      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(scientificName)}`;
+      const clean = this.cleanForWikipedia(scientificName);
+      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(clean)}`;
       const response = await fetch(url);
       if (!response.ok) return '';
       const data = await response.json();
