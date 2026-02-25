@@ -43,6 +43,11 @@ export interface Translations {
     emptyLine1: string;
     emptyLine2: string;
   };
+  rarity: {
+    common: string;
+    rare: string;
+    veryRare: string;
+  };
   login: {
     loginTitle: string;
     registerTitle: string;

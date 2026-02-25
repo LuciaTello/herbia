@@ -7,6 +7,7 @@ import { PlantService } from '../../services/plant.service';
 import { TrekService } from '../../services/trek.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
+import { getRarity } from '../../utils/rarity';
 
 @Component({
   selector: 'app-route',
@@ -67,6 +68,8 @@ export class RoutePage {
     this.galleryPlantName.set('');
   }
 
+  protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
+
   async onSearch(): Promise<void> {
     this.loading.set(true);
     this.error.set('');
@@ -79,7 +82,8 @@ export class RoutePage {
       );
       // Plants already come with photos from the server (Wikipedia + iNaturalist)
       this.description.set(result.description);
-      this.plants.set(result.plants);
+      const sorted = [...result.plants].sort((a, b) => (a.rarity || 'common').localeCompare(b.rarity || 'common'));
+      this.plants.set(sorted);
     } catch (e) {
       this.error.set(this.i18n.t().route.error);
     } finally {

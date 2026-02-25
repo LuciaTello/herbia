@@ -5,11 +5,11 @@ export interface PlantPhoto {
   source: string;
 }
 
-// Plant: what Gemini returns (a suggestion, no id yet)
+// Plant: what the LLM returns (a suggestion, no id yet)
 export interface Plant {
   commonName: string;
   scientificName: string;
-  chancePercent: number;
+  rarity: string;
   description: string;
   photos: PlantPhoto[];
 }
@@ -19,7 +19,7 @@ export interface SuggestedPlant {
   id: number;
   commonName: string;
   scientificName: string;
-  chancePercent: number;
+  rarity: string;
   description: string;
   photos: PlantPhoto[];
   found: boolean;

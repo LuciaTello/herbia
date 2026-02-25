@@ -54,7 +54,7 @@ model SuggestedPlant {
   commonName     String
   scientificName String
   description    String
-  chancePercent  Int       @default(0)    @map("chance_percent")
+  rarity         String    @default("common")
   found          Boolean   @default(false)
   foundAt        DateTime?
 

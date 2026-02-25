@@ -5,6 +5,7 @@ import { PlantPhoto } from '../../models/plant.model';
 import { TrekService } from '../../services/trek.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
+import { getRarity } from '../../utils/rarity';
 
 @Component({
   selector: 'app-my-treks',
@@ -19,6 +20,8 @@ export class MyTreksPage implements OnInit {
   protected readonly loading = signal(true);
   protected readonly galleryImages = signal<string[]>([]);
   protected readonly galleryPlantName = signal('');
+
+  protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
 
   async ngOnInit(): Promise<void> {
     try {

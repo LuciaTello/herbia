@@ -32,7 +32,7 @@ export function trekRouter(prisma: PrismaClient): Router {
           month,
           year,
         },
-        include: { plants: { include: { photos: true } } },
+        include: { plants: { include: { photos: true }, orderBy: { rarity: 'asc' } } },
       });
 
       if (existing) {
@@ -66,7 +66,7 @@ export function trekRouter(prisma: PrismaClient): Router {
               commonName: p.commonName,
               scientificName: p.scientificName,
               description: p.description,
-              chancePercent: p.chancePercent || 0,
+              rarity: p.rarity || 'common',
               photos: {
                 create: (p.photos || []).map((photo: any) => ({
                   url: photo.url,
@@ -76,7 +76,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             })),
           },
         },
-        include: { plants: { include: { photos: true } } },
+        include: { plants: { include: { photos: true }, orderBy: { rarity: 'asc' } } },
       });
 
       res.status(201).json(trek);
@@ -91,7 +91,7 @@ export function trekRouter(prisma: PrismaClient): Router {
     try {
       const treks = await prisma.trek.findMany({
         where: { userId: req.userId! },
-        include: { plants: { include: { photos: true } } },
+        include: { plants: { include: { photos: true }, orderBy: { rarity: 'asc' } } },
         orderBy: { createdAt: 'desc' },
       });
       res.json(treks);
