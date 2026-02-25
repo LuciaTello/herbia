@@ -40,6 +40,7 @@ IMPORTANT: If the origin and destination are very far apart (different countries
 
 Suggest exactly 10 plants that can be found along this path in ${monthName}.
 Consider the region, climate, season, and typical vegetation.
+Try to include a balanced variety of plant types: trees, flowers, shrubs, grasses, herbs, ferns, etc. Don't force it if the route doesn't support it, but aim for diversity when possible.
 
 For each plant, assign a rarity category:
 - "common": easy to find, you'll likely spot it without trying
