@@ -24,6 +24,10 @@
           <button class="delete-button" (click)="deleteTrek(trek.id)">&times;</button>
         </div>
 
+        @if (trek.description) {
+          <p class="trek-description">{{ trek.description }}</p>
+        }
+
         <div class="trek-plants">
           @for (plant of trek.plants; track plant.id) {
             <article class="plant-card" [class.found]="plant.found">

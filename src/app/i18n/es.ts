@@ -28,6 +28,7 @@ export const ES: Translations = {
     startTrek: '¡Empezar esta ruta!',
     saving: 'Guardando...',
     error: 'Error al buscar plantas. Verifica que el servidor está arrancado.',
+    dailyLimitReached: 'Has alcanzado el límite de 30 búsquedas por hoy. ¡Vuelve mañana!',
     loadingMessages: [
       'Preguntando a los botánicos del camino...',
       'Explorando entre arbustos y helechos...',

@@ -21,11 +21,14 @@ export interface SuggestedPlant {
   trek?: { origin: string; destination: string };
 }
 
-// Trek: a search (origin → destination) with its suggested plants
+// Trek: a search (origin → destination) for a specific month
 export interface Trek {
   id: number;
   origin: string;
   destination: string;
+  description: string;
+  month: number;
+  year: number;
   createdAt: string;
   plants: SuggestedPlant[];
 }

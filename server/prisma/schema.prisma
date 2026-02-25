@@ -31,6 +31,9 @@ model Trek {
   id          Int              @id @default(autoincrement())
   origin      String
   destination String
+  description String           @default("")  // General vegetation overview for this route/month
+  month       Int              // 1-12, for seasonal plant suggestions
+  year        Int              // e.g. 2026
   createdAt   DateTime         @default(now())
 
   // Foreign key to User

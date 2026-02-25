@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Plant } from '../../models/plant.model';
@@ -79,7 +80,11 @@ export class RoutePage {
       );
       this.router.navigate(['/my-treks']);
     } catch (e) {
-      this.error.set(this.i18n.t().route.error);
+      if (e instanceof HttpErrorResponse && e.status === 429) {
+        this.error.set(this.i18n.t().route.dailyLimitReached);
+      } else {
+        this.error.set(this.i18n.t().route.error);
+      }
     } finally {
       this.saving.set(false);
     }
