@@ -31,9 +31,9 @@
         <div class="trek-plants">
           @for (plant of trek.plants; track plant.id) {
             <article class="plant-card" [class.found]="plant.found">
-              <div class="plant-thumbnail" (click)="openGallery(plant.imageUrls, plant.commonName)">
-                @if (plant.imageUrls?.length) {
-                  <img [src]="plant.imageUrls[0]" [alt]="plant.commonName" />
+              <div class="plant-thumbnail" (click)="openGallery(plant.photos, plant.commonName)">
+                @if (plant.photos.length) {
+                  <img [src]="plant.photos[0].url" [alt]="plant.commonName" />
                 } @else {
                   <div class="no-photo">?</div>
                 }

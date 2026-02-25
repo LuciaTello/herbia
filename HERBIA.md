@@ -1,10 +1,10 @@
 # herbia
 
-> Tu companera de descubrimiento botanico para viajeros y peregrinos.
+> Tu compañera de descubrimiento botánico para viajeras.
 
 ## Vision del Proyecto
 
-**herbia** es una aplicacion web adaptada a moviles que ayuda a los viajeros a descubrir e
+**herbia** es una aplicacion web adaptada a moviles que ayuda a las viajeras a descubrir e
 identificar plantas a lo largo de su camino. El nombre es un juego de palabras entre "herbe"
 (hierba/planta en frances) e "IA" (Inteligencia Artificial).
 
@@ -59,7 +59,7 @@ Es como una **busqueda del tesoro botanica** impulsada por IA.
 
 - [ ] **Funcionalidades Sociales**
   - Compartir tus descubrimientos de plantas
-  - Ver lo que otros peregrinos encontraron en la misma ruta
+  - Ver lo que otras viajeras encontraron en la misma ruta
   - Ayuda comunitaria para identificar plantas
 
 - [ ] **Gamificacion**
@@ -82,7 +82,7 @@ Es como una **busqueda del tesoro botanica** impulsada por IA.
 | **Lenguaje** | TypeScript 5.9 | Modo estricto activado |
 | **Estilos** | CSS (scoped por componente) | Mobile-first, responsive |
 | **Testing** | Vitest 4.0 | Tests unitarios + de componente |
-| **IA (plantas)** | Google Gemini API (free tier) | Para sugerencias de plantas segun la ruta |
+| **IA (plantas)** | Groq API - Llama 3.3 70B (free tier) | Para sugerencias de plantas segun la ruta |
 | **IA (vision)** | Pl@ntNet API (gratuita) | Para reconocimiento de plantas desde fotos |
 | **Backend** | Node.js + Express (TypeScript) | Proxy para API keys + logica servidor |
 | **Base de datos** | PostgreSQL + Prisma (ORM) | Como JPA/Hibernate, datos persistentes en servidor |

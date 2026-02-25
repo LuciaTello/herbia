@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Plant } from '../models/plant.model';
+import { Plant, SuggestResult } from '../models/plant.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -11,11 +11,11 @@ export class PlantService {
   // In prod: 'https://herbia-server.onrender.com/api' (Render URL)
   private readonly apiUrl = `${environment.apiUrl}`;
 
-  async getSuggestedPlants(origin: string, destination: string, lang: string): Promise<Plant[]> {
+  async getSuggestedPlants(origin: string, destination: string, lang: string): Promise<SuggestResult> {
     // firstValueFrom converts an Observable to a Promise (so we can use async/await)
     // This is like calling restTemplate.postForObject() in Spring
     return firstValueFrom(
-      this.http.post<Plant[]>(`${this.apiUrl}/plants/suggest`, { origin, destination, lang })
+      this.http.post<SuggestResult>(`${this.apiUrl}/plants/suggest`, { origin, destination, lang })
     );
   }
 }

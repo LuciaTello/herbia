@@ -18,7 +18,7 @@ import { initPlantService } from './services/plant.service';
 dotenv.config();
 
 // Initialize services that depend on env vars (like @PostConstruct in Spring)
-initPlantService(process.env['GEMINI_API_KEY'] || '');
+initPlantService(process.env['GROQ_API_KEY'] || '');
 
 // --- Infrastructure setup (like @Bean definitions in Spring) ---
 
@@ -48,7 +48,7 @@ app.use('/api/auth', authRouter(prisma));
 
 // Protected routes (like .authenticated() - authMiddleware checks JWT first)
 // If JWT is invalid, authMiddleware returns 401 and the route handler never runs
-app.use('/api/plants', authMiddleware, plantRouter);
+app.use('/api/plants', authMiddleware, plantRouter(prisma));
 app.use('/api/collection', authMiddleware, collectionRouter(prisma));
 app.use('/api/treks', authMiddleware, trekRouter(prisma));
 

@@ -1,12 +1,10 @@
 // PlantService: like a @Service class in Spring
-// Contains the business logic for plant suggestions (Gemini AI + Wikipedia images)
+// Contains the business logic for plant suggestions (Groq/Llama AI + Wikipedia/iNaturalist images)
 
-import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 
-// Gemini model - initialized later by initPlantService() after dotenv has loaded
-// In Java this wouldn't be a problem because Spring resolves everything before starting,
-// but in Node.js, module-level code runs BEFORE dotenv.config()
-let model: GenerativeModel;
+// Groq client - initialized later by initPlantService() after dotenv has loaded
+let groq: Groq;
 
 // --- Private functions (not exported = private, like private methods in Java) ---
 
@@ -20,24 +18,37 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
-function buildPlantPrompt(origin: string, destination: string, lang: string, month: number): string {
+interface PlantPhoto {
+  url: string;
+  source: string; // "wikipedia" | "inaturalist"
+}
+
+function buildPlantPrompt(origin: string, destination: string, lang: string, month: number, exclude: string[]): string {
   const langName = LANG_NAMES[lang] || 'Spanish';
   const monthName = MONTH_NAMES[month];
-  return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
-A pilgrim is walking from ${origin} to ${destination} (likely on the Camino de Santiago or a similar route).
-The current month is ${monthName}. Only suggest plants that are visible, blooming, or identifiable during this time of year.
 
+  const travelerName = lang === 'fr' ? 'voyageuse' : 'viajera';
+
+  const exclusionBlock = exclude.length > 0
+    ? `\n\nIMPORTANT: The ${travelerName} has already found these species on previous treks. Do NOT suggest any of them:\n${exclude.join(', ')}\n`
+    : '';
+
+  return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
+A ${travelerName} (female traveler) is walking from ${origin} to ${destination} (likely on the Camino de Santiago or a similar route).
+The current month is ${monthName}. Only suggest plants that are visible, blooming, or identifiable during this time of year.
+IMPORTANT: Always use feminine gender when referring to the traveler ("${travelerName}") in ${langName} text.
+${exclusionBlock}
 Suggest exactly 10 plants that can be found along this path in ${monthName}.
 Consider the region, climate, season, and typical vegetation.
 
-For each plant, estimate a realistic percentage chance (0-100%) that a pilgrim would actually spot it on this specific route.
+For each plant, estimate a realistic percentage chance (0-100%) that the ${travelerName} would actually spot it on this specific route.
 Sort the results in DESCENDING order by this percentage (most common first, rarest last).
 
-The description should be informative but also fun and slightly humorous — a joke, a pun, a witty remark about the plant or the pilgrim's suffering. Keep it light but still useful.
+The description should be informative but also fun and slightly humorous — a joke, a pun, a witty remark about the plant or the ${travelerName}'s suffering. Keep it light but still useful.
 
 Respond ONLY with a JSON object (no markdown, no backticks, no explanation), with this exact format:
 {
-  "description": "A brief overview in ${langName} (2-3 sentences) about the general vegetation and conditions along this route in ${monthName}. Is it lush? Dry? What should the pilgrim expect?",
+  "description": "A brief overview in ${langName} (2-3 sentences) about the general vegetation and conditions along this route in ${monthName}. Is it lush? Dry? What should the ${travelerName} expect?",
   "plants": [
     {
       "commonName": "name in ${langName}",
@@ -49,9 +60,34 @@ Respond ONLY with a JSON object (no markdown, no backticks, no explanation), wit
 }`;
 }
 
+// Clean botanical notation that Wikipedia doesn't understand:
+// "Helleborus niger/orientalis" → "Helleborus niger"
+// "Taraxacum officinale agg." → "Taraxacum officinale"
+function cleanForWikipedia(name: string): string {
+  return name
+    .split('/')[0]
+    .replace(/\s+(agg|s\.l|s\.s|var|subsp)\.?.*$/i, '')
+    .trim();
+}
+
+// Fetch the hero image from Wikipedia (high-quality curated photo)
+async function fetchFromWikipedia(scientificName: string): Promise<string> {
+  try {
+    const clean = cleanForWikipedia(scientificName);
+    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(clean)}`;
+    const response = await fetch(url);
+    if (!response.ok) return '';
+    const data = await response.json();
+    return data.originalimage?.source || '';
+  } catch {
+    return '';
+  }
+}
+
 // Fetch up to 5 real photos from iNaturalist observations (free, no API key needed)
-// Each observation has photos taken by real people in the field — much better than Wikipedia thumbnails
-async function getINaturalistImages(scientificName: string): Promise<string[]> {
+// Each observation has photos taken by real people in the field
+// Uses "large" size (1024px) for better quality
+async function fetchFromINaturalist(scientificName: string): Promise<string[]> {
   try {
     const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(scientificName)}&photos=true&per_page=5&quality_grade=research&order_by=votes`;
     const response = await fetch(url);
@@ -61,13 +97,11 @@ async function getINaturalistImages(scientificName: string): Promise<string[]> {
     }
     const data = await response.json();
 
-    // Each observation has a photos array; take the first photo from each observation
-    // Replace "square" with "medium" for better resolution
     const urls: string[] = [];
     for (const obs of data.results || []) {
       const photo = obs.photos?.[0];
       if (photo?.url) {
-        urls.push(photo.url.replace('square', 'medium'));
+        urls.push(photo.url.replace('square', 'large'));
       }
     }
     console.log(`iNaturalist: ${urls.length} photos for "${scientificName}"`);
@@ -78,14 +112,33 @@ async function getINaturalistImages(scientificName: string): Promise<string[]> {
   }
 }
 
-async function enrichPlantsWithImages(plants: any[]): Promise<any[]> {
+// Fetch photos from Wikipedia + iNaturalist, returning { url, source }[] per plant
+// Wikipedia first (best quality), then iNaturalist (more angles)
+async function getPhotosForPlant(scientificName: string): Promise<PlantPhoto[]> {
+  const [wikiUrl, iNatUrls] = await Promise.all([
+    fetchFromWikipedia(scientificName),
+    fetchFromINaturalist(scientificName),
+  ]);
+
+  const photos: PlantPhoto[] = [];
+  if (wikiUrl) photos.push({ url: wikiUrl, source: 'wikipedia' });
+  for (const url of iNatUrls) {
+    if (url !== wikiUrl) photos.push({ url, source: 'inaturalist' });
+  }
+  return photos;
+}
+
+// Enrich all plants with photos and filter out any plant that has no photos
+async function enrichPlantsWithPhotos(plants: any[]): Promise<any[]> {
   if (!Array.isArray(plants)) return [];
-  return Promise.all(
+  const enriched = await Promise.all(
     plants.map(async (plant: any) => {
-      const imageUrls = await getINaturalistImages(plant.scientificName);
-      return { ...plant, imageUrls };
+      const photos = await getPhotosForPlant(plant.scientificName);
+      if (photos.length === 0) return null;
+      return { ...plant, photos };
     })
   );
+  return enriched.filter((p): p is NonNullable<typeof p> => p !== null);
 }
 
 // --- Public functions (exported = public, like public methods in Java) ---
@@ -93,8 +146,7 @@ async function enrichPlantsWithImages(plants: any[]): Promise<any[]> {
 // Must be called once after dotenv.config() has loaded the env vars
 // Like a manual @PostConstruct
 export function initPlantService(apiKey: string): void {
-  const genAI = new GoogleGenerativeAI(apiKey);
-  model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  groq = new Groq({ apiKey });
 }
 
 export interface SuggestedPlantsResult {
@@ -102,14 +154,20 @@ export interface SuggestedPlantsResult {
   plants: any[];
 }
 
-export async function getSuggestedPlants(origin: string, destination: string, lang: string = 'es', month?: number): Promise<SuggestedPlantsResult> {
+export async function getSuggestedPlants(origin: string, destination: string, lang: string = 'es', month?: number, exclude: string[] = []): Promise<SuggestedPlantsResult> {
   // getMonth() returns 0-11 (Jan=0), so +1 to get 1-12 like our DB stores
   const currentMonth = month || (new Date().getMonth() + 1);
-  const prompt = buildPlantPrompt(origin, destination, lang, currentMonth);
-  const result = await model.generateContent(prompt);
-  // Gemini sometimes wraps JSON in ```json ... ``` markdown blocks — strip them
-  const text = result.response.text().replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+  const prompt = buildPlantPrompt(origin, destination, lang, currentMonth, exclude);
+
+  const completion = await groq.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.7,
+  });
+
+  const text = (completion.choices[0]?.message?.content || '')
+    .replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
   const parsed = JSON.parse(text);
-  const plants = await enrichPlantsWithImages(parsed.plants);
+  const plants = await enrichPlantsWithPhotos(parsed.plants);
   return { description: parsed.description, plants };
 }
