@@ -7,11 +7,13 @@ import { PlantService } from '../../services/plant.service';
 import { TrekService } from '../../services/trek.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
+import { PlaceAutocompleteDirective } from '../../directives/place-autocomplete.directive';
+import { RouteMapComponent } from '../../components/route-map/route-map';
 import { getRarity } from '../../utils/rarity';
 
 @Component({
   selector: 'app-route',
-  imports: [FormsModule, RouterLink, PhotoGalleryComponent],
+  imports: [FormsModule, RouterLink, PhotoGalleryComponent, PlaceAutocompleteDirective, RouteMapComponent],
   templateUrl: './route.html',
   styleUrl: './route.css',
 })

@@ -13,6 +13,8 @@
       (ngModelChange)="origin.set($event)"
       name="origin"
       required
+      appPlaceAutocomplete
+      (placeSelected)="origin.set($event)"
     />
   </div>
 
@@ -26,6 +28,8 @@
       (ngModelChange)="destination.set($event)"
       name="destination"
       required
+      appPlaceAutocomplete
+      (placeSelected)="destination.set($event)"
     />
   </div>
 
@@ -86,6 +90,8 @@
         </div>
       </article>
     }
+
+    <app-route-map [origin]="origin()" [destination]="destination()" />
 
     <button
       class="primary-button start-trek-button"

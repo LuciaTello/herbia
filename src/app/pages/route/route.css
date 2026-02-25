@@ -208,3 +208,8 @@ h2 {
   width: 100%;
   margin-top: 1rem;
 }
+
+app-route-map {
+  max-width: 400px;
+  display: block;
+}
