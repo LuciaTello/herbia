@@ -54,14 +54,27 @@ model SuggestedPlant {
   commonName     String
   scientificName String
   description    String
-  imageUrls      String[]  @default([])   @map("image_urls")
   chancePercent  Int       @default(0)    @map("chance_percent")
   found          Boolean   @default(false)
   foundAt        DateTime?
+
+  // One-to-many: a plant has many photos (normalized from old imageUrls column)
+  photos         PlantPhoto[]
 
   // Foreign key to Trek (like @ManyToOne @JoinColumn(name = "trek_id") Trek trek;)
   trekId         Int       @map("trek_id")
   trek           Trek      @relation(fields: [trekId], references: [id], onDelete: Cascade)
 
   @@map("suggested_plants")
+}
+
+// A photo for a plant, fetched from Wikipedia or iNaturalist
+model PlantPhoto {
+  id       Int    @id @default(autoincrement())
+  url      String
+  source   String   // "wikipedia" | "inaturalist"
+  plantId  Int    @map("plant_id")
+  plant    SuggestedPlant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+
+  @@map("plant_photos")
 }

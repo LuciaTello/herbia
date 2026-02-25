@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { PlantPhoto } from '../../models/plant.model';
 import { TrekService } from '../../services/trek.service';
-import { ImageService } from '../../services/image.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 
@@ -14,7 +14,6 @@ import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gall
 })
 export class MyTreksPage implements OnInit {
   private readonly trekService = inject(TrekService);
-  private readonly imageService = inject(ImageService);
   protected readonly i18n = inject(I18nService);
   protected readonly treks = this.trekService.getTreks();
   protected readonly loading = signal(true);
@@ -24,20 +23,14 @@ export class MyTreksPage implements OnInit {
   async ngOnInit(): Promise<void> {
     try {
       await this.trekService.loadTreks();
-      // Enrich plants that have missing images (client-side iNaturalist fallback)
-      for (const trek of this.treks()) {
-        this.imageService.enrichWithImages(trek.plants).then(enriched => {
-          this.trekService.updateTrekPlants(trek.id, enriched);
-        });
-      }
     } finally {
       this.loading.set(false);
     }
   }
 
-  protected openGallery(images: string[] | undefined, name: string): void {
-    if (images?.length) {
-      this.galleryImages.set(images);
+  protected openGallery(photos: PlantPhoto[] | undefined, name: string): void {
+    if (photos?.length) {
+      this.galleryImages.set(photos.map(p => p.url));
       this.galleryPlantName.set(name);
     }
   }

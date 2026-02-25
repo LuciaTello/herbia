@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Trek, SuggestedPlant } from '../models/plant.model';
+import { Trek, SuggestedPlant, Plant } from '../models/plant.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -22,9 +22,9 @@ export class TrekService {
     this.treks.set(treks);
   }
 
-  async createTrek(origin: string, destination: string, lang: string): Promise<Trek> {
+  async createTrek(origin: string, destination: string, description: string, plants: Plant[]): Promise<Trek> {
     const trek = await firstValueFrom(
-      this.http.post<Trek>(this.apiUrl, { origin, destination, lang })
+      this.http.post<Trek>(this.apiUrl, { origin, destination, description, plants })
     );
     // Add to the beginning of the list (newest first)
     this.treks.update(list => [trek, ...list]);
@@ -43,13 +43,6 @@ export class TrekService {
           p.id === plantId ? { ...p, found: updated.found, foundAt: updated.foundAt } : p
         ),
       }))
-    );
-  }
-
-  // Update a trek's plants in the local signal (used for client-side image enrichment)
-  updateTrekPlants(trekId: number, plants: any[]): void {
-    this.treks.update(list =>
-      list.map(trek => trek.id === trekId ? { ...trek, plants } : trek)
     );
   }
 

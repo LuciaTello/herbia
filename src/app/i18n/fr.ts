@@ -2,7 +2,7 @@ import { Translations } from './translations';
 
 export const FR: Translations = {
   app: {
-    subtitle: 'Votre compagnon de découverte des plantes',
+    subtitle: 'Votre compagne de découverte des plantes',
     logout: 'Déconnexion',
   },
   home: {

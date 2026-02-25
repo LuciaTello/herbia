@@ -23,11 +23,6 @@ export class CollectionService {
     this.collection.set(plants);
   }
 
-  // Update the collection signal (used for client-side image enrichment)
-  updateCollection(plants: SuggestedPlant[]): void {
-    this.collection.set(plants);
-  }
-
   // Soft-toggle: marks the plant as not found (removes from collection, keeps in trek)
   async removePlant(id: number): Promise<void> {
     await firstValueFrom(

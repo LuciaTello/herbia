@@ -2,10 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Plant } from '../../models/plant.model';
+import { Plant, PlantPhoto } from '../../models/plant.model';
 import { PlantService } from '../../services/plant.service';
 import { TrekService } from '../../services/trek.service';
-import { ImageService } from '../../services/image.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 
@@ -18,13 +17,13 @@ import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gall
 export class RoutePage {
   private readonly plantService = inject(PlantService);
   private readonly trekService = inject(TrekService);
-  private readonly imageService = inject(ImageService);
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
 
   protected readonly origin = signal('');
   protected readonly destination = signal('');
   protected readonly plants = signal<Plant[]>([]);
+  protected readonly description = signal('');
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly error = signal('');
@@ -56,9 +55,9 @@ export class RoutePage {
     return messages[index];
   }
 
-  protected openGallery(images: string[] | undefined, name: string): void {
-    if (images?.length) {
-      this.galleryImages.set(images);
+  protected openGallery(photos: PlantPhoto[] | undefined, name: string): void {
+    if (photos?.length) {
+      this.galleryImages.set(photos.map(p => p.url));
       this.galleryPlantName.set(name);
     }
   }
@@ -73,14 +72,14 @@ export class RoutePage {
     this.error.set('');
     this.startLoadingMessages();
     try {
-      const results = await this.plantService.getSuggestedPlants(
+      const result = await this.plantService.getSuggestedPlants(
         this.origin(),
         this.destination(),
         this.i18n.currentLang(),
       );
-      // Show plants immediately, then enrich with images from iNaturalist (client-side)
-      this.plants.set(results);
-      this.imageService.enrichWithImages(results).then(enriched => this.plants.set(enriched));
+      // Plants already come with photos from the server (Wikipedia + iNaturalist)
+      this.description.set(result.description);
+      this.plants.set(result.plants);
     } catch (e) {
       this.error.set(this.i18n.t().route.error);
     } finally {
@@ -95,7 +94,8 @@ export class RoutePage {
       await this.trekService.createTrek(
         this.origin(),
         this.destination(),
-        this.i18n.currentLang(),
+        this.description(),
+        this.plants(),
       );
       this.router.navigate(['/my-treks']);
     } catch (e) {

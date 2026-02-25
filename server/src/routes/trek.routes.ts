@@ -3,9 +3,8 @@
 
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
-import { getSuggestedPlants } from '../services/plant.service';
 
-const DAILY_TREK_LIMIT = 30;
+const DAILY_TREK_LIMIT = 100;
 
 // Factory function (same pattern as collectionRouter/authRouter)
 export function trekRouter(prisma: PrismaClient): Router {
@@ -14,7 +13,7 @@ export function trekRouter(prisma: PrismaClient): Router {
   // POST /api/treks - Create a new trek or return existing one for this month
   router.post('/', async (req, res) => {
     try {
-      const { origin, destination, lang } = req.body;
+      const { origin, destination, description, plants: clientPlants } = req.body;
       const now = new Date();
       const month = now.getMonth() + 1; // 1-12
       const year = now.getFullYear();
@@ -33,7 +32,7 @@ export function trekRouter(prisma: PrismaClient): Router {
           month,
           year,
         },
-        include: { plants: true },
+        include: { plants: { include: { photos: true } } },
       });
 
       if (existing) {
@@ -52,27 +51,32 @@ export function trekRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      const result = await getSuggestedPlants(normalizedOrigin, normalizedDestination, lang, month);
-
+      // Plants come from the frontend preview (already fetched from Gemini + enriched with photos)
+      // No second Gemini call needed!
       const trek = await prisma.trek.create({
         data: {
           origin: normalizedOrigin,
           destination: normalizedDestination,
-          description: result.description,
+          description: description || '',
           month,
           year,
           userId: req.userId!,
           plants: {
-            create: result.plants.map(p => ({
+            create: (clientPlants || []).map((p: any) => ({
               commonName: p.commonName,
               scientificName: p.scientificName,
               description: p.description,
-              imageUrls: p.imageUrls || [],
               chancePercent: p.chancePercent || 0,
+              photos: {
+                create: (p.photos || []).map((photo: any) => ({
+                  url: photo.url,
+                  source: photo.source,
+                })),
+              },
             })),
           },
         },
-        include: { plants: true },
+        include: { plants: { include: { photos: true } } },
       });
 
       res.status(201).json(trek);
@@ -87,7 +91,7 @@ export function trekRouter(prisma: PrismaClient): Router {
     try {
       const treks = await prisma.trek.findMany({
         where: { userId: req.userId! },
-        include: { plants: true },
+        include: { plants: { include: { photos: true } } },
         orderBy: { createdAt: 'desc' },
       });
       res.json(treks);
