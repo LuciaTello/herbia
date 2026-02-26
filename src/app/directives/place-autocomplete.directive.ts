@@ -18,12 +18,18 @@ export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
 
     this.autocomplete = new google.maps.places.Autocomplete(this.el.nativeElement, {
       types: ['(cities)'],
+      fields: ['address_components', 'name'],
     });
 
     this.listener = this.autocomplete.addListener('place_changed', () => {
       this.zone.run(() => {
         const place = this.autocomplete!.getPlace();
-        const name = place.formatted_address || place.name || this.el.nativeElement.value;
+        const components = place.address_components || [];
+        const city = components.find(c => c.types.includes('locality'))?.long_name
+          || place.name
+          || this.el.nativeElement.value;
+        const postalCode = components.find(c => c.types.includes('postal_code'))?.long_name;
+        const name = postalCode ? `${city.toUpperCase()} (${postalCode})` : city.toUpperCase();
         this.placeSelected.emit(name);
       });
     });

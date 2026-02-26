@@ -46,7 +46,7 @@ app.use(express.json());
 
 // Public routes (like .permitAll() - no token needed)
 app.use('/api/auth', authRouter(prisma));
-app.use('/api/config', configRouter());
+app.use('/api/config', configRouter(prisma));
 
 // Protected routes (like .authenticated() - authMiddleware checks JWT first)
 // If JWT is invalid, authMiddleware returns 401 and the route handler never runs

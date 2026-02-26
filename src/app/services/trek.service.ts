@@ -32,15 +32,19 @@ export class TrekService {
   }
 
   async markPlantFound(plantId: number): Promise<void> {
-    const updated = await firstValueFrom(
-      this.http.patch<SuggestedPlant>(`${this.apiUrl}/plants/${plantId}/found`, {})
+    const result = await firstValueFrom(
+      this.http.patch<{ scientificName: string; found: boolean; foundAt: string }>(
+        `${this.apiUrl}/plants/${plantId}/found`, {}
+      )
     );
-    // Update the plant in the local signal
+    // Mark ALL plants with the same scientificName as found across all treks
     this.treks.update(list =>
       list.map(trek => ({
         ...trek,
         plants: trek.plants.map(p =>
-          p.id === plantId ? { ...p, found: updated.found, foundAt: updated.foundAt } : p
+          p.scientificName === result.scientificName
+            ? { ...p, found: true, foundAt: result.foundAt }
+            : p
         ),
       }))
     );
