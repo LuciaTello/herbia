@@ -13,6 +13,7 @@ import { authRouter } from './routes/auth.routes';
 import { configRouter } from './routes/config.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { initPlantService } from './services/plant.service';
+import { initCloudinary } from './services/cloudinary.service';
 
 // Load .env file (like Spring's application.properties)
 // MUST be called before anything that uses process.env!
@@ -20,6 +21,7 @@ dotenv.config();
 
 // Initialize services that depend on env vars (like @PostConstruct in Spring)
 initPlantService(process.env['GROQ_API_KEY'] || '');
+initCloudinary();
 
 // --- Infrastructure setup (like @Bean definitions in Spring) ---
 

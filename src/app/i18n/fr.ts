@@ -51,6 +51,9 @@ export const FR: Translations = {
     emptyLine2: 'Partez en itinéraire et commencez à chercher !',
     found: 'Trouvée',
     markFound: 'Je l\'ai trouvée !',
+    addPhoto: 'Ajouter photo',
+    uploading: 'Téléchargement...',
+    myPhotos: 'Mes photos',
     summary: (total, found) => `${total} plantes · ${found} trouvées`,
   },
   collection: {

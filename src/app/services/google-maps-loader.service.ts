@@ -9,18 +9,24 @@ export class GoogleMapsLoaderService {
   load(): Promise<boolean> {
     if (this.loadPromise) return this.loadPromise;
 
-    this.loadPromise = this.configService.getGoogleMapsApiKey().then((key) => {
+    this.loadPromise = this.configService.getGoogleMapsApiKey().then(async (key) => {
       if (!key) return false;
 
-      return new Promise<boolean>((resolve) => {
+      await new Promise<void>((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async`;
         script.async = true;
         script.defer = true;
-        script.onload = () => resolve(true);
-        script.onerror = () => resolve(false);
+        script.onload = () => resolve();
+        script.onerror = () => reject();
         document.head.appendChild(script);
       });
+
+      // With loading=async, libraries must be imported explicitly
+      await google.maps.importLibrary('places');
+      await google.maps.importLibrary('routes');
+
+      return true;
     }).catch(() => false);
 
     return this.loadPromise;
