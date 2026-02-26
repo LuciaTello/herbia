@@ -51,6 +51,7 @@ export const ES: Translations = {
     emptyLine2: '¡Ve a una ruta y empieza a buscar!',
     found: 'Encontrada',
     markFound: '¡La he encontrado!',
+    summary: (total, found) => `${total} plantas · ${found} encontradas`,
   },
   collection: {
     back: 'Volver al inicio',

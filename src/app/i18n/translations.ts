@@ -36,6 +36,7 @@ export interface Translations {
     emptyLine2: string;
     found: string;
     markFound: string;
+    summary: (total: number, found: number) => string;
   };
   collection: {
     back: string;

@@ -59,15 +59,35 @@ h2 {
   background: #f0f9f0;
   border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.trek-card.expanded {
   padding: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .trek-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+}
+
+.trek-route {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.chevron {
+  color: #2d7d46;
+  font-size: 1rem;
+  line-height: 1.4;
+  flex-shrink: 0;
 }
 
 .trek-route h3 {
@@ -80,6 +100,13 @@ h2 {
   color: #636e72;
   font-size: 0.75rem;
   margin: 0.25rem 0 0;
+}
+
+.trek-summary {
+  color: #636e72;
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0;
+  padding-left: 1.5rem;
 }
 
 .delete-button {
@@ -100,7 +127,7 @@ h2 {
   color: #636e72;
   font-size: 0.85rem;
   line-height: 1.4;
-  margin: 0 0 1rem;
+  margin: 0.75rem 0 1rem;
   font-style: italic;
 }
 

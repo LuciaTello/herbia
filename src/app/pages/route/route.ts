@@ -102,13 +102,13 @@ export class RoutePage {
   async onStartTrek(): Promise<void> {
     this.saving.set(true);
     try {
-      await this.trekService.createTrek(
+      const trek = await this.trekService.createTrek(
         this.origin(),
         this.destination(),
         this.description(),
         this.plants(),
       );
-      this.router.navigate(['/my-treks']);
+      this.router.navigate(['/my-treks'], { queryParams: { open: trek.id } });
     } catch (e) {
       if (e instanceof HttpErrorResponse && e.status === 429) {
         this.error.set(this.i18n.t().route.dailyLimitReached);

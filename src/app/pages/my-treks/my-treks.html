@@ -15,47 +15,56 @@
 } @else {
   <div class="treks-list">
     @for (trek of treks(); track trek.id) {
-      <section class="trek-card">
+      <section class="trek-card" [class.expanded]="expandedId() === trek.id">
         <div class="trek-header">
-          <div class="trek-route">
-            <h3>{{ trek.origin }} → {{ trek.destination }}</h3>
-            <p class="trek-date">{{ trek.createdAt | date }}</p>
+          <div class="trek-route" (click)="toggle(trek.id)">
+            <span class="chevron">{{ expandedId() === trek.id ? '▾' : '▸' }}</span>
+            <div>
+              <h3>{{ trek.origin }} → {{ trek.destination }}</h3>
+              <p class="trek-date">{{ trek.createdAt | date }}</p>
+            </div>
           </div>
           <button class="delete-button" (click)="deleteTrek(trek.id)">&times;</button>
         </div>
 
-        @if (trek.description) {
-          <p class="trek-description">{{ trek.description }}</p>
-        }
+        <p class="trek-summary">
+          {{ i18n.t().myTreks.summary(trek.plants.length, foundCount(trek.plants)) }}
+        </p>
 
-        <div class="trek-plants">
-          @for (plant of trek.plants; track plant.id) {
-            <article class="plant-card" [class.found]="plant.found">
-              <div class="plant-thumbnail" (click)="openGallery(plant.photos, plant.commonName)">
-                @if (plant.photos.length) {
-                  <img [src]="plant.photos[0].url" [alt]="plant.commonName" />
-                } @else {
-                  <div class="no-photo">?</div>
-                }
-              </div>
-              <div class="plant-info">
-                <h4>{{ plant.commonName }}</h4>
-                <p class="scientific">{{ plant.scientificName }}</p>
-                <p class="chance" [style.color]="rarity(plant.rarity).color">
-                  {{ rarity(plant.rarity).label }}
-                </p>
-                <p class="description">{{ plant.description }}</p>
-                @if (plant.found) {
-                  <span class="found-badge">{{ i18n.t().myTreks.found }}</span>
-                } @else {
-                  <button class="found-button" (click)="markFound(plant.id)">
-                    {{ i18n.t().myTreks.markFound }}
-                  </button>
-                }
-              </div>
-            </article>
+        @if (expandedId() === trek.id) {
+          @if (trek.description) {
+            <p class="trek-description">{{ trek.description }}</p>
           }
-        </div>
+
+          <div class="trek-plants">
+            @for (plant of trek.plants; track plant.id) {
+              <article class="plant-card" [class.found]="plant.found">
+                <div class="plant-thumbnail" (click)="openGallery(plant.photos, plant.commonName)">
+                  @if (plant.photos.length) {
+                    <img [src]="plant.photos[0].url" [alt]="plant.commonName" />
+                  } @else {
+                    <div class="no-photo">?</div>
+                  }
+                </div>
+                <div class="plant-info">
+                  <h4>{{ plant.commonName }}</h4>
+                  <p class="scientific">{{ plant.scientificName }}</p>
+                  <p class="chance" [style.color]="rarity(plant.rarity).color">
+                    {{ rarity(plant.rarity).label }}
+                  </p>
+                  <p class="description">{{ plant.description }}</p>
+                  @if (plant.found) {
+                    <span class="found-badge">{{ i18n.t().myTreks.found }}</span>
+                  } @else {
+                    <button class="found-button" (click)="markFound(plant.id)">
+                      {{ i18n.t().myTreks.markFound }}
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        }
       </section>
     }
   </div>

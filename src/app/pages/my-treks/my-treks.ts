@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PlantPhoto } from '../../models/plant.model';
 import { TrekService } from '../../services/trek.service';
 import { I18nService } from '../../i18n';
@@ -15,19 +15,33 @@ import { getRarity } from '../../utils/rarity';
 })
 export class MyTreksPage implements OnInit {
   private readonly trekService = inject(TrekService);
+  private readonly route = inject(ActivatedRoute);
   protected readonly i18n = inject(I18nService);
   protected readonly treks = this.trekService.getTreks();
   protected readonly loading = signal(true);
+  protected readonly expandedId = signal<number | null>(null);
   protected readonly galleryImages = signal<string[]>([]);
   protected readonly galleryPlantName = signal('');
 
   protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
+
+  protected foundCount(plants: { found: boolean }[]): number {
+    return plants.filter(p => p.found).length;
+  }
+
+  protected toggle(id: number): void {
+    this.expandedId.set(this.expandedId() === id ? null : id);
+  }
 
   async ngOnInit(): Promise<void> {
     try {
       await this.trekService.loadTreks();
     } finally {
       this.loading.set(false);
+    }
+    const openId = Number(this.route.snapshot.queryParamMap.get('open'));
+    if (openId) {
+      this.expandedId.set(openId);
     }
   }
 

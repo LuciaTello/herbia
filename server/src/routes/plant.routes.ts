@@ -4,6 +4,7 @@
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
 import { getSuggestedPlants } from '../services/plant.service';
+import { incrementQuota } from '../services/quota.service';
 
 // Factory function (same pattern as trekRouter/collectionRouter)
 export function plantRouter(prisma: PrismaClient): Router {
@@ -16,6 +17,13 @@ export function plantRouter(prisma: PrismaClient): Router {
 
       if (!origin || !destination) {
         res.status(400).json({ error: 'Origin and destination are required' });
+        return;
+      }
+
+      // Check daily Google Maps quota (free tier limit)
+      const withinQuota = await incrementQuota(prisma);
+      if (!withinQuota) {
+        res.status(429).json({ error: 'Daily usage limit reached. Try again tomorrow!' });
         return;
       }
 

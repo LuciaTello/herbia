@@ -18,9 +18,9 @@ export function trekRouter(prisma: PrismaClient): Router {
       const month = now.getMonth() + 1; // 1-12
       const year = now.getFullYear();
 
-      // Normalize origin/destination for comparison (trim + lowercase)
-      const normalizedOrigin = origin.trim().toLowerCase();
-      const normalizedDestination = destination.trim().toLowerCase();
+      // Normalize origin/destination for comparison (trim + uppercase to match frontend format)
+      const normalizedOrigin = origin.trim().toUpperCase();
+      const normalizedDestination = destination.trim().toUpperCase();
 
       // Check if a trek already exists for this user + route + month
       // Like findByUserIdAndOriginAndDestinationAndMonthAndYear in JPA
@@ -117,12 +117,19 @@ export function trekRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      const updated = await prisma.suggestedPlant.update({
-        where: { id: plantId },
-        data: { found: true, foundAt: new Date() },
+      const now = new Date();
+
+      // Mark ALL suggested plants with the same scientificName for this user as found
+      await prisma.suggestedPlant.updateMany({
+        where: {
+          scientificName: plant.scientificName,
+          found: false,
+          trek: { userId: req.userId! },
+        },
+        data: { found: true, foundAt: now },
       });
 
-      res.json(updated);
+      res.json({ scientificName: plant.scientificName, found: true, foundAt: now });
     } catch (error) {
       console.error('Error marking plant as found:', error);
       res.status(500).json({ error: 'Failed to mark plant as found' });
