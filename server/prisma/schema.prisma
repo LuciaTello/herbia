@@ -55,6 +55,7 @@ model SuggestedPlant {
   scientificName String
   description    String
   rarity         String    @default("common")
+  source         String    @default("ai")   // "ai" | "user"
   found          Boolean   @default(false)
   foundAt        DateTime?
 

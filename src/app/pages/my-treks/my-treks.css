@@ -299,3 +299,185 @@ h2 {
 .photo-delete-btn:hover {
   background: #636e72;
 }
+
+.identify-banner {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.identify-banner.match {
+  background: #e8f5e9;
+  border: 1px solid #81c784;
+}
+
+.identify-banner.no-match {
+  background: #fff3e0;
+  border: 1px solid #ffb74d;
+}
+
+.identify-icon {
+  margin-right: 0.25rem;
+}
+
+.identify-banner.match .identify-icon {
+  color: #2d7d46;
+}
+
+.identify-banner.no-match .identify-icon {
+  color: #e65100;
+}
+
+.identify-text {
+  font-style: italic;
+}
+
+.identify-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.375rem;
+}
+
+.identify-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.identify-btn.confirm {
+  background: #2d7d46;
+  color: white;
+}
+
+.identify-btn.confirm:hover {
+  background: #236b38;
+}
+
+.identify-btn.cancel {
+  background: #dfe6e9;
+  color: #2d3436;
+}
+
+.identify-btn.cancel:hover {
+  background: #b2bec3;
+}
+
+/* Add plant button */
+.add-plant-button {
+  display: inline-block;
+  color: white;
+  background: #e17055;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8rem;
+  margin-top: 0.75rem;
+  cursor: pointer;
+}
+
+.add-plant-button:hover {
+  background: #d35400;
+}
+
+.adding-plant-badge {
+  display: inline-block;
+  color: #636e72;
+  border: 1.5px solid #b2bec3;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8rem;
+  margin-top: 0.75rem;
+}
+
+.add-plant-message {
+  font-size: 0.8rem;
+  color: #2d7d46;
+  margin: 0.375rem 0 0;
+}
+
+/* Section title for "Mis plantas" */
+.section-title {
+  color: #636e72;
+  font-size: 0.85rem;
+  margin: 1rem 0 0.5rem;
+}
+
+/* Unidentified plants */
+.unidentified-toggle {
+  color: #636e72;
+  font-size: 0.8rem;
+  margin: 0.75rem 0 0;
+  cursor: pointer;
+}
+
+.unidentified-toggle:hover {
+  color: #2d3436;
+}
+
+.unidentified-list {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+/* User plant card delete button */
+.user-plant-card {
+  position: relative;
+}
+
+.user-plant-delete {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.375rem;
+  background: none;
+  border: none;
+  color: #b2bec3;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.125rem;
+}
+
+.user-plant-delete:hover {
+  color: #d63031;
+}
+
+.unidentified-card {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.unidentified-delete {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #b2bec3;
+  color: white;
+  border: none;
+  font-size: 0.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.unidentified-delete:hover {
+  background: #d63031;
+}
+
+.unidentified-photo {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+}

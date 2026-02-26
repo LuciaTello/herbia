@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { PlantPhoto } from '../../models/plant.model';
+import { PlantPhoto, SuggestedPlant } from '../../models/plant.model';
 import { CollectionService } from '../../services/collection.service';
 import { TrekService } from '../../services/trek.service';
 import { I18nService } from '../../i18n';
@@ -30,6 +30,14 @@ export class CollectionPage implements OnInit {
 
   protected refPhotos(photos: PlantPhoto[]): PlantPhoto[] {
     return photos.filter(p => p.source !== 'user');
+  }
+
+  protected identifiedPlants(): SuggestedPlant[] {
+    return this.collection().filter(p => p.scientificName !== '');
+  }
+
+  protected unidentifiedPlants(): SuggestedPlant[] {
+    return this.collection().filter(p => p.scientificName === '');
   }
 
   async ngOnInit(): Promise<void> {

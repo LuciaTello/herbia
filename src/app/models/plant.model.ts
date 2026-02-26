@@ -21,6 +21,7 @@ export interface SuggestedPlant {
   scientificName: string;
   rarity: string;
   description: string;
+  source?: string;  // "ai" | "user"
   photos: PlantPhoto[];
   found: boolean;
   foundAt: string | null;
@@ -33,6 +34,14 @@ export interface SuggestResult {
   tooFar: boolean;
   description: string;
   plants: Plant[];
+}
+
+// IdentifyResult: what POST /api/treks/plants/:plantId/identify returns
+export interface IdentifyResult {
+  match: boolean;
+  score: number;
+  identifiedAs: string;
+  commonName: string;
 }
 
 // Trek: a search (origin → destination) for a specific month

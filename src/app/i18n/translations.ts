@@ -39,7 +39,20 @@ export interface Translations {
     addPhoto: string;
     uploading: string;
     myPhotos: string;
+    identifying: string;
+    identifyMatch: (name: string, score: number) => string;
+    identifyNoMatch: (name: string, score: number) => string;
+    identifyUnknown: string;
+    identifyUpload: string;
+    identifyCancel: string;
+    identifyUploadAnyway: string;
     summary: (total: number, found: number) => string;
+    addPlant: string;
+    addingPlant: string;
+    myPlantsTitle: string;
+    unidentifiedCount: (count: number) => string;
+    maxPhotosReached: string;
+    plantAdded: string;
   };
   collection: {
     back: string;
@@ -47,6 +60,7 @@ export interface Translations {
     loading: string;
     emptyLine1: string;
     emptyLine2: string;
+    unidentifiedTitle: string;
   };
   rarity: {
     common: string;
