@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">herbia</string>
+    <string name="title_activity_main">herbia</string>
+    <string name="package_name">com.herbia.app</string>
+    <string name="custom_url_scheme">com.herbia.app</string>
+</resources>

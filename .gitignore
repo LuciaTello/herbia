@@ -56,5 +56,11 @@ Thumbs.db
 # IntelliJ project files (local to each developer)
 *.iml
 
+# Capacitor Android build artifacts
+android/app/build/
+android/.gradle/
+android/build/
+android/local.properties
+
 # Claude Code local settings
 .claude/
