@@ -1,5 +1,5 @@
 // PlantService: like a @Service class in Spring
-// Contains the business logic for plant suggestions (Groq/Llama AI + Wikipedia/iNaturalist images)
+// Contains the business logic for plant suggestions (iNaturalist real data + Groq/Llama AI descriptions + Wikipedia/iNaturalist images)
 
 import Groq from 'groq-sdk';
 
@@ -23,6 +23,135 @@ interface PlantPhoto {
   source: string; // "wikipedia" | "inaturalist"
 }
 
+// Hardcoded tooFar messages per language (same text as i18n strings)
+const TOO_FAR: Record<string, string> = {
+  es: 'Esa ruta cruza múltiples climas — prueba con un trek más corto para que las sugerencias de plantas sean más precisas.',
+  fr: 'Cet itinéraire traverse plusieurs climats — essayez un trek plus court pour que les suggestions de plantes soient plus précises.',
+};
+
+// --- iNaturalist species discovery ---
+
+interface INatSpecies {
+  scientificName: string;
+  commonName: string;
+  count: number;
+  photoUrl: string;
+}
+
+function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371; // Earth radius in km
+  const toRad = (deg: number) => deg * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function fetchSpeciesCounts(
+  lat: number, lng: number, radiusKm: number, month: number, locale: string,
+): Promise<INatSpecies[]> {
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lng: String(lng),
+    radius: String(radiusKm),
+    iconic_taxa: 'Plantae',
+    month: String(month),
+    quality_grade: 'research',
+    per_page: '50',
+    locale,
+  });
+  const url = `https://api.inaturalist.org/v1/observations/species_counts?${params}`;
+  console.log(`iNaturalist species_counts: lat=${lat}, lng=${lng}, radius=${radiusKm}km, month=${month}`);
+  const response = await fetch(url, {
+    headers: { 'User-Agent': 'herbia-app' },
+  });
+  if (!response.ok) {
+    console.warn(`iNaturalist species_counts returned ${response.status}`);
+    return [];
+  }
+  const data = await response.json();
+  const species: INatSpecies[] = [];
+  for (const result of data.results || []) {
+    const taxon = result.taxon;
+    if (!taxon || taxon.rank !== 'species') continue;
+    species.push({
+      scientificName: taxon.name,
+      commonName: taxon.preferred_common_name || taxon.name,
+      count: result.count,
+      photoUrl: taxon.default_photo?.medium_url || '',
+    });
+  }
+  console.log(`iNaturalist: ${species.length} species found`);
+  return species;
+}
+
+function assignRarity(count: number, maxCount: number): 'common' | 'rare' | 'veryRare' {
+  const ratio = count / maxCount;
+  if (ratio > 0.3) return 'common';
+  if (ratio > 0.05) return 'rare';
+  return 'veryRare';
+}
+
+function selectPlants(species: INatSpecies[], exclude: string[]): (INatSpecies & { rarity: string })[] {
+  const excludeLower = new Set(exclude.map(n => n.toLowerCase()));
+  const filtered = species.filter(s => !excludeLower.has(s.scientificName.toLowerCase()));
+  if (filtered.length === 0) return [];
+
+  const maxCount = Math.max(...filtered.map(s => s.count));
+  const withRarity = filtered.map(s => ({ ...s, rarity: assignRarity(s.count, maxCount) }));
+
+  const common = withRarity.filter(s => s.rarity === 'common');
+  const rare = withRarity.filter(s => s.rarity === 'rare');
+  const veryRare = withRarity.filter(s => s.rarity === 'veryRare');
+
+  const picked: (INatSpecies & { rarity: string })[] = [];
+  picked.push(...common.slice(0, 5));
+  picked.push(...rare.slice(0, 3));
+  picked.push(...veryRare.slice(0, 2));
+
+  // If we didn't get 10, fill from remaining
+  if (picked.length < 10) {
+    const pickedNames = new Set(picked.map(p => p.scientificName));
+    for (const s of withRarity) {
+      if (picked.length >= 10) break;
+      if (!pickedNames.has(s.scientificName)) picked.push(s);
+    }
+  }
+
+  return picked.slice(0, 10);
+}
+
+// --- LLM prompts ---
+
+// Description-only prompt: the LLM adds fun descriptions to real iNaturalist plants
+function buildDescriptionPrompt(
+  plants: { scientificName: string; commonName: string }[],
+  origin: string, destination: string, lang: string, month: number,
+): string {
+  const langName = LANG_NAMES[lang] || 'Spanish';
+  const monthName = MONTH_NAMES[month];
+  const plantList = plants.map((p, i) => `${i + 1}. ${p.commonName} (${p.scientificName})`).join('\n');
+
+  return `You are a botanist with a sharp sense of humor and a love for bad plant puns.
+A person is walking from ${origin} to ${destination} in ${monthName}.
+IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
+
+Here are 10 real plants found along this route:
+${plantList}
+
+Write ONLY a JSON object (no markdown, no backticks) with this format:
+{
+  "routeDescription": "A fun overview in ${langName} (2-3 sentences) about the landscape and environment along this route in ${monthName}.",
+  "plants": [
+    { "scientificName": "Latin name", "description": "Brief fun description in ${langName} (2-3 sentences). Mention what it looks like, where to find it, include a touch of humor." }
+  ]
+}
+
+Include a "description" for each of the 10 plants above, in the same order. The "scientificName" must match exactly.`;
+}
+
+// Fallback: full LLM prompt when no coordinates are available (original behavior)
 function buildPlantPrompt(origin: string, destination: string, lang: string, month: number, exclude: string[]): string {
   const langName = LANG_NAMES[lang] || 'Spanish';
   const monthName = MONTH_NAMES[month];
@@ -65,6 +194,8 @@ Respond ONLY with a JSON object (no markdown, no backticks, no explanation), wit
   ]
 }`;
 }
+
+// --- Photo helpers (unchanged) ---
 
 // Clean botanical notation that Wikipedia doesn't understand:
 // "Helleborus niger/orientalis" → "Helleborus niger"
@@ -147,24 +278,10 @@ async function enrichPlantsWithPhotos(plants: any[]): Promise<any[]> {
   return enriched.filter((p): p is NonNullable<typeof p> => p !== null);
 }
 
-// --- Public functions (exported = public, like public methods in Java) ---
+// --- LLM-only fallback (original flow, used when no coordinates) ---
 
-// Must be called once after dotenv.config() has loaded the env vars
-// Like a manual @PostConstruct
-export function initPlantService(apiKey: string): void {
-  groq = new Groq({ apiKey });
-}
-
-export interface SuggestedPlantsResult {
-  tooFar: boolean;
-  description: string;
-  plants: any[];
-}
-
-export async function getSuggestedPlants(origin: string, destination: string, lang: string = 'es', month?: number, exclude: string[] = []): Promise<SuggestedPlantsResult> {
-  // getMonth() returns 0-11 (Jan=0), so +1 to get 1-12 like our DB stores
-  const currentMonth = month || (new Date().getMonth() + 1);
-  const prompt = buildPlantPrompt(origin, destination, lang, currentMonth, exclude);
+async function llmOnlyFlow(origin: string, destination: string, lang: string, month: number, exclude: string[]): Promise<SuggestedPlantsResult> {
+  const prompt = buildPlantPrompt(origin, destination, lang, month, exclude);
 
   const completion = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
@@ -181,5 +298,95 @@ export async function getSuggestedPlants(origin: string, destination: string, la
   }
 
   const plants = await enrichPlantsWithPhotos(parsed.plants);
+  console.log(`\n🌱 Plantas sugeridas (fuente: Groq LLM):`);
+  for (const p of plants) {
+    console.log(`  - ${p.commonName} (${p.scientificName}) [${p.rarity}]`);
+  }
   return { tooFar: false, description: parsed.description, plants };
+}
+
+// --- Public functions (exported = public, like public methods in Java) ---
+
+// Must be called once after dotenv.config() has loaded the env vars
+// Like a manual @PostConstruct
+export function initPlantService(apiKey: string): void {
+  groq = new Groq({ apiKey });
+}
+
+export interface SuggestedPlantsResult {
+  tooFar: boolean;
+  description: string;
+  plants: any[];
+}
+
+export async function getSuggestedPlants(
+  origin: string, destination: string, lang: string = 'es', month?: number, exclude: string[] = [],
+  originLat?: number, originLng?: number, destLat?: number, destLng?: number,
+): Promise<SuggestedPlantsResult> {
+  const currentMonth = month || (new Date().getMonth() + 1);
+
+  // Step 1: If no coordinates → fall back to LLM-only flow
+  if (!originLat || !originLng || !destLat || !destLng) {
+    console.log('No coordinates provided, using LLM-only fallback');
+    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude);
+  }
+
+  // Step 2: Check distance
+  const distance = haversine(originLat, originLng, destLat, destLng);
+  console.log(`Route distance: ${distance.toFixed(1)} km`);
+
+  // Step 3: Too far → return immediately without LLM call
+  if (distance > 100) {
+    return { tooFar: true, description: TOO_FAR[lang] || TOO_FAR['es'], plants: [] };
+  }
+
+  // Step 4: Compute midpoint and search radius
+  const midLat = (originLat + destLat) / 2;
+  const midLng = (originLng + destLng) / 2;
+  const radius = Math.max(5, Math.min(distance / 2, 50));
+
+  // Step 5: Fetch species from iNaturalist
+  const species = await fetchSpeciesCounts(midLat, midLng, radius, currentMonth, lang);
+
+  // Step 6: If too few species → fall back to LLM-only
+  if (species.length < 3) {
+    console.log(`Only ${species.length} iNat species, using LLM-only fallback`);
+    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude);
+  }
+
+  // Step 7: Select 10 diverse plants with rarity
+  const selected = selectPlants(species, exclude);
+
+  // Step 8: Ask LLM for descriptions only
+  const descPrompt = buildDescriptionPrompt(selected, origin, destination, lang, currentMonth);
+  const completion = await groq.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
+    messages: [{ role: 'user', content: descPrompt }],
+    temperature: 0.7,
+  });
+
+  const text = (completion.choices[0]?.message?.content || '')
+    .replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+  const llmResult = JSON.parse(text);
+
+  // Step 9: Merge LLM descriptions with iNat plant data
+  const descMap = new Map<string, string>();
+  for (const p of llmResult.plants || []) {
+    descMap.set(p.scientificName, p.description);
+  }
+
+  const mergedPlants = selected.map(s => ({
+    commonName: s.commonName,
+    scientificName: s.scientificName,
+    rarity: s.rarity,
+    description: descMap.get(s.scientificName) || '',
+  }));
+
+  // Step 10: Enrich with Wikipedia + iNat observation photos
+  const plants = await enrichPlantsWithPhotos(mergedPlants);
+  console.log(`\n🌱 Plantas sugeridas (fuente: iNaturalist + descripciones Groq):`);
+  for (const p of plants) {
+    console.log(`  - ${p.commonName} (${p.scientificName}) [${p.rarity}]`);
+  }
+  return { tooFar: false, description: llmResult.routeDescription || '', plants };
 }

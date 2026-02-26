@@ -13,7 +13,7 @@ export function plantRouter(prisma: PrismaClient): Router {
   // POST /api/plants/suggest
   router.post('/suggest', async (req, res) => {
     try {
-      const { origin, destination, lang } = req.body;
+      const { origin, destination, lang, originLat, originLng, destLat, destLng } = req.body;
 
       if (!origin || !destination) {
         res.status(400).json({ error: 'Origin and destination are required' });
@@ -35,7 +35,7 @@ export function plantRouter(prisma: PrismaClient): Router {
       });
       const exclude = existing.map(p => p.scientificName);
 
-      const result = await getSuggestedPlants(origin, destination, lang || 'es', undefined, exclude);
+      const result = await getSuggestedPlants(origin, destination, lang || 'es', undefined, exclude, originLat, originLng, destLat, destLng);
 
       // Hard filter: remove any plant whose scientificName is already in the user's collection
       // (the LLM prompt asks to exclude them, but it can ignore the instruction)
@@ -46,7 +46,7 @@ export function plantRouter(prisma: PrismaClient): Router {
 
       res.json({ tooFar: result.tooFar, description: result.description, plants: filteredPlants });
     } catch (error) {
-      console.error('Error calling Gemini:', error);
+      console.error('Error fetching plant suggestions:', error);
       res.status(500).json({ error: 'Failed to get plant suggestions' });
     }
   });
