@@ -76,6 +76,12 @@ export const FR: Translations = {
     emptyLine1: "Vous n'avez encore trouvé aucune plante.",
     emptyLine2: 'Partez en itinéraire et commencez à chercher !',
     unidentifiedTitle: 'Plantes non identifiées',
+    mapTitle: 'Carte',
+    plantsCount: (n) => `${n} plante${n !== 1 ? 's' : ''}`,
+    noLocation: 'Sans localisation',
+    noLocationCount: (n) => `${n} plante${n !== 1 ? 's' : ''} sans localisation`,
+    regionsTitle: 'Régions',
+    allRegions: 'Toutes les régions',
   },
   rarity: {
     common: 'Commun',

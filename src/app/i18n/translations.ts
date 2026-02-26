@@ -61,6 +61,12 @@ export interface Translations {
     emptyLine1: string;
     emptyLine2: string;
     unidentifiedTitle: string;
+    mapTitle: string;
+    plantsCount: (n: number) => string;
+    noLocation: string;
+    noLocationCount: (n: number) => string;
+    regionsTitle: string;
+    allRegions: string;
   };
   rarity: {
     common: string;

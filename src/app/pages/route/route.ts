@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Plant, PlantPhoto } from '../../models/plant.model';
+import { Plant, PlantPhoto, PlaceSelection } from '../../models/plant.model';
 import { PlantService } from '../../services/plant.service';
 import { TrekService } from '../../services/trek.service';
 import { I18nService } from '../../i18n';
@@ -25,6 +25,10 @@ export class RoutePage {
 
   protected readonly origin = signal('');
   protected readonly destination = signal('');
+  private originCountry = '';
+  private originCountryCode = '';
+  private originRegion = '';
+  private originRegionCode = '';
   protected readonly plants = signal<Plant[]>([]);
   protected readonly description = signal('');
   protected readonly tooFar = signal(false);
@@ -73,6 +77,18 @@ export class RoutePage {
 
   protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
 
+  protected onOriginSelected(selection: PlaceSelection): void {
+    this.origin.set(selection.name);
+    this.originCountry = selection.country || '';
+    this.originCountryCode = selection.countryCode || '';
+    this.originRegion = selection.region || '';
+    this.originRegionCode = selection.regionCode || '';
+  }
+
+  protected onDestinationSelected(selection: PlaceSelection): void {
+    this.destination.set(selection.name);
+  }
+
   async onSearch(): Promise<void> {
     this.loading.set(true);
     this.error.set('');
@@ -107,6 +123,10 @@ export class RoutePage {
         this.destination(),
         this.description(),
         this.plants(),
+        this.originCountry,
+        this.originCountryCode,
+        this.originRegion,
+        this.originRegionCode,
       );
       this.router.navigate(['/my-treks'], { queryParams: { open: trek.id } });
     } catch (e) {

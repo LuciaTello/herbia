@@ -26,7 +26,7 @@ export interface SuggestedPlant {
   found: boolean;
   foundAt: string | null;
   trekId: number;
-  trek?: { origin: string; destination: string };
+  trek?: { origin: string; destination: string; country?: string | null; countryCode?: string | null; region?: string | null; regionCode?: string | null };
 }
 
 // SuggestResult: what POST /api/plants/suggest returns (description + plants)
@@ -44,6 +44,15 @@ export interface IdentifyResult {
   commonName: string;
 }
 
+// PlaceSelection: emitted by PlaceAutocomplete when a place is selected
+export interface PlaceSelection {
+  name: string;
+  country?: string;
+  countryCode?: string;
+  region?: string;
+  regionCode?: string;
+}
+
 // Trek: a search (origin → destination) for a specific month
 export interface Trek {
   id: number;
@@ -52,6 +61,10 @@ export interface Trek {
   description: string;
   month: number;
   year: number;
+  country?: string | null;
+  countryCode?: string | null;
+  region?: string | null;
+  regionCode?: string | null;
   createdAt: string;
   plants: SuggestedPlant[];
 }

@@ -35,6 +35,10 @@ model Trek {
   month       Int              // 1-12, for seasonal plant suggestions
   year        Int              // e.g. 2026
   createdAt   DateTime         @default(now())
+  country     String?
+  countryCode String?          @map("country_code")
+  region      String?
+  regionCode  String?          @map("region_code")
 
   // Foreign key to User
   userId      Int              @map("user_id")

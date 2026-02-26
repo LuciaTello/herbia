@@ -13,63 +13,126 @@
     <p>{{ i18n.t().collection.emptyLine2 }}</p>
   </div>
 } @else {
-  <div class="collection-list">
-    @for (found of identifiedPlants(); track found.id) {
-      <article class="found-card">
-        <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
-        <div class="plant-thumbnail" (click)="openGallery(refPhotos(found.photos), found.commonName)">
-          @if (refPhotos(found.photos).length) {
-            <img [src]="refPhotos(found.photos)[0].url" [alt]="found.commonName" />
-          } @else if (userPhotos(found.photos).length) {
-            <img [src]="userPhotos(found.photos)[0].url" [alt]="found.commonName" />
-          } @else {
-            <div class="no-photo">?</div>
+  <!-- Breadcrumb (hidden on map view) -->
+  @if (view() !== 'map') {
+    <nav class="breadcrumb">
+      @for (part of breadcrumb(); track $index; let last = $last) {
+        @if (!last && part.action !== null) {
+          <button class="breadcrumb-link" (click)="navigateTo(part.action)">{{ part.label }}</button>
+          <span class="breadcrumb-sep">/</span>
+        } @else {
+          <span class="breadcrumb-current">{{ part.label }}</span>
+        }
+      }
+    </nav>
+  }
+
+  @switch (view()) {
+    <!-- MAP VIEW -->
+    @case ('map') {
+      <app-world-map
+        [plantCounts]="continentCounts()"
+        [lang]="i18n.currentLang()"
+        (continentSelected)="onContinentSelected($event)"
+      />
+
+      @if (noLocationPlants().length) {
+        <button class="no-location-link" (click)="onShowNoLocation()">
+          {{ i18n.t().collection.noLocationCount(noLocationPlants().length) }}
+        </button>
+      }
+
+      @if (unidentifiedPlants().length) {
+        <h3 class="unidentified-title">{{ i18n.t().collection.unidentifiedTitle }}</h3>
+        <div class="collection-list">
+          @for (plant of unidentifiedPlants(); track plant.id) {
+            <article class="found-card unidentified">
+              <button class="remove-button" (click)="removePlant(plant.id)">&times;</button>
+              <div class="plant-thumbnail" (click)="openGallery(userPhotos(plant.photos), '')">
+                @if (userPhotos(plant.photos).length) {
+                  <img [src]="userPhotos(plant.photos)[0].url" alt="" />
+                } @else {
+                  <div class="no-photo">?</div>
+                }
+              </div>
+              <div class="found-info">
+                <p class="route">{{ plant.trek?.origin }} → {{ plant.trek?.destination }}</p>
+                <p class="date">{{ plant.foundAt }}</p>
+              </div>
+            </article>
           }
         </div>
-        <div class="found-info">
-          <h4>{{ found.commonName }}</h4>
-          <p class="scientific">{{ found.scientificName }}</p>
-          <p class="chance" [style.color]="rarity(found.rarity).color">
-            {{ rarity(found.rarity).label }}
-          </p>
-          <p class="route">{{ found.trek?.origin }} → {{ found.trek?.destination }}</p>
-          <p class="date">{{ found.foundAt }}</p>
-        </div>
-        @if (userPhotos(found.photos).length) {
-          <div class="user-photos-box">
-            @for (photo of userPhotos(found.photos); track photo.id) {
-              <div class="user-photo-wrapper">
-                <img class="user-photo-thumb" [src]="photo.url" [alt]="found.commonName"
-                     (click)="openGallery(userPhotos(found.photos), found.commonName)" />
-                <button class="photo-delete-btn" (click)="deletePhoto(photo.id!, found.id)">&times;</button>
+      }
+    }
+
+    <!-- COUNTRIES VIEW -->
+    @case ('countries') {
+      <div class="country-grid">
+        @for (country of countriesInContinent(); track country.code) {
+          <button class="country-card" (click)="onCountrySelected(country.code, country.name)">
+            <span class="country-flag">{{ country.flag }}</span>
+            <span class="country-name">{{ country.name }}</span>
+            <span class="country-count">{{ i18n.t().collection.plantsCount(country.count) }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- REGIONS VIEW -->
+    @case ('regions') {
+      <div class="country-grid">
+        <button class="country-card all-region-card" (click)="onShowAllFromCountry()">
+          <span class="country-name">{{ i18n.t().collection.allRegions }}</span>
+          <span class="country-count">{{ i18n.t().collection.plantsCount(plantsInView().length) }}</span>
+        </button>
+        @for (region of regionsInCountry(); track region.name) {
+          <button class="country-card" (click)="onRegionSelected(region.name)">
+            <span class="country-name">{{ region.name }}</span>
+            <span class="country-count">{{ i18n.t().collection.plantsCount(region.count) }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- PLANTS VIEW -->
+    @case ('plants') {
+      <div class="collection-list">
+        @for (found of plantsInView(); track found.id) {
+          <article class="found-card">
+            <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
+            <div class="plant-thumbnail" (click)="openGallery(refPhotos(found.photos), found.commonName)">
+              @if (refPhotos(found.photos).length) {
+                <img [src]="refPhotos(found.photos)[0].url" [alt]="found.commonName" />
+              } @else if (userPhotos(found.photos).length) {
+                <img [src]="userPhotos(found.photos)[0].url" [alt]="found.commonName" />
+              } @else {
+                <div class="no-photo">?</div>
+              }
+            </div>
+            <div class="found-info">
+              <h4>{{ found.commonName }}</h4>
+              <p class="scientific">{{ found.scientificName }}</p>
+              <p class="chance" [style.color]="rarity(found.rarity).color">
+                {{ rarity(found.rarity).label }}
+              </p>
+              <p class="route">{{ found.trek?.origin }} → {{ found.trek?.destination }}</p>
+              <p class="date">{{ found.foundAt }}</p>
+            </div>
+            @if (userPhotos(found.photos).length) {
+              <div class="user-photos-box">
+                @for (photo of userPhotos(found.photos); track photo.id) {
+                  <div class="user-photo-wrapper">
+                    <img class="user-photo-thumb" [src]="photo.url" [alt]="found.commonName"
+                         (click)="openGallery(userPhotos(found.photos), found.commonName)" />
+                    <button class="photo-delete-btn" (click)="deletePhoto(photo.id!, found.id)">&times;</button>
+                  </div>
+                }
               </div>
             }
-          </div>
+          </article>
         }
-      </article>
+      </div>
     }
-  </div>
-
-  @if (unidentifiedPlants().length) {
-    <h3 class="unidentified-title">{{ i18n.t().collection.unidentifiedTitle }}</h3>
-    <div class="collection-list">
-      @for (plant of unidentifiedPlants(); track plant.id) {
-        <article class="found-card unidentified">
-          <button class="remove-button" (click)="removePlant(plant.id)">&times;</button>
-          <div class="plant-thumbnail" (click)="openGallery(userPhotos(plant.photos), '')">
-            @if (userPhotos(plant.photos).length) {
-              <img [src]="userPhotos(plant.photos)[0].url" alt="" />
-            } @else {
-              <div class="no-photo">?</div>
-            }
-          </div>
-          <div class="found-info">
-            <p class="route">{{ plant.trek?.origin }} → {{ plant.trek?.destination }}</p>
-            <p class="date">{{ plant.foundAt }}</p>
-          </div>
-        </article>
-      }
-    </div>
   }
 }
 

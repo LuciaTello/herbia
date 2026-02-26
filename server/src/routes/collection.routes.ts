@@ -18,7 +18,7 @@ export function collectionRouter(prisma: PrismaClient): Router {
         },
         include: {
           photos: true,
-          trek: { select: { origin: true, destination: true } },
+          trek: { select: { origin: true, destination: true, country: true, countryCode: true, region: true, regionCode: true } },
         },
         orderBy: { foundAt: 'desc' },
       });

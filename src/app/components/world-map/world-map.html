@@ -1,0 +1,33 @@
+<svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" class="world-map">
+  @for (c of continents(); track c.id) {
+    <g class="continent" [class.has-plants]="c.count > 0" (click)="onContinentClick(c.id)">
+      @switch (c.id) {
+        @case ('europe') {
+          <path [attr.fill]="fillColor(c.count)" d="M460,60 L480,55 510,60 530,70 540,85 535,110 545,125 530,140 520,155 500,165 480,170 460,165 445,155 435,140 440,120 450,105 455,85Z" />
+          <text x="485" y="120" class="label">{{ c.name }}</text>
+          <text x="485" y="138" class="count">{{ c.count }}</text>
+        }
+        @case ('asia') {
+          <path [attr.fill]="fillColor(c.count)" d="M570,50 L620,45 680,55 740,70 780,100 800,140 790,180 770,210 740,230 700,240 660,235 620,220 590,195 570,165 555,130 560,90Z" />
+          <text x="680" y="140" class="label">{{ c.name }}</text>
+          <text x="680" y="158" class="count">{{ c.count }}</text>
+        }
+        @case ('africa') {
+          <path [attr.fill]="fillColor(c.count)" d="M440,180 L470,175 505,185 520,210 525,245 520,280 510,315 495,345 475,365 455,370 435,360 420,335 415,300 418,265 425,235 430,210Z" />
+          <text x="470" y="275" class="label">{{ c.name }}</text>
+          <text x="470" y="293" class="count">{{ c.count }}</text>
+        }
+        @case ('america') {
+          <path [attr.fill]="fillColor(c.count)" d="M120,30 L180,25 230,45 250,80 240,120 225,155 210,180 220,210 230,245 225,285 210,330 195,365 175,395 155,415 135,420 120,400 115,365 125,325 135,285 140,245 130,210 115,175 105,140 100,100 105,65Z" />
+          <text x="170" y="200" class="label">{{ c.name }}</text>
+          <text x="170" y="218" class="count">{{ c.count }}</text>
+        }
+        @case ('oceania') {
+          <path [attr.fill]="fillColor(c.count)" d="M750,260 L790,255 840,265 880,285 895,310 885,340 860,360 830,365 795,355 770,335 755,310 750,285Z" />
+          <text x="822" y="310" class="label">{{ c.name }}</text>
+          <text x="822" y="328" class="count">{{ c.count }}</text>
+        }
+      }
+    </g>
+  }
+</svg>
