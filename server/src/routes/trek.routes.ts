@@ -23,7 +23,7 @@ export function trekRouter(prisma: PrismaClient): Router {
   // POST /api/treks - Create a new trek or return existing one for this month
   router.post('/', async (req, res) => {
     try {
-      const { origin, destination, description, plants: clientPlants } = req.body;
+      const { origin, destination, description, plants: clientPlants, country, countryCode, region, regionCode } = req.body;
       const now = new Date();
       const month = now.getMonth() + 1; // 1-12
       const year = now.getFullYear();
@@ -70,6 +70,10 @@ export function trekRouter(prisma: PrismaClient): Router {
           description: description || '',
           month,
           year,
+          country: country || null,
+          countryCode: countryCode || null,
+          region: region || null,
+          regionCode: regionCode || null,
           userId: req.userId!,
           plants: {
             create: (clientPlants || []).map((p: any) => ({

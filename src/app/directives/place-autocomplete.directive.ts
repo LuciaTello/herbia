@@ -1,5 +1,6 @@
 import { Directive, ElementRef, inject, NgZone, OnDestroy, OnInit, output } from '@angular/core';
 import { GoogleMapsLoaderService } from '../services/google-maps-loader.service';
+import { PlaceSelection } from '../models/plant.model';
 
 @Directive({ selector: '[appPlaceAutocomplete]' })
 export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
@@ -7,7 +8,7 @@ export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
   private readonly zone = inject(NgZone);
   private readonly loader = inject(GoogleMapsLoaderService);
 
-  readonly placeSelected = output<string>();
+  readonly placeSelected = output<PlaceSelection>();
 
   private autocomplete: google.maps.places.Autocomplete | null = null;
   private listener: google.maps.MapsEventListener | null = null;
@@ -30,7 +31,17 @@ export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
           || this.el.nativeElement.value;
         const postalCode = components.find(c => c.types.includes('postal_code'))?.long_name;
         const name = postalCode ? `${city.toUpperCase()} (${postalCode})` : city.toUpperCase();
-        this.placeSelected.emit(name);
+
+        const countryComponent = components.find(c => c.types.includes('country'));
+        const regionComponent = components.find(c => c.types.includes('administrative_area_level_1'));
+
+        this.placeSelected.emit({
+          name,
+          country: countryComponent?.long_name,
+          countryCode: countryComponent?.short_name,
+          region: regionComponent?.long_name,
+          regionCode: regionComponent?.short_name,
+        });
       });
     });
   }

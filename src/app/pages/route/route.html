@@ -14,7 +14,7 @@
       name="origin"
       required
       appPlaceAutocomplete
-      (placeSelected)="origin.set($event)"
+      (placeSelected)="onOriginSelected($event)"
     />
   </div>
 
@@ -29,7 +29,7 @@
       name="destination"
       required
       appPlaceAutocomplete
-      (placeSelected)="destination.set($event)"
+      (placeSelected)="onDestinationSelected($event)"
     />
   </div>
 

@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.world-map {
+  width: 100%;
+  height: auto;
+}
+
+.continent {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.continent:hover {
+  opacity: 0.8;
+}
+
+.continent path {
+  stroke: #b2bec3;
+  stroke-width: 1.5;
+  transition: fill 0.2s;
+}
+
+.continent.has-plants path {
+  stroke: #2d7d46;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  fill: #2d3436;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.count {
+  font-size: 12px;
+  fill: #636e72;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.continent.has-plants .count {
+  fill: #2d3436;
+  font-weight: 600;
+}
