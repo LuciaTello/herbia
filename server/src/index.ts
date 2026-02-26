@@ -36,8 +36,19 @@ const prisma = new PrismaClient({ adapter });
 
 // CORS: allow the frontend (Cloudflare Pages) to call this backend (Render)
 // In Spring this would be @CrossOrigin or a CorsFilter
+const allowedOrigins = [
+  process.env['FRONTEND_URL'] || 'http://localhost:4200',
+  'https://localhost',    // Capacitor Android
+  'capacitor://localhost', // Capacitor iOS
+];
 app.use(cors({
-  origin: process.env['FRONTEND_URL'] || 'http://localhost:4200',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
 }));
 app.use(express.json());
 
