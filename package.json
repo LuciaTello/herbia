@@ -7,7 +7,10 @@
     "postinstall": "cd server && npm install",
     "build": "ng build && cd server && npx prisma generate && npm run build",
     "start": "node server/dist/index.js",
-    "test": "ng test"
+    "test": "ng test",
+    "cap:build": "ng build --configuration production --base-href ./ && npx cap sync android",
+    "cap:open": "npx cap open android",
+    "cap:run": "npx cap run android"
   },
   "prettier": {
     "printWidth": 100,
@@ -31,6 +34,8 @@
     "@angular/google-maps": "^21.2.0",
     "@angular/platform-browser": "^21.1.0",
     "@angular/router": "^21.1.0",
+    "@capacitor/android": "^7.5.0",
+    "@capacitor/core": "^7.5.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -38,6 +43,7 @@
     "@angular/build": "^21.1.4",
     "@angular/cli": "^21.1.4",
     "@angular/compiler-cli": "^21.1.0",
+    "@capacitor/cli": "^7.5.0",
     "@types/google.maps": "^3.58.1",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
