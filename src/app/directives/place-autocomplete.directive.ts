@@ -16,8 +16,7 @@ export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
     const loaded = await this.loader.load();
     if (!loaded) return;
 
-    const { Autocomplete } = await google.maps.importLibrary('places') as google.maps.PlacesLibrary;
-    this.autocomplete = new Autocomplete(this.el.nativeElement, {
+    this.autocomplete = new google.maps.places.Autocomplete(this.el.nativeElement, {
       types: ['(cities)'],
       fields: ['address_components', 'name'],
     });
