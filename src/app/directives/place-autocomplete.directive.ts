@@ -1,38 +1,43 @@
-import { Directive, ElementRef, inject, NgZone, OnDestroy, OnInit, output } from '@angular/core';
+import {
+  Component, ElementRef, ViewChild, AfterViewInit,
+  inject, NgZone, OnDestroy, output, input, CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { GoogleMapsLoaderService } from '../services/google-maps-loader.service';
 
-@Directive({ selector: '[appPlaceAutocomplete]' })
-export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
-  private readonly el = inject(ElementRef<HTMLInputElement>);
-  private readonly zone = inject(NgZone);
+@Component({
+  selector: 'app-place-autocomplete',
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: `<gmp-place-autocomplete #el [attr.placeholder]="placeholder()"></gmp-place-autocomplete>`,
+  styles: `
+    :host { display: block; }
+    gmp-place-autocomplete { width: 100%; }
+  `,
+})
+export class PlaceAutocompleteComponent implements AfterViewInit, OnDestroy {
   private readonly loader = inject(GoogleMapsLoaderService);
+  private readonly zone = inject(NgZone);
 
+  readonly placeholder = input('');
   readonly placeSelected = output<string>();
 
-  private autocomplete: google.maps.places.Autocomplete | null = null;
+  @ViewChild('el', { read: ElementRef }) elRef!: ElementRef;
+
   private listener: google.maps.MapsEventListener | null = null;
 
-  async ngOnInit(): Promise<void> {
+  async ngAfterViewInit(): Promise<void> {
     const loaded = await this.loader.load();
     if (!loaded) return;
 
-    this.autocomplete = new google.maps.places.Autocomplete(this.el.nativeElement, {
-      types: ['(cities)'],
-      fields: ['address_components', 'name'],
-    });
+    const el = this.elRef.nativeElement as google.maps.places.PlaceAutocompleteElement;
+    el.types = ['(cities)'];
 
-    this.listener = this.autocomplete.addListener('place_changed', () => {
+    this.listener = el.addEventListener('gmp-placeselect', ((e: google.maps.places.PlaceAutocompletePlaceSelectEvent) => {
       this.zone.run(() => {
-        const place = this.autocomplete!.getPlace();
-        const components = place.address_components || [];
-        const city = components.find(c => c.types.includes('locality'))?.long_name
-          || place.name
-          || this.el.nativeElement.value;
-        const postalCode = components.find(c => c.types.includes('postal_code'))?.long_name;
-        const name = postalCode ? `${city.toUpperCase()} (${postalCode})` : city.toUpperCase();
+        const place = e.place;
+        const name = place.displayName?.toUpperCase() || '';
         this.placeSelected.emit(name);
       });
-    });
+    }) as EventListener) as unknown as google.maps.MapsEventListener;
   }
 
   ngOnDestroy(): void {
