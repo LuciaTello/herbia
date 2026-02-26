@@ -1,16 +1,28 @@
 import {
   Component, ElementRef, ViewChild, AfterViewInit,
-  inject, NgZone, OnDestroy, output, input, CUSTOM_ELEMENTS_SCHEMA,
+  inject, NgZone, OnDestroy, output, input, signal, CUSTOM_ELEMENTS_SCHEMA,
 } from '@angular/core';
 import { GoogleMapsLoaderService } from '../services/google-maps-loader.service';
 
 @Component({
   selector: 'app-place-autocomplete',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  template: `<gmp-place-autocomplete #el [attr.placeholder]="placeholder()"></gmp-place-autocomplete>`,
+  template: `
+    @if (!ready()) {
+      <input [placeholder]="placeholder()" disabled />
+    }
+    <div #container></div>
+  `,
   styles: `
     :host { display: block; }
-    gmp-place-autocomplete { width: 100%; }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.75rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
   `,
 })
 export class PlaceAutocompleteComponent implements AfterViewInit, OnDestroy {
@@ -19,28 +31,35 @@ export class PlaceAutocompleteComponent implements AfterViewInit, OnDestroy {
 
   readonly placeholder = input('');
   readonly placeSelected = output<string>();
+  protected readonly ready = signal(false);
 
-  @ViewChild('el', { read: ElementRef }) elRef!: ElementRef;
+  @ViewChild('container', { read: ElementRef }) containerRef!: ElementRef<HTMLDivElement>;
 
-  private listener: google.maps.MapsEventListener | null = null;
+  private el: google.maps.places.PlaceAutocompleteElement | null = null;
 
   async ngAfterViewInit(): Promise<void> {
     const loaded = await this.loader.load();
     if (!loaded) return;
 
-    const el = this.elRef.nativeElement as google.maps.places.PlaceAutocompleteElement;
-    el.types = ['(cities)'];
+    this.el = new google.maps.places.PlaceAutocompleteElement({
+      types: ['(cities)'],
+    });
 
-    this.listener = el.addEventListener('gmp-placeselect', ((e: google.maps.places.PlaceAutocompletePlaceSelectEvent) => {
+    (this.el as any).placeholder = this.placeholder();
+    this.el.style.width = '100%';
+
+    this.el.addEventListener('gmp-placeselect', ((e: google.maps.places.PlaceAutocompletePlaceSelectEvent) => {
       this.zone.run(() => {
-        const place = e.place;
-        const name = place.displayName?.toUpperCase() || '';
+        const name = e.place.displayName?.toUpperCase() || '';
         this.placeSelected.emit(name);
       });
-    }) as EventListener) as unknown as google.maps.MapsEventListener;
+    }) as EventListener);
+
+    this.containerRef.nativeElement.appendChild(this.el);
+    this.zone.run(() => this.ready.set(true));
   }
 
   ngOnDestroy(): void {
-    this.listener?.remove();
+    this.el?.remove();
   }
 }
