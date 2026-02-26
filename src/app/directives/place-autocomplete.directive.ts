@@ -1,58 +1,41 @@
-import {
-  Component, ElementRef, ViewChild, AfterViewInit,
-  inject, NgZone, OnDestroy, output, input, signal, CUSTOM_ELEMENTS_SCHEMA,
-} from '@angular/core';
+import { Directive, ElementRef, inject, NgZone, OnDestroy, OnInit, output } from '@angular/core';
 import { GoogleMapsLoaderService } from '../services/google-maps-loader.service';
 
-@Component({
-  selector: 'app-place-autocomplete',
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  template: `
-    @if (ready()) {
-      <gmp-place-autocomplete #el></gmp-place-autocomplete>
-    } @else {
-      <input [placeholder]="placeholder()" disabled />
-    }
-  `,
-  styles: `
-    :host { display: block; }
-    input, gmp-place-autocomplete {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 0.75rem;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-  `,
-})
-export class PlaceAutocompleteComponent implements AfterViewInit, OnDestroy {
-  private readonly loader = inject(GoogleMapsLoaderService);
+@Directive({ selector: '[appPlaceAutocomplete]' })
+export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
+  private readonly el = inject(ElementRef<HTMLInputElement>);
   private readonly zone = inject(NgZone);
+  private readonly loader = inject(GoogleMapsLoaderService);
 
-  readonly placeholder = input('');
   readonly placeSelected = output<string>();
-  protected readonly ready = signal(false);
 
-  @ViewChild('el', { read: ElementRef }) set elRef(ref: ElementRef | undefined) {
-    if (!ref) return;
-    const el = ref.nativeElement as google.maps.places.PlaceAutocompleteElement;
-    (el as any).placeholder = this.placeholder();
-    el.types = ['(cities)'];
+  private autocomplete: google.maps.places.Autocomplete | null = null;
+  private listener: google.maps.MapsEventListener | null = null;
 
-    el.addEventListener('gmp-placeselect', ((e: google.maps.places.PlaceAutocompletePlaceSelectEvent) => {
-      this.zone.run(() => {
-        const name = e.place.displayName?.toUpperCase() || '';
-        this.placeSelected.emit(name);
-      });
-    }) as EventListener);
-  }
-
-  async ngAfterViewInit(): Promise<void> {
+  async ngOnInit(): Promise<void> {
     const loaded = await this.loader.load();
     if (!loaded) return;
-    this.zone.run(() => this.ready.set(true));
+
+    this.autocomplete = new google.maps.places.Autocomplete(this.el.nativeElement, {
+      types: ['(cities)'],
+      fields: ['address_components', 'name'],
+    });
+
+    this.listener = this.autocomplete.addListener('place_changed', () => {
+      this.zone.run(() => {
+        const place = this.autocomplete!.getPlace();
+        const components = place.address_components || [];
+        const city = components.find(c => c.types.includes('locality'))?.long_name
+          || place.name
+          || this.el.nativeElement.value;
+        const postalCode = components.find(c => c.types.includes('postal_code'))?.long_name;
+        const name = postalCode ? `${city.toUpperCase()} (${postalCode})` : city.toUpperCase();
+        this.placeSelected.emit(name);
+      });
+    });
   }
 
-  ngOnDestroy(): void {}
+  ngOnDestroy(): void {
+    this.listener?.remove();
+  }
 }
