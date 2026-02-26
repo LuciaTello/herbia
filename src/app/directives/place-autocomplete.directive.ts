@@ -19,7 +19,7 @@ export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
 
     this.autocomplete = new google.maps.places.Autocomplete(this.el.nativeElement, {
       types: ['(cities)'],
-      fields: ['address_components', 'name'],
+      fields: ['address_components', 'name', 'geometry'],
     });
 
     this.listener = this.autocomplete.addListener('place_changed', () => {
@@ -35,12 +35,17 @@ export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
         const countryComponent = components.find(c => c.types.includes('country'));
         const regionComponent = components.find(c => c.types.includes('administrative_area_level_1'));
 
+        const lat = place.geometry?.location?.lat();
+        const lng = place.geometry?.location?.lng();
+
         this.placeSelected.emit({
           name,
           country: countryComponent?.long_name,
           countryCode: countryComponent?.short_name,
           region: regionComponent?.long_name,
           regionCode: regionComponent?.short_name,
+          lat,
+          lng,
         });
       });
     });

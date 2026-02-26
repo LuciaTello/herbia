@@ -29,6 +29,10 @@ export class RoutePage {
   private originCountryCode = '';
   private originRegion = '';
   private originRegionCode = '';
+  private originLat: number | null = null;
+  private originLng: number | null = null;
+  private destLat: number | null = null;
+  private destLng: number | null = null;
   protected readonly plants = signal<Plant[]>([]);
   protected readonly description = signal('');
   protected readonly tooFar = signal(false);
@@ -83,10 +87,14 @@ export class RoutePage {
     this.originCountryCode = selection.countryCode || '';
     this.originRegion = selection.region || '';
     this.originRegionCode = selection.regionCode || '';
+    this.originLat = selection.lat ?? null;
+    this.originLng = selection.lng ?? null;
   }
 
   protected onDestinationSelected(selection: PlaceSelection): void {
     this.destination.set(selection.name);
+    this.destLat = selection.lat ?? null;
+    this.destLng = selection.lng ?? null;
   }
 
   async onSearch(): Promise<void> {
@@ -98,6 +106,10 @@ export class RoutePage {
         this.origin(),
         this.destination(),
         this.i18n.currentLang(),
+        this.originLat,
+        this.originLng,
+        this.destLat,
+        this.destLng,
       );
       this.tooFar.set(result.tooFar);
       this.description.set(result.description);

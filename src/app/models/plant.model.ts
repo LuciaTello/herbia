@@ -51,6 +51,8 @@ export interface PlaceSelection {
   countryCode?: string;
   region?: string;
   regionCode?: string;
+  lat?: number;
+  lng?: number;
 }
 
 // Trek: a search (origin → destination) for a specific month
