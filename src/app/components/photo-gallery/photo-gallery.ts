@@ -12,6 +12,7 @@ export class PhotoGalleryComponent {
   @Output() closeGallery = new EventEmitter<void>();
 
   protected readonly currentIndex = signal(0);
+  private touchStartX = 0;
 
   ngOnInit(): void {
     this.currentIndex.set(this.startIndex);
@@ -27,6 +28,17 @@ export class PhotoGalleryComponent {
 
   protected close(): void {
     this.closeGallery.emit();
+  }
+
+  protected onTouchStart(e: TouchEvent): void {
+    this.touchStartX = e.touches[0].clientX;
+  }
+
+  protected onTouchEnd(e: TouchEvent): void {
+    const delta = e.changedTouches[0].clientX - this.touchStartX;
+    if (Math.abs(delta) > 50) {
+      delta < 0 ? this.next() : this.prev();
+    }
   }
 
   @HostListener('document:keydown', ['$event'])

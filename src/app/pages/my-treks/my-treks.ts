@@ -22,8 +22,17 @@ export class MyTreksPage implements OnInit {
   protected readonly expandedId = signal<number | null>(null);
   protected readonly galleryImages = signal<string[]>([]);
   protected readonly galleryPlantName = signal('');
+  protected readonly uploadingPhotoId = signal<number | null>(null);
 
   protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
+
+  protected userPhotos(photos: PlantPhoto[]): PlantPhoto[] {
+    return photos.filter(p => p.source === 'user');
+  }
+
+  protected refPhotos(photos: PlantPhoto[]): PlantPhoto[] {
+    return photos.filter(p => p.source !== 'user');
+  }
 
   protected foundCount(plants: { found: boolean }[]): number {
     return plants.filter(p => p.found).length;
@@ -55,6 +64,23 @@ export class MyTreksPage implements OnInit {
   protected closeGallery(): void {
     this.galleryImages.set([]);
     this.galleryPlantName.set('');
+  }
+
+  async onPhotoSelected(event: Event, plantId: number): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.uploadingPhotoId.set(plantId);
+    try {
+      await this.trekService.uploadPlantPhoto(plantId, file);
+    } finally {
+      this.uploadingPhotoId.set(null);
+      input.value = '';
+    }
+  }
+
+  async deletePhoto(photoId: number): Promise<void> {
+    await this.trekService.deletePlantPhoto(photoId);
   }
 
   async markFound(plantId: number): Promise<void> {

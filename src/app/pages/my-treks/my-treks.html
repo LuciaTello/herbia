@@ -39,9 +39,9 @@
           <div class="trek-plants">
             @for (plant of trek.plants; track plant.id) {
               <article class="plant-card" [class.found]="plant.found">
-                <div class="plant-thumbnail" (click)="openGallery(plant.photos, plant.commonName)">
-                  @if (plant.photos.length) {
-                    <img [src]="plant.photos[0].url" [alt]="plant.commonName" />
+                <div class="plant-thumbnail" (click)="openGallery(refPhotos(plant.photos), plant.commonName)">
+                  @if (refPhotos(plant.photos).length) {
+                    <img [src]="refPhotos(plant.photos)[0].url" [alt]="plant.commonName" />
                   } @else {
                     <div class="no-photo">?</div>
                   }
@@ -55,6 +55,36 @@
                   <p class="description">{{ plant.description }}</p>
                   @if (plant.found) {
                     <span class="found-badge">{{ i18n.t().myTreks.found }}</span>
+                    @if (userPhotos(plant.photos).length) {
+                      <div class="user-photos-box">
+                        @for (photo of userPhotos(plant.photos); track photo.id) {
+                          <div class="user-photo-wrapper">
+                            <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
+                                 (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
+                            <button class="photo-delete-btn" (click)="deletePhoto(photo.id!)">&times;</button>
+                          </div>
+                        }
+                        @if (uploadingPhotoId() === plant.id) {
+                          <span class="uploading-badge">{{ i18n.t().myTreks.uploading }}</span>
+                        } @else if (userPhotos(plant.photos).length < 4) {
+                          <label class="add-photo-button">
+                            {{ i18n.t().myTreks.addPhoto }}
+                            <input type="file" accept="image/*" capture="environment"
+                                   (change)="onPhotoSelected($event, plant.id)" hidden />
+                          </label>
+                        }
+                      </div>
+                    } @else {
+                      @if (uploadingPhotoId() === plant.id) {
+                        <span class="uploading-badge">{{ i18n.t().myTreks.uploading }}</span>
+                      } @else {
+                        <label class="add-photo-button">
+                          {{ i18n.t().myTreks.addPhoto }}
+                          <input type="file" accept="image/*" capture="environment"
+                                 (change)="onPhotoSelected($event, plant.id)" hidden />
+                        </label>
+                      }
+                    }
                   } @else {
                     <button class="found-button" (click)="markFound(plant.id)">
                       {{ i18n.t().myTreks.markFound }}

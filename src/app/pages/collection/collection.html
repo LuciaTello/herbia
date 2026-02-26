@@ -17,9 +17,9 @@
     @for (found of collection(); track found.id) {
       <article class="found-card">
         <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
-        <div class="plant-thumbnail" (click)="openGallery(found.photos, found.commonName)">
-          @if (found.photos.length) {
-            <img [src]="found.photos[0].url" [alt]="found.commonName" />
+        <div class="plant-thumbnail" (click)="openGallery(refPhotos(found.photos), found.commonName)">
+          @if (refPhotos(found.photos).length) {
+            <img [src]="refPhotos(found.photos)[0].url" [alt]="found.commonName" />
           } @else {
             <div class="no-photo">?</div>
           }
@@ -33,6 +33,17 @@
           <p class="route">{{ found.trek?.origin }} → {{ found.trek?.destination }}</p>
           <p class="date">{{ found.foundAt }}</p>
         </div>
+        @if (userPhotos(found.photos).length) {
+          <div class="user-photos-box">
+            @for (photo of userPhotos(found.photos); track photo.id) {
+              <div class="user-photo-wrapper">
+                <img class="user-photo-thumb" [src]="photo.url" [alt]="found.commonName"
+                     (click)="openGallery(userPhotos(found.photos), found.commonName)" />
+                <button class="photo-delete-btn" (click)="deletePhoto(photo.id!, found.id)">&times;</button>
+              </div>
+            }
+          </div>
+        }
       </article>
     }
   </div>

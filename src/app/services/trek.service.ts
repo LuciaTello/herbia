@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Trek, SuggestedPlant, Plant } from '../models/plant.model';
+import { Trek, SuggestedPlant, Plant, PlantPhoto } from '../models/plant.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -46,6 +46,44 @@ export class TrekService {
             ? { ...p, found: true, foundAt: result.foundAt }
             : p
         ),
+      }))
+    );
+  }
+
+  async uploadPlantPhoto(plantId: number, file: File): Promise<PlantPhoto> {
+    const formData = new FormData();
+    formData.append('photo', file);
+    const photo = await firstValueFrom(
+      this.http.post<PlantPhoto>(`${this.apiUrl}/plants/${plantId}/photo`, formData)
+    );
+    // Add the new photo to the matching plant (and all plants with same scientificName)
+    const targetPlant = this.treks().flatMap(t => t.plants).find(p => p.id === plantId);
+    if (targetPlant) {
+      this.treks.update(list =>
+        list.map(trek => ({
+          ...trek,
+          plants: trek.plants.map(p =>
+            p.scientificName === targetPlant.scientificName
+              ? { ...p, photos: [...p.photos, photo] }
+              : p
+          ),
+        }))
+      );
+    }
+    return photo;
+  }
+
+  async deletePlantPhoto(photoId: number): Promise<void> {
+    await firstValueFrom(
+      this.http.delete(`${this.apiUrl}/photos/${photoId}`)
+    );
+    this.treks.update(list =>
+      list.map(trek => ({
+        ...trek,
+        plants: trek.plants.map(p => ({
+          ...p,
+          photos: p.photos.filter(ph => ph.id !== photoId),
+        })),
       }))
     );
   }

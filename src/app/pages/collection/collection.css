@@ -59,6 +59,7 @@ h2 {
   /* position: relative makes this the reference point for position: absolute children */
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   background: #f0f9f0;
   border-radius: 12px;
@@ -138,4 +139,49 @@ h2 {
   color: #636e72;
   font-size: 0.75rem;
   margin: 0.125rem 0 0;
+}
+
+.user-photos-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f5f0e8;
+  border-radius: 8px;
+}
+
+.user-photo-wrapper {
+  position: relative;
+}
+
+.user-photo-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.photo-delete-btn {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #b2bec3;
+  color: white;
+  border: none;
+  font-size: 0.55rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-delete-btn:hover {
+  background: #636e72;
 }
