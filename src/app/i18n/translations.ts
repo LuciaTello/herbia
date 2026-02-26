@@ -36,6 +36,9 @@ export interface Translations {
     emptyLine2: string;
     found: string;
     markFound: string;
+    addPhoto: string;
+    uploading: string;
+    myPhotos: string;
     summary: (total: number, found: number) => string;
   };
   collection: {
