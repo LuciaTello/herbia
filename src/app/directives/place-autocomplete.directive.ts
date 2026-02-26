@@ -8,14 +8,15 @@ import { GoogleMapsLoaderService } from '../services/google-maps-loader.service'
   selector: 'app-place-autocomplete',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
-    @if (!ready()) {
+    @if (ready()) {
+      <gmp-place-autocomplete #el></gmp-place-autocomplete>
+    } @else {
       <input [placeholder]="placeholder()" disabled />
     }
-    <div #container></div>
   `,
   styles: `
     :host { display: block; }
-    input {
+    input, gmp-place-autocomplete {
       width: 100%;
       box-sizing: border-box;
       padding: 0.75rem;
@@ -33,33 +34,25 @@ export class PlaceAutocompleteComponent implements AfterViewInit, OnDestroy {
   readonly placeSelected = output<string>();
   protected readonly ready = signal(false);
 
-  @ViewChild('container', { read: ElementRef }) containerRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('el', { read: ElementRef }) set elRef(ref: ElementRef | undefined) {
+    if (!ref) return;
+    const el = ref.nativeElement as google.maps.places.PlaceAutocompleteElement;
+    (el as any).placeholder = this.placeholder();
+    el.types = ['(cities)'];
 
-  private el: google.maps.places.PlaceAutocompleteElement | null = null;
-
-  async ngAfterViewInit(): Promise<void> {
-    const loaded = await this.loader.load();
-    if (!loaded) return;
-
-    this.el = new google.maps.places.PlaceAutocompleteElement({
-      types: ['(cities)'],
-    });
-
-    (this.el as any).placeholder = this.placeholder();
-    this.el.style.width = '100%';
-
-    this.el.addEventListener('gmp-placeselect', ((e: google.maps.places.PlaceAutocompletePlaceSelectEvent) => {
+    el.addEventListener('gmp-placeselect', ((e: google.maps.places.PlaceAutocompletePlaceSelectEvent) => {
       this.zone.run(() => {
         const name = e.place.displayName?.toUpperCase() || '';
         this.placeSelected.emit(name);
       });
     }) as EventListener);
+  }
 
-    this.containerRef.nativeElement.appendChild(this.el);
+  async ngAfterViewInit(): Promise<void> {
+    const loaded = await this.loader.load();
+    if (!loaded) return;
     this.zone.run(() => this.ready.set(true));
   }
 
-  ngOnDestroy(): void {
-    this.el?.remove();
-  }
+  ngOnDestroy(): void {}
 }
