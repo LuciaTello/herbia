@@ -14,12 +14,14 @@
   </div>
 } @else {
   <div class="collection-list">
-    @for (found of collection(); track found.id) {
+    @for (found of identifiedPlants(); track found.id) {
       <article class="found-card">
         <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
         <div class="plant-thumbnail" (click)="openGallery(refPhotos(found.photos), found.commonName)">
           @if (refPhotos(found.photos).length) {
             <img [src]="refPhotos(found.photos)[0].url" [alt]="found.commonName" />
+          } @else if (userPhotos(found.photos).length) {
+            <img [src]="userPhotos(found.photos)[0].url" [alt]="found.commonName" />
           } @else {
             <div class="no-photo">?</div>
           }
@@ -47,6 +49,28 @@
       </article>
     }
   </div>
+
+  @if (unidentifiedPlants().length) {
+    <h3 class="unidentified-title">{{ i18n.t().collection.unidentifiedTitle }}</h3>
+    <div class="collection-list">
+      @for (plant of unidentifiedPlants(); track plant.id) {
+        <article class="found-card unidentified">
+          <button class="remove-button" (click)="removePlant(plant.id)">&times;</button>
+          <div class="plant-thumbnail" (click)="openGallery(userPhotos(plant.photos), '')">
+            @if (userPhotos(plant.photos).length) {
+              <img [src]="userPhotos(plant.photos)[0].url" alt="" />
+            } @else {
+              <div class="no-photo">?</div>
+            }
+          </div>
+          <div class="found-info">
+            <p class="route">{{ plant.trek?.origin }} → {{ plant.trek?.destination }}</p>
+            <p class="date">{{ plant.foundAt }}</p>
+          </div>
+        </article>
+      }
+    </div>
+  }
 }
 
 @if (galleryImages().length) {

@@ -37,7 +37,7 @@
           }
 
           <div class="trek-plants">
-            @for (plant of trek.plants; track plant.id) {
+            @for (plant of aiPlants(trek.plants); track plant.id) {
               <article class="plant-card" [class.found]="plant.found">
                 <div class="plant-thumbnail" (click)="openGallery(refPhotos(plant.photos), plant.commonName)">
                   @if (refPhotos(plant.photos).length) {
@@ -64,26 +64,52 @@
                             <button class="photo-delete-btn" (click)="deletePhoto(photo.id!)">&times;</button>
                           </div>
                         }
-                        @if (uploadingPhotoId() === plant.id) {
+                        @if (identifying() === plant.id) {
+                          <span class="uploading-badge">{{ i18n.t().myTreks.identifying }}</span>
+                        } @else if (uploadingPhotoId() === plant.id) {
                           <span class="uploading-badge">{{ i18n.t().myTreks.uploading }}</span>
                         } @else if (userPhotos(plant.photos).length < 4) {
                           <label class="add-photo-button">
                             {{ i18n.t().myTreks.addPhoto }}
-                            <input type="file" accept="image/*" capture="environment"
+                            <input type="file" accept="image/jpeg,image/png" capture="environment"
                                    (change)="onPhotoSelected($event, plant.id)" hidden />
                           </label>
                         }
                       </div>
                     } @else {
-                      @if (uploadingPhotoId() === plant.id) {
+                      @if (identifying() === plant.id) {
+                        <span class="uploading-badge">{{ i18n.t().myTreks.identifying }}</span>
+                      } @else if (uploadingPhotoId() === plant.id) {
                         <span class="uploading-badge">{{ i18n.t().myTreks.uploading }}</span>
                       } @else {
                         <label class="add-photo-button">
                           {{ i18n.t().myTreks.addPhoto }}
-                          <input type="file" accept="image/*" capture="environment"
+                          <input type="file" accept="image/jpeg,image/png" capture="environment"
                                  (change)="onPhotoSelected($event, plant.id)" hidden />
                         </label>
                       }
+                    }
+                    @if (identifyResult() && pendingPlantId() === plant.id) {
+                      <div class="identify-banner" [class.match]="identifyResult()!.match" [class.no-match]="!identifyResult()!.match">
+                        @if (identifyResult()!.match) {
+                          <span class="identify-icon">&#10003;</span>
+                          <span class="identify-text">{{ i18n.t().myTreks.identifyMatch(identifyResult()!.identifiedAs, identifyResult()!.score) }}</span>
+                        } @else if (identifyResult()!.identifiedAs) {
+                          <span class="identify-icon">&#9888;</span>
+                          <span class="identify-text">{{ i18n.t().myTreks.identifyNoMatch(identifyResult()!.identifiedAs, identifyResult()!.score) }}</span>
+                        } @else {
+                          <span class="identify-icon">&#9888;</span>
+                          <span class="identify-text">{{ i18n.t().myTreks.identifyUnknown }}</span>
+                        }
+                        <div class="identify-actions">
+                          <button class="identify-btn confirm" (click)="confirmUpload()">
+                            {{ identifyResult()!.match ? i18n.t().myTreks.identifyUpload : i18n.t().myTreks.identifyUploadAnyway }}
+                          </button>
+                          <button class="identify-btn cancel" (click)="cancelUpload()">
+                            {{ i18n.t().myTreks.identifyCancel }}
+                          </button>
+                        </div>
+                      </div>
                     }
                   } @else {
                     <button class="found-button" (click)="markFound(plant.id)">
@@ -94,6 +120,76 @@
               </article>
             }
           </div>
+
+          <!-- Add plant button -->
+          @if (addingPlantForTrek() === trek.id) {
+            <span class="adding-plant-badge">{{ i18n.t().myTreks.addingPlant }}</span>
+          } @else {
+            <label class="add-plant-button">
+              {{ i18n.t().myTreks.addPlant }}
+              <input type="file" accept="image/jpeg,image/png" capture="environment"
+                     (change)="onAddPlant($event, trek.id)" hidden />
+            </label>
+          }
+
+          @if (addPlantMessage() && (addingPlantForTrek() === null || addingPlantForTrek() === trek.id)) {
+            <p class="add-plant-message">{{ addPlantMessage() }}</p>
+          }
+
+          <!-- User-added identified plants -->
+          @if (userPlants(trek.plants).length) {
+            <h5 class="section-title">{{ i18n.t().myTreks.myPlantsTitle }}</h5>
+            <div class="trek-plants">
+              @for (plant of userPlants(trek.plants); track plant.id) {
+                <article class="plant-card found user-plant-card">
+                  <button class="user-plant-delete" (click)="deleteUserPlant(plant.id)">&times;</button>
+                  <div class="plant-thumbnail" (click)="openGallery(userPhotos(plant.photos), plant.commonName)">
+                    @if (userPhotos(plant.photos).length) {
+                      <img [src]="userPhotos(plant.photos)[0].url" [alt]="plant.commonName" />
+                    } @else {
+                      <div class="no-photo">?</div>
+                    }
+                  </div>
+                  <div class="plant-info">
+                    <h4>{{ plant.commonName }}</h4>
+                    <p class="scientific">{{ plant.scientificName }}</p>
+                    @if (userPhotos(plant.photos).length > 1) {
+                      <div class="user-photos-box">
+                        @for (photo of userPhotos(plant.photos); track photo.id) {
+                          <div class="user-photo-wrapper">
+                            <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
+                                 (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
+                            <button class="photo-delete-btn" (click)="deletePhoto(photo.id!)">&times;</button>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          }
+
+          <!-- Unidentified plants toggle -->
+          @if (unidentifiedPlants(trek.plants).length) {
+            <p class="unidentified-toggle" (click)="toggleUnidentified(trek.id)">
+              {{ i18n.t().myTreks.unidentifiedCount(unidentifiedPlants(trek.plants).length) }}
+              {{ showUnidentifiedFor() === trek.id ? '▾' : '▸' }}
+            </p>
+            @if (showUnidentifiedFor() === trek.id) {
+              <div class="unidentified-list">
+                @for (plant of unidentifiedPlants(trek.plants); track plant.id) {
+                  <div class="unidentified-card">
+                    <button class="unidentified-delete" (click)="deleteUserPlant(plant.id)">&times;</button>
+                    @if (userPhotos(plant.photos).length) {
+                      <img class="unidentified-photo" [src]="userPhotos(plant.photos)[0].url" alt=""
+                           (click)="openGallery(userPhotos(plant.photos), '')" />
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
         }
       </section>
     }

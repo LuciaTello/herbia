@@ -5,13 +5,14 @@ import { Router } from 'express';
 import multer, { memoryStorage } from 'multer';
 import type { PrismaClient } from '../generated/prisma/client';
 import { uploadPhoto, deletePhoto } from '../services/cloudinary.service';
+import { identifyPlant } from '../services/plantnet.service';
 
 const upload = multer({
   storage: memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
+const ALLOWED_MIMES = ['image/jpeg', 'image/png'];
 
 const DAILY_TREK_LIMIT = 100;
 
@@ -145,6 +146,39 @@ export function trekRouter(prisma: PrismaClient): Router {
     }
   });
 
+  // POST /api/treks/plants/:plantId/identify - Identify a plant photo via PlantNet
+  router.post('/plants/:plantId/identify', upload.single('photo'), async (req, res) => {
+    try {
+      const plantId = parseInt(req.params['plantId'] as string);
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).json({ error: 'No photo provided' });
+        return;
+      }
+      if (!ALLOWED_MIMES.includes(file.mimetype)) {
+        res.status(400).json({ error: 'Invalid file type. Use JPEG or PNG' });
+        return;
+      }
+
+      // Verify ownership
+      const plant = await prisma.suggestedPlant.findUnique({
+        where: { id: plantId },
+        include: { trek: { select: { userId: true } } },
+      });
+      if (!plant || plant.trek.userId !== req.userId!) {
+        res.status(404).json({ error: 'Plant not found' });
+        return;
+      }
+
+      const result = await identifyPlant(file.buffer, file.mimetype, plant.scientificName);
+      res.json(result);
+    } catch (error) {
+      console.error('Error identifying plant:', error);
+      res.status(500).json({ error: 'Identification failed' });
+    }
+  });
+
   // POST /api/treks/plants/:plantId/photo - Upload a user photo for a found plant
   router.post('/plants/:plantId/photo', upload.single('photo'), async (req, res) => {
     try {
@@ -156,7 +190,7 @@ export function trekRouter(prisma: PrismaClient): Router {
         return;
       }
       if (!ALLOWED_MIMES.includes(file.mimetype)) {
-        res.status(400).json({ error: 'Invalid file type. Use JPEG, PNG, or WebP' });
+        res.status(400).json({ error: 'Invalid file type. Use JPEG or PNG' });
         return;
       }
 
@@ -174,11 +208,15 @@ export function trekRouter(prisma: PrismaClient): Router {
         return;
       }
 
+      // Count user photos GLOBALLY for this species (across all treks of this user)
       const userPhotoCount = await prisma.plantPhoto.count({
-        where: { plantId, source: 'user' },
+        where: {
+          source: 'user',
+          plant: { scientificName: plant.scientificName, trek: { userId: req.userId! } },
+        },
       });
       if (userPhotoCount >= 4) {
-        res.status(400).json({ error: 'Maximum 4 photos per plant' });
+        res.status(409).json({ error: 'Maximum 4 photos per species' });
         return;
       }
 
@@ -192,6 +230,152 @@ export function trekRouter(prisma: PrismaClient): Router {
     } catch (error) {
       console.error('Error uploading plant photo:', error);
       res.status(500).json({ error: 'Failed to upload photo' });
+    }
+  });
+
+  // POST /api/treks/:trekId/add-plant - Add a user-found plant via PlantNet identification
+  router.post('/:trekId/add-plant', upload.single('photo'), async (req, res) => {
+    try {
+      const trekId = parseInt(req.params['trekId'] as string);
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).json({ error: 'No photo provided' });
+        return;
+      }
+      if (!ALLOWED_MIMES.includes(file.mimetype)) {
+        res.status(400).json({ error: 'Invalid file type. Use JPEG or PNG' });
+        return;
+      }
+
+      // Verify trek ownership
+      const trek = await prisma.trek.findUnique({ where: { id: trekId } });
+      if (!trek || trek.userId !== req.userId!) {
+        res.status(404).json({ error: 'Trek not found' });
+        return;
+      }
+
+      // Identify via PlantNet (no expected name — we just want to know what it is)
+      const result = await identifyPlant(file.buffer, file.mimetype, '');
+      const identified = result.identifiedAs !== '';
+      const now = new Date();
+
+      let plant;
+
+      if (identified) {
+        // Check if this species already exists in this trek (AI-suggested or user-added)
+        const existingInTrek = await prisma.suggestedPlant.findFirst({
+          where: { trekId, scientificName: result.identifiedAs },
+          include: { photos: true },
+        });
+
+        if (existingInTrek) {
+          plant = existingInTrek;
+        } else {
+          plant = await prisma.suggestedPlant.create({
+            data: {
+              trekId,
+              source: 'user',
+              scientificName: result.identifiedAs,
+              commonName: result.commonName,
+              description: '',
+              rarity: 'common',
+              found: true,
+              foundAt: now,
+            },
+            include: { photos: true },
+          });
+        }
+
+        // Mark ALL plants with same scientificName as found (across all user treks)
+        await prisma.suggestedPlant.updateMany({
+          where: {
+            scientificName: result.identifiedAs,
+            found: false,
+            trek: { userId: req.userId! },
+          },
+          data: { found: true, foundAt: now },
+        });
+
+        // Check global photo count for this species
+        const globalPhotoCount = await prisma.plantPhoto.count({
+          where: {
+            source: 'user',
+            plant: { scientificName: result.identifiedAs, trek: { userId: req.userId! } },
+          },
+        });
+        if (globalPhotoCount >= 4) {
+          res.status(409).json({ error: 'Maximum 4 photos per species' });
+          return;
+        }
+      } else {
+        // Unidentified: always create a new entry (no species to deduplicate against)
+        plant = await prisma.suggestedPlant.create({
+          data: {
+            trekId,
+            source: 'user',
+            scientificName: '',
+            commonName: '',
+            description: '',
+            rarity: 'common',
+            found: true,
+            foundAt: now,
+          },
+          include: { photos: true },
+        });
+      }
+
+      // Upload to Cloudinary + create PlantPhoto
+      const url = await uploadPhoto(file.buffer, plant.id);
+      await prisma.plantPhoto.create({
+        data: { url, source: 'user', plantId: plant.id },
+      });
+
+      // Re-fetch with photos to return complete data
+      const updated = await prisma.suggestedPlant.findUnique({
+        where: { id: plant.id },
+        include: { photos: true },
+      });
+
+      res.status(201).json({ plant: updated, identified });
+    } catch (error) {
+      console.error('Error adding user plant:', error);
+      res.status(500).json({ error: 'Failed to add plant' });
+    }
+  });
+
+  // DELETE /api/treks/plants/:plantId - Delete a user-added plant and its photos
+  router.delete('/plants/:plantId', async (req, res) => {
+    try {
+      const plantId = parseInt(req.params['plantId']);
+
+      const plant = await prisma.suggestedPlant.findUnique({
+        where: { id: plantId },
+        include: { photos: true, trek: { select: { userId: true } } },
+      });
+
+      if (!plant || plant.trek.userId !== req.userId!) {
+        res.status(404).json({ error: 'Plant not found' });
+        return;
+      }
+
+      if (plant.source !== 'user') {
+        res.status(403).json({ error: 'Cannot delete AI-suggested plants' });
+        return;
+      }
+
+      // Delete photos from Cloudinary
+      for (const photo of plant.photos.filter(p => p.source === 'user')) {
+        await deletePhoto(photo.url);
+      }
+
+      // Cascade: deleting the plant also deletes its PlantPhoto rows
+      await prisma.suggestedPlant.delete({ where: { id: plantId } });
+
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting user plant:', error);
+      res.status(500).json({ error: 'Failed to delete plant' });
     }
   });
 
@@ -216,7 +400,7 @@ export function trekRouter(prisma: PrismaClient): Router {
       }
 
       await deletePhoto(photo.url);
-      await prisma.plantPhoto.delete({ where: { id: photoId } });
+      await prisma.plantPhoto.deleteMany({ where: { id: photoId } });
 
       res.status(204).send();
     } catch (error) {
