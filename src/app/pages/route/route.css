@@ -39,8 +39,7 @@ h2 {
   color: #2d3436;
 }
 
-.field input,
-.field gmp-place-autocomplete {
+.field input {
   padding: 0.75rem;
   border: 2px solid #ddd;
   border-radius: 8px;
@@ -50,8 +49,7 @@ h2 {
   box-sizing: border-box;
 }
 
-.field input:focus,
-.field gmp-place-autocomplete:focus-within {
+.field input:focus {
   outline: none;
   border-color: #2d7d46;
 }

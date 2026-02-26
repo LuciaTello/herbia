@@ -4,22 +4,36 @@
 
 <form class="route-form" (ngSubmit)="onSearch()">
   <div class="field">
-    <label>{{ i18n.t().route.originLabel }}</label>
-    <app-place-autocomplete
+    <label for="origin">{{ i18n.t().route.originLabel }}</label>
+    <input
+      id="origin"
+      type="text"
       [placeholder]="i18n.t().route.originPlaceholder"
+      [ngModel]="origin()"
+      (ngModelChange)="origin.set($event)"
+      name="origin"
+      required
+      appPlaceAutocomplete
       (placeSelected)="origin.set($event)"
     />
   </div>
 
   <div class="field">
-    <label>{{ i18n.t().route.destinationLabel }}</label>
-    <app-place-autocomplete
+    <label for="destination">{{ i18n.t().route.destinationLabel }}</label>
+    <input
+      id="destination"
+      type="text"
       [placeholder]="i18n.t().route.destinationPlaceholder"
+      [ngModel]="destination()"
+      (ngModelChange)="destination.set($event)"
+      name="destination"
+      required
+      appPlaceAutocomplete
       (placeSelected)="destination.set($event)"
     />
   </div>
 
-  <button type="submit" class="primary-button" [disabled]="loading() || !origin() || !destination()">
+  <button type="submit" class="primary-button" [disabled]="loading()">
     @if (loading()) {
       {{ i18n.t().route.searching }}
     } @else {
