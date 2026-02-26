@@ -228,3 +228,74 @@ h2 {
   font-size: 0.8rem;
   margin-top: 0.5rem;
 }
+
+.add-photo-button {
+  display: inline-block;
+  color: #2d7d46;
+  border: 1.5px solid #2d7d46;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.add-photo-button:hover {
+  background: #e8f5e9;
+}
+
+.uploading-badge {
+  display: inline-block;
+  color: #636e72;
+  border: 1.5px solid #b2bec3;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.user-photos-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #f5f0e8;
+  border-radius: 8px;
+}
+
+.user-photo-wrapper {
+  position: relative;
+}
+
+.user-photo-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.photo-delete-btn {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #b2bec3;
+  color: white;
+  border: none;
+  font-size: 0.55rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-delete-btn:hover {
+  background: #636e72;
+}

@@ -2,7 +2,8 @@
   <div class="gallery-content" (click)="$event.stopPropagation()">
     <button class="close-button" (click)="close()">&times;</button>
 
-    <div class="gallery-image-container">
+    <div class="gallery-image-container"
+         (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
       @if (images.length > 1) {
         <button class="nav-button prev" (click)="prev()">&#8249;</button>
       }

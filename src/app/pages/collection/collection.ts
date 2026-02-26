@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PlantPhoto } from '../../models/plant.model';
 import { CollectionService } from '../../services/collection.service';
+import { TrekService } from '../../services/trek.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { getRarity } from '../../utils/rarity';
@@ -14,6 +15,7 @@ import { getRarity } from '../../utils/rarity';
 })
 export class CollectionPage implements OnInit {
   private readonly collectionService = inject(CollectionService);
+  private readonly trekService = inject(TrekService);
   protected readonly i18n = inject(I18nService);
   protected readonly collection = this.collectionService.getCollection();
   protected readonly loading = signal(true);
@@ -21,6 +23,14 @@ export class CollectionPage implements OnInit {
   protected readonly galleryPlantName = signal('');
 
   protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
+
+  protected userPhotos(photos: PlantPhoto[]): PlantPhoto[] {
+    return photos.filter(p => p.source === 'user');
+  }
+
+  protected refPhotos(photos: PlantPhoto[]): PlantPhoto[] {
+    return photos.filter(p => p.source !== 'user');
+  }
 
   async ngOnInit(): Promise<void> {
     try {
@@ -40,6 +50,18 @@ export class CollectionPage implements OnInit {
   protected closeGallery(): void {
     this.galleryImages.set([]);
     this.galleryPlantName.set('');
+  }
+
+  async deletePhoto(photoId: number, plantId: number): Promise<void> {
+    await this.trekService.deletePlantPhoto(photoId);
+    // Update collection signal locally
+    this.collectionService.getCollection().update(list =>
+      list.map(p =>
+        p.id === plantId
+          ? { ...p, photos: p.photos.filter(ph => ph.id !== photoId) }
+          : p
+      )
+    );
   }
 
   async removePlant(id: number): Promise<void> {
