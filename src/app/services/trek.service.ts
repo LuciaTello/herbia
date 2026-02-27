@@ -25,9 +25,14 @@ export class TrekService {
   async createTrek(
     origin: string, destination: string, description: string, plants: Plant[],
     country?: string, countryCode?: string, region?: string, regionCode?: string,
+    originLat?: number | null, originLng?: number | null, destLat?: number | null, destLng?: number | null,
   ): Promise<Trek> {
     const trek = await firstValueFrom(
-      this.http.post<Trek>(this.apiUrl, { origin, destination, description, plants, country, countryCode, region, regionCode })
+      this.http.post<Trek>(this.apiUrl, {
+        origin, destination, description, plants,
+        country, countryCode, region, regionCode,
+        originLat, originLng, destLat, destLng,
+      })
     );
     // Add to the beginning of the list (newest first)
     this.treks.update(list => [trek, ...list]);

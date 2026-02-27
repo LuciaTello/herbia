@@ -29,8 +29,7 @@ export class PlaceAutocompleteDirective implements OnInit, OnDestroy {
         const city = components.find(c => c.types.includes('locality'))?.long_name
           || place.name
           || this.el.nativeElement.value;
-        const postalCode = components.find(c => c.types.includes('postal_code'))?.long_name;
-        const name = postalCode ? `${city.toUpperCase()} (${postalCode})` : city.toUpperCase();
+        const name = city.toUpperCase();
 
         const countryComponent = components.find(c => c.types.includes('country'));
         const regionComponent = components.find(c => c.types.includes('administrative_area_level_1'));

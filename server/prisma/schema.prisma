@@ -39,6 +39,10 @@ model Trek {
   countryCode String?          @map("country_code")
   region      String?
   regionCode  String?          @map("region_code")
+  originLat   Float?           @map("origin_lat")
+  originLng   Float?           @map("origin_lng")
+  destLat     Float?           @map("dest_lat")
+  destLng     Float?           @map("dest_lng")
 
   // Foreign key to User
   userId      Int              @map("user_id")
@@ -46,7 +50,10 @@ model Trek {
 
   // One-to-many: a trek has many suggested plants
   // cascade delete handled by Prisma (onDelete: Cascade)
-  plants      SuggestedPlant[]
+  plants      SuggestedPlant[] @relation("trekPlants")
+
+  // Plants that were originally found in this trek (reverse of foundInTrek)
+  plantsFoundHere SuggestedPlant[] @relation("foundInTrek")
 
   @@map("treks")
 }
@@ -63,12 +70,16 @@ model SuggestedPlant {
   found          Boolean   @default(false)
   foundAt        DateTime?
 
+  // Trek where this plant was originally found (null if not found yet)
+  foundInTrekId  Int?      @map("found_in_trek_id")
+  foundInTrek    Trek?     @relation("foundInTrek", fields: [foundInTrekId], references: [id], onDelete: SetNull)
+
   // One-to-many: a plant has many photos (normalized from old imageUrls column)
   photos         PlantPhoto[]
 
   // Foreign key to Trek (like @ManyToOne @JoinColumn(name = "trek_id") Trek trek;)
   trekId         Int       @map("trek_id")
-  trek           Trek      @relation(fields: [trekId], references: [id], onDelete: Cascade)
+  trek           Trek      @relation("trekPlants", fields: [trekId], references: [id], onDelete: Cascade)
 
   @@map("suggested_plants")
 }

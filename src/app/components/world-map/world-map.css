@@ -11,39 +11,41 @@
 
 .continent {
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: filter 0.2s ease;
 }
 
 .continent:hover {
-  opacity: 0.8;
+  filter: drop-shadow(1px 1px 3px rgba(45, 52, 54, 0.3));
 }
 
 .continent path {
-  stroke: #b2bec3;
-  stroke-width: 1.5;
+  stroke: white;
+  stroke-width: 0.5;
+  stroke-linejoin: round;
   transition: fill 0.2s;
 }
 
-.continent.has-plants path {
-  stroke: #2d7d46;
+.continent:hover path {
+  stroke-width: 1;
 }
 
 .label {
-  font-size: 14px;
+  font-size: 7px;
   font-weight: 600;
   fill: #2d3436;
   text-anchor: middle;
+  pointer-events: none;
+}
+
+.count-badge {
+  fill: #2d7d46;
   pointer-events: none;
 }
 
 .count {
-  font-size: 12px;
-  fill: #636e72;
+  font-size: 5px;
+  fill: white;
+  font-weight: 700;
   text-anchor: middle;
   pointer-events: none;
-}
-
-.continent.has-plants .count {
-  fill: #2d3436;
-  font-weight: 600;
 }

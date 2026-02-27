@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "treks" ADD COLUMN     "dest_lat" DOUBLE PRECISION,
+ADD COLUMN     "dest_lng" DOUBLE PRECISION,
+ADD COLUMN     "origin_lat" DOUBLE PRECISION,
+ADD COLUMN     "origin_lng" DOUBLE PRECISION;

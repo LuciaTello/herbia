@@ -102,11 +102,60 @@ h2 {
   margin: 0.25rem 0 0;
 }
 
-.trek-summary {
+.trek-progress {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0 0;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #dfe6e9;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #2d7d46;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.complete {
+  background: #daa520;
+}
+
+.progress-text {
   color: #636e72;
   font-size: 0.8rem;
-  margin: 0.5rem 0 0;
-  padding-left: 1.5rem;
+  margin: 0.25rem 0 0;
+}
+
+.progress-text.complete {
+  color: #b8860b;
+  font-weight: bold;
+}
+
+/* Unfound plants: grayscale + reduced opacity */
+.plant-card:not(.found) {
+  opacity: 0.85;
+}
+
+.plant-card:not(.found) .plant-thumbnail img {
+  filter: grayscale(100%);
+}
+
+/* Rarity border */
+.plant-card.rarity-common {
+  border-left: 3px solid #78b87a;
+}
+
+.plant-card.rarity-rare {
+  border-left: 3px solid #c0c0c0;
+}
+
+.plant-card.rarity-veryRare {
+  border-left: 3px solid #ffd700;
 }
 
 .delete-button {
@@ -227,6 +276,14 @@ h2 {
   padding: 0.375rem 0.75rem;
   font-size: 0.8rem;
   margin-top: 0.5rem;
+}
+
+.found-in-trek {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+  font-style: italic;
 }
 
 .add-photo-button {

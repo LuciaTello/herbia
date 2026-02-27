@@ -2,13 +2,22 @@
 
 <h2>{{ i18n.t().route.title }}</h2>
 
+<div class="mode-toggle">
+  <button [class.active]="mode() === 'route'" (click)="setMode('route')">
+    {{ i18n.t().route.routeTab }}
+  </button>
+  <button [class.active]="mode() === 'zone'" (click)="setMode('zone')">
+    {{ i18n.t().route.zoneTab }}
+  </button>
+</div>
+
 <form class="route-form" (ngSubmit)="onSearch()">
   <div class="field">
-    <label for="origin">{{ i18n.t().route.originLabel }}</label>
+    <label for="origin">{{ mode() === 'zone' ? i18n.t().route.locationLabel : i18n.t().route.originLabel }}</label>
     <input
       id="origin"
       type="text"
-      [placeholder]="i18n.t().route.originPlaceholder"
+      [placeholder]="mode() === 'zone' ? i18n.t().route.locationPlaceholder : i18n.t().route.originPlaceholder"
       [ngModel]="origin()"
       (ngModelChange)="origin.set($event)"
       name="origin"
@@ -18,26 +27,28 @@
     />
   </div>
 
-  <div class="field">
-    <label for="destination">{{ i18n.t().route.destinationLabel }}</label>
-    <input
-      id="destination"
-      type="text"
-      [placeholder]="i18n.t().route.destinationPlaceholder"
-      [ngModel]="destination()"
-      (ngModelChange)="destination.set($event)"
-      name="destination"
-      required
-      appPlaceAutocomplete
-      (placeSelected)="onDestinationSelected($event)"
-    />
-  </div>
+  @if (mode() === 'route') {
+    <div class="field">
+      <label for="destination">{{ i18n.t().route.destinationLabel }}</label>
+      <input
+        id="destination"
+        type="text"
+        [placeholder]="i18n.t().route.destinationPlaceholder"
+        [ngModel]="destination()"
+        (ngModelChange)="destination.set($event)"
+        name="destination"
+        required
+        appPlaceAutocomplete
+        (placeSelected)="onDestinationSelected($event)"
+      />
+    </div>
+  }
 
   <button type="submit" class="primary-button" [disabled]="loading()">
     @if (loading()) {
       {{ i18n.t().route.searching }}
     } @else {
-      {{ i18n.t().route.search }}
+      {{ mode() === 'zone' ? i18n.t().route.searchZone : i18n.t().route.search }}
     }
   </button>
 </form>
@@ -65,7 +76,7 @@
 
 @if (plants().length > 0) {
   <section class="results">
-    <h3>{{ i18n.t().route.resultsTitle }}</h3>
+    <h3>{{ mode() === 'zone' ? i18n.t().route.zoneResultsTitle : i18n.t().route.resultsTitle }}</h3>
 
     @if (description()) {
       <p class="trek-description">{{ description() }}</p>
@@ -91,7 +102,9 @@
       </article>
     }
 
-    <app-route-map [origin]="origin()" [destination]="destination()" />
+    @if (mode() === 'route') {
+      <app-route-map [origin]="origin()" [destination]="destination()" />
+    }
 
     <button
       class="primary-button start-trek-button"

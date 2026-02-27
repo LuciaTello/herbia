@@ -22,6 +22,10 @@ export class WorldMapComponent {
     }));
   });
 
+  protected continent(id: string) {
+    return this.continents().find(c => c.id === id)!;
+  }
+
   protected fillColor(count: number): string {
     if (count === 0) return '#dfe6e9';
     if (count <= 3) return '#a8e6cf';

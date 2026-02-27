@@ -20,6 +20,12 @@ export interface Translations {
     searching: string;
     search: string;
     loadingHint: string;
+    routeTab: string;
+    zoneTab: string;
+    locationLabel: string;
+    locationPlaceholder: string;
+    searchZone: string;
+    zoneResultsTitle: string;
     resultsTitle: string;
     startTrek: string;
     saving: string;
@@ -35,6 +41,7 @@ export interface Translations {
     emptyLine1: string;
     emptyLine2: string;
     found: string;
+    foundInTrek: (origin: string, destination: string) => string;
     markFound: string;
     addPhoto: string;
     uploading: string;
@@ -47,6 +54,7 @@ export interface Translations {
     identifyCancel: string;
     identifyUploadAnyway: string;
     summary: (total: number, found: number) => string;
+    missionComplete: string;
     addPlant: string;
     addingPlant: string;
     myPlantsTitle: string;
