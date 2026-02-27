@@ -2,13 +2,13 @@ import { Translations } from './translations';
 
 export const ES: Translations = {
   app: {
-    subtitle: 'Explora rutas, captura plantas, completa tu herbario',
+    subtitle: 'Dime adónde vas y te diré qué plantas encontrarás',
     logout: 'Salir',
   },
   home: {
     title: 'Cada camino esconde plantas por descubrir',
     description:
-      'Elige un origen y un destino — te diremos qué plantas crecen por el camino para que las encuentres y las captures.',
+      'Indica una ruta o una zona — buscaremos qué plantas crecen allí. Sal a encontrarlas, hazles una foto y completa tu herbario viajero.',
     startRoute: 'Nueva misión',
     myMissions: 'Mis misiones',
     myCollection: 'Mi colección',
@@ -70,7 +70,7 @@ export const ES: Translations = {
     identifyUploadAnyway: 'Subir igualmente',
     summary: (total, found) => `${found}/${total} capturadas`,
     missionComplete: '¡Misión completada!',
-    addPlant: 'Añadir planta',
+    addPlant: 'Añadir otras plantas',
     addingPlant: 'Identificando...',
     myPlantsTitle: 'Mis plantas',
     unidentifiedCount: (count) => `${count} planta${count !== 1 ? 's' : ''} sin identificar`,
@@ -82,6 +82,7 @@ export const ES: Translations = {
     completedMissions: 'Completadas',
     missionsCount: (n) => `${n} misión${n !== 1 ? 'es' : ''}`,
     noLocationMissions: (n) => `${n} misión${n !== 1 ? 'es' : ''} sin ubicar`,
+    allFound: '¡Has encontrado todas las plantas! Misión completada.',
   },
   collection: {
     back: 'Volver al inicio',
@@ -126,10 +127,10 @@ export const ES: Translations = {
       'Colección',
     ],
     texts: [
-      'Tu herbario personal de viajera. Descubre las plantas que crecen en tus rutas, identifícalas y construye tu propia colección botánica mientras viajas. Sospechosamente, están en todas partes.',
-      'Cuéntanos dónde vas a estar hoy — ya sea una ruta entre dos ciudades o una zona que quieras explorar. Buscaremos qué plantas crecen por allí y te prepararemos una misión con las especies que puedes encontrar. Ellas ya están ahí. Observándote. Fotosintetizando.',
-      'Cuando encuentres una planta de tu misión, sácale una foto. La identificaremos automáticamente y la añadiremos a tu herbario con su nombre y ubicación. No hace falta que la planta coopere.',
-      'Todas tus capturas se guardan en tu colección, organizadas en un mapa del mundo por regiones. Completa misiones para llenar tu herbario de nuevas especies. Pronto sabrás demasiadas cosas sobre plantas.',
+      'Herbia convierte tus viajes en misiones botánicas. Dinos adónde vas y te diremos qué plantas crecen en tu camino. Solo tienes que salir a buscarlas. Spoiler: están por todas partes.',
+      'Elige una ruta entre dos ciudades o una zona que quieras explorar. Te prepararemos una misión con las especies que puedes encontrar por el camino — con fotos, pistas y nivel de rareza. Las plantas ya están ahí. Fotosintetizando. Esperándote.',
+      'Cuando encuentres una planta de tu misión, sácale una foto. Herbia la identificará automáticamente y la añadirá a tu herbario. Si no la reconoce... bueno, la naturaleza también tiene sus misterios.',
+      'Tus capturas se guardan en una colección organizada en un mapa del mundo. Completa misiones, descubre nuevas especies y ve cómo tu herbario crece con cada viaje. Pronto sabrás demasiado sobre plantas.',
     ],
     next: 'Siguiente',
     start: '¡Empezar!',

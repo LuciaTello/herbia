@@ -40,22 +40,29 @@ export class MissionService {
   }
 
   async markPlantFound(plantId: number): Promise<void> {
-    const result = await firstValueFrom(
-      this.http.patch<{ scientificName: string; found: boolean; foundAt: string }>(
-        `${this.apiUrl}/plants/${plantId}/found`, {}
-      )
-    );
-    // Mark ALL plants with the same scientificName as found across all missions
-    this.missions.update(list =>
-      list.map(mission => ({
-        ...mission,
-        plants: mission.plants.map(p =>
-          p.scientificName === result.scientificName
-            ? { ...p, found: true, foundAt: result.foundAt }
-            : p
-        ),
-      }))
-    );
+    // Find the scientificName to do an optimistic update immediately
+    const scientificName = this.missions()
+      .flatMap(m => m.plants)
+      .find(p => p.id === plantId)?.scientificName;
+
+    if (scientificName) {
+      const now = new Date().toISOString();
+      this.missions.update(list =>
+        list.map(mission => ({
+          ...mission,
+          plants: mission.plants.map(p =>
+            p.scientificName === scientificName
+              ? { ...p, found: true, foundAt: now }
+              : p
+          ),
+        }))
+      );
+    }
+
+    // Fire API call in background
+    firstValueFrom(
+      this.http.patch(`${this.apiUrl}/plants/${plantId}/found`, {})
+    ).catch(() => {});
   }
 
   async identifyPlant(plantId: number, file: File): Promise<IdentifyResult> {

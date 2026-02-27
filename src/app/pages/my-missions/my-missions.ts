@@ -35,6 +35,7 @@ export class MyMissionsPage implements OnInit {
   protected readonly addingPlantForMission = signal<number | null>(null);
   protected readonly showUnidentifiedFor = signal<number | null>(null);
   protected readonly addPlantMessage = signal<string | null>(null);
+  protected readonly completedPopup = signal(false);
 
   // Top-level toggle: active missions list vs completed missions map
   protected readonly showCompleted = signal(false);
@@ -341,6 +342,7 @@ export class MyMissionsPage implements OnInit {
 
   async markFound(plantId: number): Promise<void> {
     await this.missionService.markPlantFound(plantId);
+    await this.checkAutoComplete();
   }
 
   async completeMission(id: number): Promise<void> {
@@ -361,6 +363,18 @@ export class MyMissionsPage implements OnInit {
 
   protected userPlants(plants: SuggestedPlant[]): SuggestedPlant[] {
     return plants.filter(p => p.source === 'user' && p.scientificName !== '');
+  }
+
+  private async checkAutoComplete(): Promise<void> {
+    for (const mission of this.missions()) {
+      if (mission.status === 'completed') continue;
+      const aiPlants = mission.plants.filter(p => p.source !== 'user');
+      if (aiPlants.length > 0 && aiPlants.every(p => p.found)) {
+        await this.completeMission(mission.id);
+        this.completedPopup.set(true);
+        setTimeout(() => this.completedPopup.set(false), 3500);
+      }
+    }
   }
 
   protected unidentifiedPlants(plants: SuggestedPlant[]): SuggestedPlant[] {
@@ -384,6 +398,7 @@ export class MyMissionsPage implements OnInit {
       const result = await this.missionService.addUserPlant(missionId, file);
       this.addPlantMessage.set(this.i18n.t().myMissions.plantAdded);
       setTimeout(() => this.addPlantMessage.set(null), 3000);
+      await this.checkAutoComplete();
     } catch (err: any) {
       if (err?.status === 409) {
         this.addPlantMessage.set(this.i18n.t().myMissions.maxPhotosReached);

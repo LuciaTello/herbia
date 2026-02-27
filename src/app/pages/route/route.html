@@ -68,9 +68,6 @@
 @if (tooFar()) {
   <section class="too-far">
     <p class="error-message">{{ i18n.t().route.tooFar }}</p>
-    @if (description()) {
-      <p class="mission-description">{{ description() }}</p>
-    }
   </section>
 }
 
