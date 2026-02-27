@@ -12,17 +12,32 @@ export class PhotoGalleryComponent {
   @Output() closeGallery = new EventEmitter<void>();
 
   protected readonly currentIndex = signal(0);
+  protected readonly imageLoading = signal(true);
   private touchStartX = 0;
 
   ngOnInit(): void {
     this.currentIndex.set(this.startIndex);
+    this.preloadAll();
+  }
+
+  private preloadAll(): void {
+    for (const src of this.images) {
+      const img = new Image();
+      img.src = src;
+    }
+  }
+
+  protected onImageLoad(): void {
+    this.imageLoading.set(false);
   }
 
   protected prev(): void {
+    this.imageLoading.set(true);
     this.currentIndex.update(i => (i > 0 ? i - 1 : this.images.length - 1));
   }
 
   protected next(): void {
+    this.imageLoading.set(true);
     this.currentIndex.update(i => (i < this.images.length - 1 ? i + 1 : 0));
   }
 

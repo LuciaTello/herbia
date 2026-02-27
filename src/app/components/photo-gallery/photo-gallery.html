@@ -8,7 +8,13 @@
         <button class="nav-button prev" (click)="prev()">&#8249;</button>
       }
 
-      <img [src]="images[currentIndex()]" [alt]="plantName" class="gallery-image" />
+      <div class="image-wrapper">
+        @if (imageLoading()) {
+          <div class="gallery-spinner"></div>
+        }
+        <img [src]="images[currentIndex()]" [alt]="plantName" class="gallery-image"
+             [class.loading]="imageLoading()" (load)="onImageLoad()" />
+      </div>
 
       @if (images.length > 1) {
         <button class="nav-button next" (click)="next()">&#8250;</button>

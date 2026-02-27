@@ -2,13 +2,13 @@ import { Translations } from './translations';
 
 export const FR: Translations = {
   app: {
-    subtitle: 'Explorez des itinéraires, capturez des plantes, complétez votre herbier',
+    subtitle: 'Dis-moi où tu vas, je te dirai quelles plantes tu trouveras',
     logout: 'Déconnexion',
   },
   home: {
     title: 'Chaque chemin cache des plantes à découvrir',
     description:
-      'Choisissez un point de départ et une destination — on vous dira quelles plantes poussent en chemin pour les trouver et les capturer.',
+      'Indique un itinéraire ou une zone — on cherchera quelles plantes y poussent. Pars à leur recherche, prends-les en photo et complète ton herbier de voyageuse.',
     startRoute: 'Nouvelle mission',
     myMissions: 'Mes missions',
     myCollection: 'Ma collection',
@@ -70,7 +70,7 @@ export const FR: Translations = {
     identifyUploadAnyway: 'Envoyer quand même',
     summary: (total, found) => `${found}/${total} capturées`,
     missionComplete: 'Mission accomplie !',
-    addPlant: 'Ajouter autres plantes',
+    addPlant: 'Ajouter d\'autres plantes',
     addingPlant: 'Identification...',
     myPlantsTitle: 'Mes plantes',
     unidentifiedCount: (count) => `${count} plante${count !== 1 ? 's' : ''} non identifiée${count !== 1 ? 's' : ''}`,
@@ -82,6 +82,7 @@ export const FR: Translations = {
     completedMissions: 'Terminées',
     missionsCount: (n) => `${n} mission${n !== 1 ? 's' : ''}`,
     noLocationMissions: (n) => `${n} mission${n !== 1 ? 's' : ''} sans localisation`,
+    allFound: 'Tu as trouvé toutes les plantes ! Mission accomplie.',
   },
   collection: {
     back: "Retour à l'accueil",
@@ -126,10 +127,10 @@ export const FR: Translations = {
       'Collection',
     ],
     texts: [
-      'Ton herbier personnel de voyageuse. Découvre les plantes qui poussent sur tes itinéraires, identifie-les et construis ta propre collection botanique en voyageant. Elles sont partout. C\'est suspect.',
-      'Dis-nous où tu seras aujourd\'hui — que ce soit un trajet entre deux villes ou une zone que tu veux explorer. On cherchera quelles plantes poussent par là et on te préparera une mission avec les espèces que tu peux trouver. Elles sont déjà là. Elles t\'observent. Elles photosynthétisent.',
-      'Quand tu trouves une plante de ta mission, prends-la en photo. On l\'identifiera automatiquement et on l\'ajoutera à ton herbier avec son nom et sa localisation. La plante n\'a pas besoin de coopérer.',
-      'Toutes tes captures sont sauvegardées dans ta collection, organisées sur une carte du monde par régions. Complète des missions pour remplir ton herbier de nouvelles espèces. Bientôt, tu sauras beaucoup trop de choses sur les plantes.',
+      'Herbia transforme tes trajets en missions botaniques. Dis-nous où tu vas et on te dira quelles plantes poussent sur ton chemin. Il ne te reste qu\'à partir à leur recherche. Spoiler : elles sont partout.',
+      'Choisis un trajet entre deux villes ou une zone à explorer. On te préparera une mission avec les espèces que tu peux trouver en chemin — avec photos, indices et niveau de rareté. Les plantes sont déjà là. Elles photosynthétisent. Elles t\'attendent.',
+      'Quand tu trouves une plante de ta mission, prends-la en photo. Herbia l\'identifiera automatiquement et l\'ajoutera à ton herbier. Si elle ne la reconnaît pas... bon, la nature a aussi ses mystères.',
+      'Tes captures sont sauvegardées dans une collection organisée sur une carte du monde. Complète des missions, découvre de nouvelles espèces et regarde ton herbier grandir à chaque voyage. Bientôt, tu en sauras beaucoup trop sur les plantes.',
     ],
     next: 'Suivant',
     start: 'Commencer !',

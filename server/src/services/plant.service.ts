@@ -62,7 +62,6 @@ async function fetchSpeciesCounts(
     locale,
   });
   const url = `https://api.inaturalist.org/v1/observations/species_counts?${params}`;
-  console.log(`iNaturalist species_counts: lat=${lat}, lng=${lng}, radius=${radiusKm}km, month=${month}`);
   const response = await fetch(url, {
     headers: { 'User-Agent': 'herbia-app' },
   });
@@ -82,7 +81,6 @@ async function fetchSpeciesCounts(
       photoUrl: taxon.default_photo?.medium_url || '',
     });
   }
-  console.log(`iNaturalist: ${species.length} species found`);
   return species;
 }
 
@@ -258,7 +256,6 @@ async function fetchFromINaturalist(scientificName: string): Promise<string[]> {
         urls.push(photo.url.replace('square', 'large'));
       }
     }
-    console.log(`iNaturalist: ${urls.length} photos for "${scientificName}"`);
     return urls;
   } catch (e) {
     console.error(`iNaturalist error for "${scientificName}":`, e);
@@ -315,10 +312,6 @@ async function llmOnlyFlow(origin: string, destination: string, lang: string, mo
   }
 
   const plants = await enrichPlantsWithPhotos(parsed.plants);
-  console.log(`\n🌱 Plantas sugeridas (fuente: Groq LLM):`);
-  for (const p of plants) {
-    console.log(`  - ${p.commonName} (${p.scientificName}) [${p.rarity}]`);
-  }
   return { tooFar: false, description: parsed.description, plants };
 }
 
@@ -344,14 +337,12 @@ export async function getSuggestedPlants(
 
   // Step 1: If no coordinates → fall back to LLM-only flow
   if (!originLat || !originLng || !destLat || !destLng) {
-    console.log('No coordinates provided, using LLM-only fallback');
     return llmOnlyFlow(origin, destination, lang, currentMonth, exclude);
   }
 
   // Step 2: Check distance
   const distance = haversine(originLat, originLng, destLat, destLng);
   const isZone = origin === destination;
-  console.log(isZone ? `Zone mode around ${origin}` : `Route distance: ${distance.toFixed(1)} km`);
 
   // Step 3: Too far → return immediately without LLM call (skip for zone mode)
   if (!isZone && distance > 100) {
@@ -368,7 +359,6 @@ export async function getSuggestedPlants(
 
   // Step 6: If too few species → fall back to LLM-only
   if (species.length < 3) {
-    console.log(`Only ${species.length} iNat species, using LLM-only fallback`);
     return llmOnlyFlow(origin, destination, lang, currentMonth, exclude);
   }
 
@@ -403,9 +393,5 @@ export async function getSuggestedPlants(
 
   // Step 10: Enrich with Wikipedia + iNat observation photos
   const plants = await enrichPlantsWithPhotos(mergedPlants);
-  console.log(`\n🌱 Plantas sugeridas (fuente: iNaturalist + descripciones Groq):`);
-  for (const p of plants) {
-    console.log(`  - ${p.commonName} (${p.scientificName}) [${p.rarity}]`);
-  }
   return { tooFar: false, description: llmResult.routeDescription || '', plants };
 }

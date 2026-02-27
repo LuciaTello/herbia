@@ -67,6 +67,7 @@ export interface Translations {
     completedMissions: string;
     missionsCount: (n: number) => string;
     noLocationMissions: (n: number) => string;
+    allFound: string;
   };
   collection: {
     back: string;

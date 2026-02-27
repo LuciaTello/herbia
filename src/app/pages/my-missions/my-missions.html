@@ -330,6 +330,12 @@
   </section>
 </ng-template>
 
+@if (completedPopup()) {
+  <div class="completed-popup" (click)="completedPopup.set(false)">
+    <p>{{ i18n.t().myMissions.allFound }}</p>
+  </div>
+}
+
 @if (galleryImages().length) {
   <app-photo-gallery
     [images]="galleryImages()"
