@@ -6,7 +6,7 @@ import type { PrismaClient } from '../generated/prisma/client';
 import { getSuggestedPlants } from '../services/plant.service';
 import { incrementQuota } from '../services/quota.service';
 
-// Factory function (same pattern as trekRouter/collectionRouter)
+// Factory function (same pattern as missionRouter/collectionRouter)
 export function plantRouter(prisma: PrismaClient): Router {
   const router = Router();
 
@@ -29,9 +29,9 @@ export function plantRouter(prisma: PrismaClient): Router {
       }
 
       // Only exclude plants the user has already FOUND (not just suggested)
-      // Unfound plants can reappear in new treks
+      // Unfound plants can reappear in new missions
       const found = await prisma.suggestedPlant.findMany({
-        where: { trek: { userId: req.userId! }, found: true },
+        where: { mission: { userId: req.userId! }, found: true },
         select: { scientificName: true },
         distinct: ['scientificName'],
       });

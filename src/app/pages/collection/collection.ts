@@ -2,7 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PlantPhoto } from '../../models/plant.model';
 import { CollectionService } from '../../services/collection.service';
-import { TrekService } from '../../services/trek.service';
+import { MissionService } from '../../services/mission.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { WorldMapComponent } from '../../components/world-map/world-map';
@@ -20,7 +20,7 @@ type CollectionView = 'map' | 'countries' | 'regions' | 'plants';
 })
 export class CollectionPage implements OnInit {
   private readonly collectionService = inject(CollectionService);
-  private readonly trekService = inject(TrekService);
+  private readonly missionService = inject(MissionService);
   protected readonly i18n = inject(I18nService);
   protected readonly collection = this.collectionService.getCollection();
   protected readonly loading = signal(true);
@@ -56,19 +56,19 @@ export class CollectionPage implements OnInit {
 
   // Plants with location data
   private readonly locatedPlants = computed(() =>
-    this.identifiedPlants().filter(p => p.trek?.countryCode)
+    this.identifiedPlants().filter(p => p.mission?.countryCode)
   );
 
   // Plants without location data
   protected readonly noLocationPlants = computed(() =>
-    this.identifiedPlants().filter(p => !p.trek?.countryCode)
+    this.identifiedPlants().filter(p => !p.mission?.countryCode)
   );
 
   // Continent → plant count (for the map)
   protected readonly continentCounts = computed(() => {
     const counts: Record<string, number> = {};
     for (const p of this.locatedPlants()) {
-      const continent = getContinent(p.trek!.countryCode!);
+      const continent = getContinent(p.mission!.countryCode!);
       if (continent) {
         counts[continent] = (counts[continent] || 0) + 1;
       }
@@ -83,7 +83,7 @@ export class CollectionPage implements OnInit {
     const lang = this.i18n.currentLang();
     const countryMap = new Map<string, { code: string; name: string; flag: string; count: number }>();
     for (const p of this.locatedPlants()) {
-      const code = p.trek!.countryCode!;
+      const code = p.mission!.countryCode!;
       if (getContinent(code) !== continent) continue;
       const existing = countryMap.get(code);
       if (existing) {
@@ -106,8 +106,8 @@ export class CollectionPage implements OnInit {
     if (!code) return [];
     const regionMap = new Map<string, { name: string; count: number }>();
     for (const p of this.locatedPlants()) {
-      if (p.trek!.countryCode !== code) continue;
-      const regionName = p.trek!.region || '?';
+      if (p.mission!.countryCode !== code) continue;
+      const regionName = p.mission!.region || '?';
       const existing = regionMap.get(regionName);
       if (existing) {
         existing.count++;
@@ -128,8 +128,8 @@ export class CollectionPage implements OnInit {
     }
     if (!code) return [];
     return this.locatedPlants().filter(p => {
-      if (p.trek!.countryCode !== code) return false;
-      if (region) return (p.trek!.region || '?') === region;
+      if (p.mission!.countryCode !== code) return false;
+      if (region) return (p.mission!.region || '?') === region;
       return true;
     });
   });
@@ -236,7 +236,7 @@ export class CollectionPage implements OnInit {
   }
 
   async deletePhoto(photoId: number, plantId: number): Promise<void> {
-    await this.trekService.deletePlantPhoto(photoId);
+    await this.missionService.deletePlantPhoto(photoId);
     this.collectionService.getCollection().update(list =>
       list.map(p =>
         p.id === plantId

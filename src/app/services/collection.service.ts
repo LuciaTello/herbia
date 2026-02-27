@@ -23,7 +23,7 @@ export class CollectionService {
     this.collection.set(plants);
   }
 
-  // Soft-toggle: marks the plant as not found (removes from collection, keeps in trek)
+  // Soft-toggle: marks the plant as not found (removes from collection, keeps in mission)
   async removePlant(id: number): Promise<void> {
     await firstValueFrom(
       this.http.delete(`${this.apiUrl}/${id}`)

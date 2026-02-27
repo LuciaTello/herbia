@@ -18,16 +18,16 @@ model User {
   passwordHash String   @map("password_hash")          // NEVER store plain passwords!
   createdAt    DateTime @default(now())
 
-  // One-to-many: a user has many treks
-  // Like @OneToMany(mappedBy = "user") List<Trek> treks;
-  treks        Trek[]
+  // One-to-many: a user has many missions
+  // Like @OneToMany(mappedBy = "user") List<Mission> missions;
+  missions     Mission[]
 
   @@map("users")
 }
 
-// A trek represents a search (origin → destination) with its suggested plants
-// Like @Entity Trek in JPA
-model Trek {
+// A mission represents a search (origin → destination) with its suggested plants
+// Like @Entity Mission in JPA
+model Mission {
   id          Int              @id @default(autoincrement())
   origin      String
   destination String
@@ -43,22 +43,23 @@ model Trek {
   originLng   Float?           @map("origin_lng")
   destLat     Float?           @map("dest_lat")
   destLng     Float?           @map("dest_lng")
+  status      String           @default("active")  // "active" | "completed"
 
   // Foreign key to User
   userId      Int              @map("user_id")
   user        User             @relation(fields: [userId], references: [id])
 
-  // One-to-many: a trek has many suggested plants
+  // One-to-many: a mission has many suggested plants
   // cascade delete handled by Prisma (onDelete: Cascade)
-  plants      SuggestedPlant[] @relation("trekPlants")
+  plants      SuggestedPlant[] @relation("missionPlants")
 
-  // Plants that were originally found in this trek (reverse of foundInTrek)
-  plantsFoundHere SuggestedPlant[] @relation("foundInTrek")
+  // Plants that were originally found in this mission (reverse of foundInMission)
+  plantsFoundHere SuggestedPlant[] @relation("foundInMission")
 
   @@map("treks")
 }
 
-// A plant suggested by Gemini for a specific trek
+// A plant suggested by the AI for a specific mission
 // Like @Entity SuggestedPlant in JPA
 model SuggestedPlant {
   id             Int       @id @default(autoincrement())
@@ -70,16 +71,16 @@ model SuggestedPlant {
   found          Boolean   @default(false)
   foundAt        DateTime?
 
-  // Trek where this plant was originally found (null if not found yet)
-  foundInTrekId  Int?      @map("found_in_trek_id")
-  foundInTrek    Trek?     @relation("foundInTrek", fields: [foundInTrekId], references: [id], onDelete: SetNull)
+  // Mission where this plant was originally found (null if not found yet)
+  foundInMissionId  Int?      @map("found_in_trek_id")
+  foundInMission    Mission?  @relation("foundInMission", fields: [foundInMissionId], references: [id], onDelete: SetNull)
 
   // One-to-many: a plant has many photos (normalized from old imageUrls column)
   photos         PlantPhoto[]
 
-  // Foreign key to Trek (like @ManyToOne @JoinColumn(name = "trek_id") Trek trek;)
-  trekId         Int       @map("trek_id")
-  trek           Trek      @relation("trekPlants", fields: [trekId], references: [id], onDelete: Cascade)
+  // Foreign key to Mission (like @ManyToOne @JoinColumn(name = "trek_id") Mission mission;)
+  missionId      Int       @map("trek_id")
+  mission        Mission   @relation("missionPlants", fields: [missionId], references: [id], onDelete: Cascade)
 
   @@map("suggested_plants")
 }

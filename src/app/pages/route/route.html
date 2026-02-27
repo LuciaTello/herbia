@@ -69,7 +69,7 @@
   <section class="too-far">
     <p class="error-message">{{ i18n.t().route.tooFar }}</p>
     @if (description()) {
-      <p class="trek-description">{{ description() }}</p>
+      <p class="mission-description">{{ description() }}</p>
     }
   </section>
 }
@@ -79,7 +79,7 @@
     <h3>{{ mode() === 'zone' ? i18n.t().route.zoneResultsTitle : i18n.t().route.resultsTitle }}</h3>
 
     @if (description()) {
-      <p class="trek-description">{{ description() }}</p>
+      <p class="mission-description">{{ description() }}</p>
     }
 
     @for (plant of plants(); track plant.scientificName) {
@@ -107,14 +107,14 @@
     }
 
     <button
-      class="primary-button start-trek-button"
-      (click)="onStartTrek()"
+      class="primary-button start-mission-button"
+      (click)="onStartMission()"
       [disabled]="saving()"
     >
       @if (saving()) {
         {{ i18n.t().route.saving }}
       } @else {
-        {{ i18n.t().route.startTrek }}
+        {{ i18n.t().route.startMission }}
       }
     </button>
   </section>

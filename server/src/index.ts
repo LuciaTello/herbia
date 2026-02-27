@@ -8,7 +8,7 @@ import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { plantRouter } from './routes/plant.routes';
 import { collectionRouter } from './routes/collection.routes';
-import { trekRouter } from './routes/trek.routes';
+import { missionRouter } from './routes/mission.routes';
 import { authRouter } from './routes/auth.routes';
 import { configRouter } from './routes/config.routes';
 import { authMiddleware } from './middleware/auth.middleware';
@@ -65,7 +65,7 @@ app.use('/api/config', configRouter(prisma));
 // If JWT is invalid, authMiddleware returns 401 and the route handler never runs
 app.use('/api/plants', authMiddleware, plantRouter(prisma));
 app.use('/api/collection', authMiddleware, collectionRouter(prisma));
-app.use('/api/treks', authMiddleware, trekRouter(prisma));
+app.use('/api/missions', authMiddleware, missionRouter(prisma));
 
 // --- Start server (like SpringApplication.run()) ---
 

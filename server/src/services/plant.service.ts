@@ -25,8 +25,8 @@ interface PlantPhoto {
 
 // Hardcoded tooFar messages per language (same text as i18n strings)
 const TOO_FAR: Record<string, string> = {
-  es: 'Esa ruta cruza múltiples climas — prueba con un trek más corto para que las sugerencias de plantas sean más precisas.',
-  fr: 'Cet itinéraire traverse plusieurs climats — essayez un trek plus court pour que les suggestions de plantes soient plus précises.',
+  es: 'Esa ruta cruza múltiples climas — prueba con un mission más corto para que las sugerencias de plantas sean más precisas.',
+  fr: 'Cet itinéraire traverse plusieurs climats — essayez un mission plus court pour que les suggestions de plantes soient plus précises.',
 };
 
 // --- iNaturalist species discovery ---
@@ -106,20 +106,20 @@ function selectPlants(species: INatSpecies[], exclude: string[]): (INatSpecies &
   const veryRare = withRarity.filter(s => s.rarity === 'veryRare');
 
   const picked: (INatSpecies & { rarity: string })[] = [];
-  picked.push(...common.slice(0, 5));
-  picked.push(...rare.slice(0, 3));
-  picked.push(...veryRare.slice(0, 2));
+  picked.push(...common.slice(0, 3));
+  picked.push(...rare.slice(0, 1));
+  picked.push(...veryRare.slice(0, 1));
 
-  // If we didn't get 10, fill from remaining
-  if (picked.length < 10) {
+  // If we didn't get 5, fill from remaining
+  if (picked.length < 5) {
     const pickedNames = new Set(picked.map(p => p.scientificName));
     for (const s of withRarity) {
-      if (picked.length >= 10) break;
+      if (picked.length >= 5) break;
       if (!pickedNames.has(s.scientificName)) picked.push(s);
     }
   }
 
-  return picked.slice(0, 10);
+  return picked.slice(0, 5);
 }
 
 // --- LLM prompts ---
@@ -142,7 +142,7 @@ function buildDescriptionPrompt(
 ${routeContext}
 IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
 
-Here are 10 real plants found along this route:
+Here are 5 real plants found along this route:
 ${plantList}
 
 Write ONLY a JSON object (no markdown, no backticks) with this format:
@@ -153,7 +153,7 @@ Write ONLY a JSON object (no markdown, no backticks) with this format:
   ]
 }
 
-Include a "description" for each of the 10 plants above, in the same order. The "scientificName" must match exactly.`;
+Include a "description" for each of the 5 plants above, in the same order. The "scientificName" must match exactly.`;
 }
 
 // Fallback: full LLM prompt when no coordinates are available (original behavior)
@@ -162,7 +162,7 @@ function buildPlantPrompt(origin: string, destination: string, lang: string, mon
   const monthName = MONTH_NAMES[month];
 
   const exclusionBlock = exclude.length > 0
-    ? `\n\nIMPORTANT: The traveler has already found these species on previous treks. Do NOT suggest any of them:\n${exclude.join(', ')}\n`
+    ? `\n\nIMPORTANT: The traveler has already found these species on previous missions. Do NOT suggest any of them:\n${exclude.join(', ')}\n`
     : '';
 
   const isZone = origin === destination;
@@ -171,7 +171,7 @@ function buildPlantPrompt(origin: string, destination: string, lang: string, mon
     : `A person is walking from ${origin} to ${destination}.`;
   const tooFarBlock = isZone
     ? ''
-    : `\nIMPORTANT: If the origin and destination are very far apart (different countries, different climate zones, or more than ~100 km), set "tooFar" to true in your response and leave plants as an empty array. The description should explain in ${langName} that the trek crosses multiple climates and suggest picking a shorter route.`;
+    : `\nIMPORTANT: If the origin and destination are very far apart (different countries, different climate zones, or more than ~100 km), set "tooFar" to true in your response and leave plants as an empty array. The description should explain in ${langName} that the mission crosses multiple climates and suggest picking a shorter route.`;
 
   return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
 ${routeContext}
@@ -179,7 +179,7 @@ The current month is ${monthName}. Only suggest plants that are visible, bloomin
 IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
 ${exclusionBlock}${tooFarBlock}
 
-Suggest exactly 10 plants that can be found along this path in ${monthName}.
+Suggest exactly 5 plants that can be found along this path in ${monthName}.
 Consider the region, climate, season, and typical vegetation.
 Try to include a balanced variety of plant types: trees, flowers, shrubs, grasses, herbs, ferns, etc. Don't force it if the route doesn't support it, but aim for diversity when possible.
 

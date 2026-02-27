@@ -1,5 +1,5 @@
-// TrekRoutes: like a @RestController for treks in Spring
-// Handles CRUD for treks and marking plants as found
+// MissionRoutes: like a @RestController for missions in Spring
+// Handles CRUD for missions and marking plants as found
 
 import { Router } from 'express';
 import multer, { memoryStorage } from 'multer';
@@ -14,13 +14,13 @@ const upload = multer({
 
 const ALLOWED_MIMES = ['image/jpeg', 'image/png'];
 
-const DAILY_TREK_LIMIT = 100;
+const DAILY_MISSION_LIMIT = 100;
 
 // Factory function (same pattern as collectionRouter/authRouter)
-export function trekRouter(prisma: PrismaClient): Router {
+export function missionRouter(prisma: PrismaClient): Router {
   const router = Router();
 
-  // POST /api/treks - Create a new trek or return existing one for this month
+  // POST /api/missions - Create a new mission
   router.post('/', async (req, res) => {
     try {
       const { origin, destination, description, plants: clientPlants, country, countryCode, region, regionCode, originLat, originLng, destLat, destLng } = req.body;
@@ -33,43 +33,23 @@ export function trekRouter(prisma: PrismaClient): Router {
       const normalizedOrigin = origin.trim().toUpperCase();
       const normalizedDestination = dest.trim().toUpperCase();
 
-      // Round coordinates to 2 decimals (~1km precision) for dedup comparison
+      // Round coordinates to 2 decimals (~1km precision)
       const roundedOriginLat = originLat ? Math.round(originLat * 100) / 100 : null;
       const roundedOriginLng = originLng ? Math.round(originLng * 100) / 100 : null;
 
-      // Check if a trek already exists for this user + route + coordinates + month
-      const existing = await prisma.trek.findFirst({
-        where: {
-          userId: req.userId!,
-          origin: normalizedOrigin,
-          destination: normalizedDestination,
-          originLat: roundedOriginLat,
-          originLng: roundedOriginLng,
-          month,
-          year,
-        },
-        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
-      });
-
-      if (existing) {
-        res.json(existing);
-        return;
-      }
-
-      // Rate limit: max 30 NEW treks per user per day (protects Gemini API quota)
+      // Rate limit: max missions per user per day (protects API quota)
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
-      const todayCount = await prisma.trek.count({
+      const todayCount = await prisma.mission.count({
         where: { userId: req.userId!, createdAt: { gte: startOfDay } },
       });
-      if (todayCount >= DAILY_TREK_LIMIT) {
+      if (todayCount >= DAILY_MISSION_LIMIT) {
         res.status(429).json({ error: 'Daily search limit reached' });
         return;
       }
 
-      // Plants come from the frontend preview (already fetched from Gemini + enriched with photos)
-      // No second Gemini call needed!
-      const trek = await prisma.trek.create({
+      // Plants come from the frontend preview (already fetched from LLM + enriched with photos)
+      const mission = await prisma.mission.create({
         data: {
           origin: normalizedOrigin,
           destination: normalizedDestination,
@@ -100,43 +80,43 @@ export function trekRouter(prisma: PrismaClient): Router {
             })),
           },
         },
-        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
+        include: { plants: { include: { photos: true, foundInMission: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
       });
 
-      res.status(201).json(trek);
+      res.status(201).json(mission);
     } catch (error) {
-      console.error('Error creating trek:', error);
-      res.status(500).json({ error: 'Failed to create trek' });
+      console.error('Error creating mission:', error);
+      res.status(500).json({ error: 'Failed to create mission' });
     }
   });
 
-  // GET /api/treks - List all treks for the authenticated user
+  // GET /api/missions - List all missions for the authenticated user
   router.get('/', async (req, res) => {
     try {
-      const treks = await prisma.trek.findMany({
+      const missions = await prisma.mission.findMany({
         where: { userId: req.userId! },
-        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
+        include: { plants: { include: { photos: true, foundInMission: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
         orderBy: { createdAt: 'desc' },
       });
-      res.json(treks);
+      res.json(missions);
     } catch (error) {
-      console.error('Error fetching treks:', error);
-      res.status(500).json({ error: 'Failed to fetch treks' });
+      console.error('Error fetching missions:', error);
+      res.status(500).json({ error: 'Failed to fetch missions' });
     }
   });
 
-  // PATCH /api/treks/plants/:plantId/found - Mark a suggested plant as found
+  // PATCH /api/missions/plants/:plantId/found - Mark a suggested plant as found
   router.patch('/plants/:plantId/found', async (req, res) => {
     try {
       const plantId = parseInt(req.params['plantId']);
 
-      // Verify ownership: the plant's trek must belong to this user
+      // Verify ownership: the plant's mission must belong to this user
       const plant = await prisma.suggestedPlant.findUnique({
         where: { id: plantId },
-        include: { trek: { select: { userId: true } } },
+        include: { mission: { select: { userId: true } } },
       });
 
-      if (!plant || plant.trek.userId !== req.userId!) {
+      if (!plant || plant.mission.userId !== req.userId!) {
         res.status(404).json({ error: 'Plant not found' });
         return;
       }
@@ -144,24 +124,24 @@ export function trekRouter(prisma: PrismaClient): Router {
       const now = new Date();
 
       // Mark ALL suggested plants with the same scientificName for this user as found
-      // Store which trek it was originally found in
+      // Store which mission it was originally found in
       await prisma.suggestedPlant.updateMany({
         where: {
           scientificName: plant.scientificName,
           found: false,
-          trek: { userId: req.userId! },
+          mission: { userId: req.userId! },
         },
-        data: { found: true, foundAt: now, foundInTrekId: plant.trekId },
+        data: { found: true, foundAt: now, foundInMissionId: plant.missionId },
       });
 
-      res.json({ scientificName: plant.scientificName, found: true, foundAt: now, foundInTrekId: plant.trekId });
+      res.json({ scientificName: plant.scientificName, found: true, foundAt: now, foundInMissionId: plant.missionId });
     } catch (error) {
       console.error('Error marking plant as found:', error);
       res.status(500).json({ error: 'Failed to mark plant as found' });
     }
   });
 
-  // POST /api/treks/plants/:plantId/identify - Identify a plant photo via PlantNet
+  // POST /api/missions/plants/:plantId/identify - Identify a plant photo via PlantNet
   router.post('/plants/:plantId/identify', upload.single('photo'), async (req, res) => {
     try {
       const plantId = parseInt(req.params['plantId'] as string);
@@ -179,9 +159,9 @@ export function trekRouter(prisma: PrismaClient): Router {
       // Verify ownership
       const plant = await prisma.suggestedPlant.findUnique({
         where: { id: plantId },
-        include: { trek: { select: { userId: true } } },
+        include: { mission: { select: { userId: true } } },
       });
-      if (!plant || plant.trek.userId !== req.userId!) {
+      if (!plant || plant.mission.userId !== req.userId!) {
         res.status(404).json({ error: 'Plant not found' });
         return;
       }
@@ -194,7 +174,7 @@ export function trekRouter(prisma: PrismaClient): Router {
     }
   });
 
-  // POST /api/treks/plants/:plantId/photo - Upload a user photo for a found plant
+  // POST /api/missions/plants/:plantId/photo - Upload a user photo for a found plant
   router.post('/plants/:plantId/photo', upload.single('photo'), async (req, res) => {
     try {
       const plantId = parseInt(req.params['plantId'] as string);
@@ -212,9 +192,9 @@ export function trekRouter(prisma: PrismaClient): Router {
       // Verify ownership + found status
       const plant = await prisma.suggestedPlant.findUnique({
         where: { id: plantId },
-        include: { trek: { select: { userId: true } } },
+        include: { mission: { select: { userId: true } } },
       });
-      if (!plant || plant.trek.userId !== req.userId!) {
+      if (!plant || plant.mission.userId !== req.userId!) {
         res.status(404).json({ error: 'Plant not found' });
         return;
       }
@@ -223,11 +203,11 @@ export function trekRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Count user photos GLOBALLY for this species (across all treks of this user)
+      // Count user photos GLOBALLY for this species (across all missions of this user)
       const userPhotoCount = await prisma.plantPhoto.count({
         where: {
           source: 'user',
-          plant: { scientificName: plant.scientificName, trek: { userId: req.userId! } },
+          plant: { scientificName: plant.scientificName, mission: { userId: req.userId! } },
         },
       });
       if (userPhotoCount >= 4) {
@@ -248,10 +228,10 @@ export function trekRouter(prisma: PrismaClient): Router {
     }
   });
 
-  // POST /api/treks/:trekId/add-plant - Add a user-found plant via PlantNet identification
-  router.post('/:trekId/add-plant', upload.single('photo'), async (req, res) => {
+  // POST /api/missions/:missionId/add-plant - Add a user-found plant via PlantNet identification
+  router.post('/:missionId/add-plant', upload.single('photo'), async (req, res) => {
     try {
-      const trekId = parseInt(req.params['trekId'] as string);
+      const missionId = parseInt(req.params['missionId'] as string);
       const file = req.file;
 
       if (!file) {
@@ -263,10 +243,10 @@ export function trekRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Verify trek ownership
-      const trek = await prisma.trek.findUnique({ where: { id: trekId } });
-      if (!trek || trek.userId !== req.userId!) {
-        res.status(404).json({ error: 'Trek not found' });
+      // Verify mission ownership
+      const mission = await prisma.mission.findUnique({ where: { id: missionId } });
+      if (!mission || mission.userId !== req.userId!) {
+        res.status(404).json({ error: 'Mission not found' });
         return;
       }
 
@@ -278,18 +258,18 @@ export function trekRouter(prisma: PrismaClient): Router {
       let plant;
 
       if (identified) {
-        // Check if this species already exists in this trek (AI-suggested or user-added)
-        const existingInTrek = await prisma.suggestedPlant.findFirst({
-          where: { trekId, scientificName: result.identifiedAs },
+        // Check if this species already exists in this mission (AI-suggested or user-added)
+        const existingInMission = await prisma.suggestedPlant.findFirst({
+          where: { missionId, scientificName: result.identifiedAs },
           include: { photos: true },
         });
 
-        if (existingInTrek) {
-          plant = existingInTrek;
+        if (existingInMission) {
+          plant = existingInMission;
         } else {
           plant = await prisma.suggestedPlant.create({
             data: {
-              trekId,
+              missionId,
               source: 'user',
               scientificName: result.identifiedAs,
               commonName: result.commonName,
@@ -297,27 +277,27 @@ export function trekRouter(prisma: PrismaClient): Router {
               rarity: 'common',
               found: true,
               foundAt: now,
-              foundInTrekId: trekId,
+              foundInMissionId: missionId,
             },
             include: { photos: true },
           });
         }
 
-        // Mark ALL plants with same scientificName as found (across all user treks)
+        // Mark ALL plants with same scientificName as found (across all user missions)
         await prisma.suggestedPlant.updateMany({
           where: {
             scientificName: result.identifiedAs,
             found: false,
-            trek: { userId: req.userId! },
+            mission: { userId: req.userId! },
           },
-          data: { found: true, foundAt: now, foundInTrekId: trekId },
+          data: { found: true, foundAt: now, foundInMissionId: missionId },
         });
 
         // Check global photo count for this species
         const globalPhotoCount = await prisma.plantPhoto.count({
           where: {
             source: 'user',
-            plant: { scientificName: result.identifiedAs, trek: { userId: req.userId! } },
+            plant: { scientificName: result.identifiedAs, mission: { userId: req.userId! } },
           },
         });
         if (globalPhotoCount >= 4) {
@@ -328,7 +308,7 @@ export function trekRouter(prisma: PrismaClient): Router {
         // Unidentified: always create a new entry (no species to deduplicate against)
         plant = await prisma.suggestedPlant.create({
           data: {
-            trekId,
+            missionId,
             source: 'user',
             scientificName: '',
             commonName: '',
@@ -336,7 +316,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             rarity: 'common',
             found: true,
             foundAt: now,
-            foundInTrekId: trekId,
+            foundInMissionId: missionId,
           },
           include: { photos: true },
         });
@@ -361,17 +341,17 @@ export function trekRouter(prisma: PrismaClient): Router {
     }
   });
 
-  // DELETE /api/treks/plants/:plantId - Delete a user-added plant and its photos
+  // DELETE /api/missions/plants/:plantId - Delete a user-added plant and its photos
   router.delete('/plants/:plantId', async (req, res) => {
     try {
       const plantId = parseInt(req.params['plantId']);
 
       const plant = await prisma.suggestedPlant.findUnique({
         where: { id: plantId },
-        include: { photos: true, trek: { select: { userId: true } } },
+        include: { photos: true, mission: { select: { userId: true } } },
       });
 
-      if (!plant || plant.trek.userId !== req.userId!) {
+      if (!plant || plant.mission.userId !== req.userId!) {
         res.status(404).json({ error: 'Plant not found' });
         return;
       }
@@ -396,17 +376,17 @@ export function trekRouter(prisma: PrismaClient): Router {
     }
   });
 
-  // DELETE /api/treks/photos/:photoId - Delete a user photo from a plant
+  // DELETE /api/missions/photos/:photoId - Delete a user photo from a plant
   router.delete('/photos/:photoId', async (req, res) => {
     try {
       const photoId = parseInt(req.params['photoId']);
 
       const photo = await prisma.plantPhoto.findUnique({
         where: { id: photoId },
-        include: { plant: { include: { trek: { select: { userId: true } } } } },
+        include: { plant: { include: { mission: { select: { userId: true } } } } },
       });
 
-      if (!photo || photo.plant.trek.userId !== req.userId!) {
+      if (!photo || photo.plant.mission.userId !== req.userId!) {
         res.status(404).json({ error: 'Photo not found' });
         return;
       }
@@ -426,21 +406,40 @@ export function trekRouter(prisma: PrismaClient): Router {
     }
   });
 
-  // DELETE /api/treks/:id - Delete a trek (cascade deletes its plants)
+  // PATCH /api/missions/:id/complete - Mark a mission as completed
+  router.patch('/:id/complete', async (req, res) => {
+    try {
+      const id = parseInt(req.params['id']);
+      const result = await prisma.mission.updateMany({
+        where: { id, userId: req.userId! },
+        data: { status: 'completed' },
+      });
+      if (result.count === 0) {
+        res.status(404).json({ error: 'Mission not found' });
+        return;
+      }
+      res.json({ id, status: 'completed' });
+    } catch (error) {
+      console.error('Error completing mission:', error);
+      res.status(500).json({ error: 'Failed to complete mission' });
+    }
+  });
+
+  // DELETE /api/missions/:id - Delete a mission (cascade deletes its plants)
   router.delete('/:id', async (req, res) => {
     try {
       const id = parseInt(req.params['id']);
-      const result = await prisma.trek.deleteMany({
+      const result = await prisma.mission.deleteMany({
         where: { id, userId: req.userId! },
       });
       if (result.count === 0) {
-        res.status(404).json({ error: 'Trek not found' });
+        res.status(404).json({ error: 'Mission not found' });
         return;
       }
       res.status(204).send();
     } catch (error) {
-      console.error('Error deleting trek:', error);
-      res.status(500).json({ error: 'Failed to delete trek' });
+      console.error('Error deleting mission:', error);
+      res.status(500).json({ error: 'Failed to delete mission' });
     }
   });
 
