@@ -10,7 +10,7 @@ export const ES: Translations = {
     description:
       'Elige un origen y un destino — te diremos qué plantas crecen por el camino para que las encuentres y las captures.',
     startRoute: 'Nueva misión',
-    myTreks: 'Mis misiones',
+    myMissions: 'Mis misiones',
     myCollection: 'Mi colección',
   },
   route: {
@@ -31,9 +31,9 @@ export const ES: Translations = {
     loadingHint:
       'La primera búsqueda puede tardar ~30s (el servidor duerme la siesta)',
     resultsTitle: 'Plantas en tu camino',
-    startTrek: '¡Aceptar misión!',
+    startMission: '¡Aceptar misión!',
     saving: 'Guardando...',
-    tooFar: 'Esa ruta cruza múltiples climas — prueba con un trek más corto para mejores resultados.',
+    tooFar: 'Esa ruta cruza múltiples climas — prueba con una misión más corta para mejores resultados.',
     error: 'Error al buscar plantas. Verifica que el servidor está arrancado.',
     dailyLimitReached: 'Has alcanzado el límite de 30 búsquedas por hoy. ¡Vuelve mañana!',
     loadingMessages: [
@@ -49,14 +49,14 @@ export const ES: Translations = {
       'Descifrando el lenguaje de las flores...',
     ],
   },
-  myTreks: {
+  myMissions: {
     back: 'Volver al inicio',
     title: 'Mis misiones',
     loading: 'Cargando tus misiones...',
     emptyLine1: 'Todavía no tienes ninguna misión.',
     emptyLine2: '¡Lanza una misión y empieza a capturar!',
     found: 'Capturada',
-    foundInTrek: (origin, destination) => `Capturada en ${origin} → ${destination}`,
+    foundInMission: (origin, destination) => `Capturada en ${origin} → ${destination}`,
     markFound: '¡La he visto!',
     addPhoto: 'Añadir foto',
     uploading: 'Subiendo...',
@@ -76,6 +76,12 @@ export const ES: Translations = {
     unidentifiedCount: (count) => `${count} planta${count !== 1 ? 's' : ''} sin identificar`,
     maxPhotosReached: 'Máx 4 fotos por especie. Borra una primero.',
     plantAdded: '¡Planta añadida!',
+    completeMission: 'Terminar misión',
+    completed: 'Completada',
+    activeMissions: 'En curso',
+    completedMissions: 'Completadas',
+    missionsCount: (n) => `${n} misión${n !== 1 ? 'es' : ''}`,
+    noLocationMissions: (n) => `${n} misión${n !== 1 ? 'es' : ''} sin ubicar`,
   },
   collection: {
     back: 'Volver al inicio',

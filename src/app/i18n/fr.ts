@@ -10,7 +10,7 @@ export const FR: Translations = {
     description:
       'Choisissez un point de départ et une destination — on vous dira quelles plantes poussent en chemin pour les trouver et les capturer.',
     startRoute: 'Nouvelle mission',
-    myTreks: 'Mes missions',
+    myMissions: 'Mes missions',
     myCollection: 'Ma collection',
   },
   route: {
@@ -31,9 +31,9 @@ export const FR: Translations = {
     loadingHint:
       'La première recherche peut prendre ~30s (le serveur fait la sieste)',
     resultsTitle: 'Plantes sur votre chemin',
-    startTrek: 'Accepter la mission !',
+    startMission: 'Accepter la mission !',
     saving: 'Enregistrement...',
-    tooFar: 'Cet itinéraire traverse plusieurs climats — essayez un trek plus court pour de meilleurs résultats.',
+    tooFar: 'Cet itinéraire traverse plusieurs climats — essayez une mission plus courte pour de meilleurs résultats.',
     error: 'Erreur lors de la recherche. Vérifiez que le serveur est démarré.',
     dailyLimitReached: 'Vous avez atteint la limite de 30 recherches pour aujourd\'hui. Revenez demain !',
     loadingMessages: [
@@ -49,14 +49,14 @@ export const FR: Translations = {
       'Déchiffrage du langage des fleurs...',
     ],
   },
-  myTreks: {
+  myMissions: {
     back: "Retour à l'accueil",
     title: 'Mes missions',
     loading: 'Chargement de vos missions...',
     emptyLine1: "Vous n'avez encore aucune mission.",
     emptyLine2: 'Lancez une mission et commencez à capturer !',
     found: 'Capturée',
-    foundInTrek: (origin, destination) => `Capturée sur ${origin} → ${destination}`,
+    foundInMission: (origin, destination) => `Capturée sur ${origin} → ${destination}`,
     markFound: 'Je l\'ai vue !',
     addPhoto: 'Ajouter photo',
     uploading: 'Téléchargement...',
@@ -70,12 +70,18 @@ export const FR: Translations = {
     identifyUploadAnyway: 'Envoyer quand même',
     summary: (total, found) => `${found}/${total} capturées`,
     missionComplete: 'Mission accomplie !',
-    addPlant: 'Ajouter plante',
+    addPlant: 'Ajouter autres plantes',
     addingPlant: 'Identification...',
     myPlantsTitle: 'Mes plantes',
     unidentifiedCount: (count) => `${count} plante${count !== 1 ? 's' : ''} non identifiée${count !== 1 ? 's' : ''}`,
     maxPhotosReached: 'Max 4 photos par espèce. Supprimez-en une d\'abord.',
     plantAdded: 'Plante ajoutée !',
+    completeMission: 'Terminer la mission',
+    completed: 'Terminée',
+    activeMissions: 'En cours',
+    completedMissions: 'Terminées',
+    missionsCount: (n) => `${n} mission${n !== 1 ? 's' : ''}`,
+    noLocationMissions: (n) => `${n} mission${n !== 1 ? 's' : ''} sans localisation`,
   },
   collection: {
     back: "Retour à l'accueil",

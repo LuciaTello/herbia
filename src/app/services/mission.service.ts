@@ -1,42 +1,42 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Trek, SuggestedPlant, Plant, PlantPhoto, IdentifyResult } from '../models/plant.model';
+import { Mission, SuggestedPlant, Plant, PlantPhoto, IdentifyResult } from '../models/plant.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
-export class TrekService {
+export class MissionService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/treks`;
+  private readonly apiUrl = `${environment.apiUrl}/missions`;
 
-  private readonly treks = signal<Trek[]>([]);
+  private readonly missions = signal<Mission[]>([]);
 
-  getTreks() {
-    return this.treks;
+  getMissions() {
+    return this.missions;
   }
 
-  async loadTreks(): Promise<void> {
-    const treks = await firstValueFrom(
-      this.http.get<Trek[]>(this.apiUrl)
+  async loadMissions(): Promise<void> {
+    const missions = await firstValueFrom(
+      this.http.get<Mission[]>(this.apiUrl)
     );
-    this.treks.set(treks);
+    this.missions.set(missions);
   }
 
-  async createTrek(
+  async createMission(
     origin: string, destination: string, description: string, plants: Plant[],
     country?: string, countryCode?: string, region?: string, regionCode?: string,
     originLat?: number | null, originLng?: number | null, destLat?: number | null, destLng?: number | null,
-  ): Promise<Trek> {
-    const trek = await firstValueFrom(
-      this.http.post<Trek>(this.apiUrl, {
+  ): Promise<Mission> {
+    const mission = await firstValueFrom(
+      this.http.post<Mission>(this.apiUrl, {
         origin, destination, description, plants,
         country, countryCode, region, regionCode,
         originLat, originLng, destLat, destLng,
       })
     );
     // Add to the beginning of the list (newest first)
-    this.treks.update(list => [trek, ...list]);
-    return trek;
+    this.missions.update(list => [mission, ...list]);
+    return mission;
   }
 
   async markPlantFound(plantId: number): Promise<void> {
@@ -45,11 +45,11 @@ export class TrekService {
         `${this.apiUrl}/plants/${plantId}/found`, {}
       )
     );
-    // Mark ALL plants with the same scientificName as found across all treks
-    this.treks.update(list =>
-      list.map(trek => ({
-        ...trek,
-        plants: trek.plants.map(p =>
+    // Mark ALL plants with the same scientificName as found across all missions
+    this.missions.update(list =>
+      list.map(mission => ({
+        ...mission,
+        plants: mission.plants.map(p =>
           p.scientificName === result.scientificName
             ? { ...p, found: true, foundAt: result.foundAt }
             : p
@@ -73,12 +73,12 @@ export class TrekService {
       this.http.post<PlantPhoto>(`${this.apiUrl}/plants/${plantId}/photo`, formData)
     );
     // Add the new photo to the matching plant (and all plants with same scientificName)
-    const targetPlant = this.treks().flatMap(t => t.plants).find(p => p.id === plantId);
+    const targetPlant = this.missions().flatMap(m => m.plants).find(p => p.id === plantId);
     if (targetPlant) {
-      this.treks.update(list =>
-        list.map(trek => ({
-          ...trek,
-          plants: trek.plants.map(p =>
+      this.missions.update(list =>
+        list.map(mission => ({
+          ...mission,
+          plants: mission.plants.map(p =>
             p.scientificName === targetPlant.scientificName
               ? { ...p, photos: [...p.photos, photo] }
               : p
@@ -93,10 +93,10 @@ export class TrekService {
     await firstValueFrom(
       this.http.delete(`${this.apiUrl}/photos/${photoId}`)
     );
-    this.treks.update(list =>
-      list.map(trek => ({
-        ...trek,
-        plants: trek.plants.map(p => ({
+    this.missions.update(list =>
+      list.map(mission => ({
+        ...mission,
+        plants: mission.plants.map(p => ({
           ...p,
           photos: p.photos.filter(ph => ph.id !== photoId),
         })),
@@ -104,24 +104,24 @@ export class TrekService {
     );
   }
 
-  async addUserPlant(trekId: number, file: File): Promise<{ plant: SuggestedPlant; identified: boolean }> {
+  async addUserPlant(missionId: number, file: File): Promise<{ plant: SuggestedPlant; identified: boolean }> {
     const formData = new FormData();
     formData.append('photo', file);
     const result = await firstValueFrom(
       this.http.post<{ plant: SuggestedPlant; identified: boolean }>(
-        `${this.apiUrl}/${trekId}/add-plant`, formData
+        `${this.apiUrl}/${missionId}/add-plant`, formData
       )
     );
     const scientificName = result.plant.scientificName;
-    // Update signal: add/replace plant in matching trek + mark same species found everywhere
-    this.treks.update(list => list.map(trek => {
-      let plants = trek.plants.map(p =>
-        // Mark all same-species plants as found across all treks
+    // Update signal: add/replace plant in matching mission + mark same species found everywhere
+    this.missions.update(list => list.map(mission => {
+      let plants = mission.plants.map(p =>
+        // Mark all same-species plants as found across all missions
         scientificName && p.scientificName === scientificName && !p.found
           ? { ...p, found: true, foundAt: result.plant.foundAt }
           : p
       );
-      if (trek.id === trekId) {
+      if (mission.id === missionId) {
         const existingIdx = plants.findIndex(p => p.id === result.plant.id);
         if (existingIdx >= 0) {
           // Plant already existed — update it (new photo added)
@@ -132,7 +132,7 @@ export class TrekService {
           plants = [...plants, result.plant];
         }
       }
-      return { ...trek, plants };
+      return { ...mission, plants };
     }));
     return result;
   }
@@ -141,18 +141,27 @@ export class TrekService {
     await firstValueFrom(
       this.http.delete(`${this.apiUrl}/plants/${plantId}`)
     );
-    this.treks.update(list =>
-      list.map(trek => ({
-        ...trek,
-        plants: trek.plants.filter(p => p.id !== plantId),
+    this.missions.update(list =>
+      list.map(mission => ({
+        ...mission,
+        plants: mission.plants.filter(p => p.id !== plantId),
       }))
     );
   }
 
-  async deleteTrek(id: number): Promise<void> {
+  async completeMission(id: number): Promise<void> {
+    await firstValueFrom(
+      this.http.patch(`${this.apiUrl}/${id}/complete`, {})
+    );
+    this.missions.update(list =>
+      list.map(mission => mission.id === id ? { ...mission, status: 'completed' } : mission)
+    );
+  }
+
+  async deleteMission(id: number): Promise<void> {
     await firstValueFrom(
       this.http.delete(`${this.apiUrl}/${id}`)
     );
-    this.treks.update(list => list.filter(trek => trek.id !== id));
+    this.missions.update(list => list.filter(mission => mission.id !== id));
   }
 }

@@ -7,7 +7,7 @@ export interface Translations {
     title: string;
     description: string;
     startRoute: string;
-    myTreks: string;
+    myMissions: string;
     myCollection: string;
   };
   route: {
@@ -27,21 +27,21 @@ export interface Translations {
     searchZone: string;
     zoneResultsTitle: string;
     resultsTitle: string;
-    startTrek: string;
+    startMission: string;
     saving: string;
     tooFar: string;
     error: string;
     dailyLimitReached: string;
     loadingMessages: string[];
   };
-  myTreks: {
+  myMissions: {
     back: string;
     title: string;
     loading: string;
     emptyLine1: string;
     emptyLine2: string;
     found: string;
-    foundInTrek: (origin: string, destination: string) => string;
+    foundInMission: (origin: string, destination: string) => string;
     markFound: string;
     addPhoto: string;
     uploading: string;
@@ -61,6 +61,12 @@ export interface Translations {
     unidentifiedCount: (count: number) => string;
     maxPhotosReached: string;
     plantAdded: string;
+    completeMission: string;
+    completed: string;
+    activeMissions: string;
+    completedMissions: string;
+    missionsCount: (n: number) => string;
+    noLocationMissions: (n: number) => string;
   };
   collection: {
     back: string;

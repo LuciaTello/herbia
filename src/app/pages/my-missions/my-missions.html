@@ -1,0 +1,336 @@
+<a routerLink="/" class="back-link">{{ i18n.t().myMissions.back }}</a>
+
+<h2>{{ i18n.t().myMissions.title }}</h2>
+
+@if (loading()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-message">{{ i18n.t().myMissions.loading }}</p>
+  </div>
+} @else if (missions().length === 0) {
+  <div class="empty">
+    <p>{{ i18n.t().myMissions.emptyLine1 }}</p>
+    <p>{{ i18n.t().myMissions.emptyLine2 }}</p>
+  </div>
+} @else {
+  <!-- Top-level toggle -->
+  <div class="missions-toggle">
+    <button class="toggle-btn" [class.active]="!showCompleted()" (click)="switchToActive()">
+      {{ i18n.t().myMissions.activeMissions }}
+    </button>
+    <button class="toggle-btn" [class.active]="showCompleted()" (click)="switchToCompleted()">
+      {{ i18n.t().myMissions.completedMissions }}
+    </button>
+  </div>
+
+  @if (!showCompleted()) {
+    <!-- ACTIVE MISSIONS: flat list -->
+    <div class="missions-list">
+      @for (mission of activeMissions(); track mission.id) {
+        <ng-container *ngTemplateOutlet="missionTpl; context: { $implicit: mission }" />
+      } @empty {
+        <div class="empty">
+          <p>{{ i18n.t().myMissions.emptyLine1 }}</p>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- COMPLETED MISSIONS: map drill-down -->
+
+    @if (mapView() !== 'map') {
+      <nav class="breadcrumb">
+        @for (part of breadcrumb(); track $index; let last = $last) {
+          @if (!last && part.action !== null) {
+            <button class="breadcrumb-link" (click)="navigateTo(part.action)">{{ part.label }}</button>
+            <span class="breadcrumb-sep">/</span>
+          } @else {
+            <span class="breadcrumb-current">{{ part.label }}</span>
+          }
+        }
+      </nav>
+    }
+
+    @switch (mapView()) {
+      @case ('map') {
+        <app-world-map
+          [plantCounts]="continentCounts()"
+          [lang]="i18n.currentLang()"
+          (continentSelected)="onContinentSelected($event)"
+        />
+
+        @if (noLocationCompleted().length) {
+          <button class="no-location-link" (click)="onShowNoLocation()">
+            {{ i18n.t().myMissions.noLocationMissions(noLocationCompleted().length) }}
+          </button>
+        }
+      }
+
+      @case ('countries') {
+        <div class="country-grid">
+          @for (country of countriesInContinent(); track country.code) {
+            <button class="country-card" (click)="onCountrySelected(country.code, country.name)">
+              <span class="country-flag">{{ country.flag }}</span>
+              <span class="country-name">{{ country.name }}</span>
+              <span class="country-count">{{ i18n.t().myMissions.missionsCount(country.count) }}</span>
+            </button>
+          }
+        </div>
+      }
+
+      @case ('regions') {
+        <div class="country-grid">
+          <button class="country-card all-region-card" (click)="onShowAllFromCountry()">
+            <span class="country-name">{{ i18n.t().collection.allRegions }}</span>
+            <span class="country-count">{{ i18n.t().myMissions.missionsCount(completedInCountry().length) }}</span>
+          </button>
+          @for (region of regionsInCountry(); track region.name) {
+            <button class="country-card" (click)="onRegionSelected(region.name)">
+              <span class="country-name">{{ region.name }}</span>
+              <span class="country-count">{{ i18n.t().myMissions.missionsCount(region.count) }}</span>
+            </button>
+          }
+        </div>
+      }
+
+      @case ('missions') {
+        <div class="missions-list">
+          @for (mission of completedInView(); track mission.id) {
+            <ng-container *ngTemplateOutlet="missionTpl; context: { $implicit: mission }" />
+          } @empty {
+            <div class="empty">
+              <p>{{ i18n.t().myMissions.emptyLine1 }}</p>
+            </div>
+          }
+        </div>
+      }
+    }
+  }
+}
+
+<!-- Mission card template -->
+<ng-template #missionTpl let-mission>
+  <section class="mission-card" [class.expanded]="expandedId() === mission.id">
+    <div class="mission-header">
+      <div class="mission-route" (click)="toggle(mission.id)">
+        <span class="chevron">{{ expandedId() === mission.id ? '▾' : '▸' }}</span>
+        <div>
+          <h3>
+            @if (mission.origin === mission.destination) {
+              {{ mission.origin }}
+            } @else {
+              {{ mission.origin }} → {{ mission.destination }}
+            }
+          </h3>
+          <p class="mission-date">
+            {{ mission.createdAt | date }}
+            @if (mission.status === 'completed') {
+              <span class="completed-badge">{{ i18n.t().myMissions.completed }}</span>
+            }
+          </p>
+        </div>
+      </div>
+      <button class="delete-button" (click)="deleteMission(mission.id)">&times;</button>
+    </div>
+
+    <div class="mission-progress">
+      <div class="progress-bar">
+        <div class="progress-fill"
+             [class.complete]="foundCount(mission.plants) === mission.plants.length"
+             [style.width.%]="mission.plants.length ? (foundCount(mission.plants) / mission.plants.length * 100) : 0"></div>
+      </div>
+      <p class="progress-text" [class.complete]="foundCount(mission.plants) === mission.plants.length">
+        @if (foundCount(mission.plants) === mission.plants.length) {
+          {{ i18n.t().myMissions.missionComplete }}
+        } @else {
+          {{ i18n.t().myMissions.summary(mission.plants.length, foundCount(mission.plants)) }}
+        }
+      </p>
+    </div>
+
+    @if (expandedId() === mission.id) {
+      @if (mission.description) {
+        <p class="mission-description">{{ mission.description }}</p>
+      }
+
+      <div class="mission-plants">
+        @for (plant of aiPlants(mission.plants); track plant.id) {
+          <article class="plant-card" [class.found]="plant.found"
+                   [class.rarity-common]="plant.rarity === 'common' || !plant.rarity"
+                   [class.rarity-rare]="plant.rarity === 'rare'"
+                   [class.rarity-veryRare]="plant.rarity === 'veryRare'">
+            <div class="plant-thumbnail" (click)="openGallery(refPhotos(plant.photos), plant.commonName)">
+              @if (refPhotos(plant.photos).length) {
+                <img [src]="refPhotos(plant.photos)[0].url" [alt]="plant.commonName" />
+              } @else {
+                <div class="no-photo">?</div>
+              }
+            </div>
+            <div class="plant-info">
+              <h4>{{ plant.commonName }}</h4>
+              <p class="scientific">{{ plant.scientificName }}</p>
+              <p class="chance" [style.color]="rarity(plant.rarity).color">
+                {{ rarity(plant.rarity).label }}
+              </p>
+              <p class="description">{{ plant.description }}</p>
+              @if (plant.found) {
+                <span class="found-badge">{{ i18n.t().myMissions.found }}</span>
+                @if (plant.foundInMission && plant.foundInMissionId !== mission.id) {
+                  @if (plant.foundInMission.origin === plant.foundInMission.destination) {
+                    <span class="found-in-mission">Capturada en {{ plant.foundInMission.origin }}</span>
+                  } @else {
+                    <span class="found-in-mission">{{ i18n.t().myMissions.foundInMission(plant.foundInMission.origin, plant.foundInMission.destination) }}</span>
+                  }
+                }
+                @if (userPhotos(plant.photos).length) {
+                  <div class="user-photos-box">
+                    @for (photo of userPhotos(plant.photos); track photo.id) {
+                      <div class="user-photo-wrapper">
+                        <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
+                             (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
+                        <button class="photo-delete-btn" (click)="deletePhoto(photo.id!)">&times;</button>
+                      </div>
+                    }
+                    @if (identifying() === plant.id) {
+                      <span class="uploading-badge">{{ i18n.t().myMissions.identifying }}</span>
+                    } @else if (uploadingPhotoId() === plant.id) {
+                      <span class="uploading-badge">{{ i18n.t().myMissions.uploading }}</span>
+                    } @else if (userPhotos(plant.photos).length < 4) {
+                      <label class="add-photo-button">
+                        {{ i18n.t().myMissions.addPhoto }}
+                        <input type="file" accept="image/jpeg,image/png" capture="environment"
+                               (change)="onPhotoSelected($event, plant.id)" hidden />
+                      </label>
+                    }
+                  </div>
+                } @else {
+                  @if (identifying() === plant.id) {
+                    <span class="uploading-badge">{{ i18n.t().myMissions.identifying }}</span>
+                  } @else if (uploadingPhotoId() === plant.id) {
+                    <span class="uploading-badge">{{ i18n.t().myMissions.uploading }}</span>
+                  } @else {
+                    <label class="add-photo-button">
+                      {{ i18n.t().myMissions.addPhoto }}
+                      <input type="file" accept="image/jpeg,image/png" capture="environment"
+                             (change)="onPhotoSelected($event, plant.id)" hidden />
+                    </label>
+                  }
+                }
+                @if (identifyResult() && pendingPlantId() === plant.id) {
+                  <div class="identify-banner" [class.match]="identifyResult()!.match" [class.no-match]="!identifyResult()!.match">
+                    @if (identifyResult()!.match) {
+                      <span class="identify-icon">&#10003;</span>
+                      <span class="identify-text">{{ i18n.t().myMissions.identifyMatch(identifyResult()!.identifiedAs, identifyResult()!.score) }}</span>
+                    } @else if (identifyResult()!.identifiedAs) {
+                      <span class="identify-icon">&#9888;</span>
+                      <span class="identify-text">{{ i18n.t().myMissions.identifyNoMatch(identifyResult()!.identifiedAs, identifyResult()!.score) }}</span>
+                    } @else {
+                      <span class="identify-icon">&#9888;</span>
+                      <span class="identify-text">{{ i18n.t().myMissions.identifyUnknown }}</span>
+                    }
+                    <div class="identify-actions">
+                      <button class="identify-btn confirm" (click)="confirmUpload()">
+                        {{ identifyResult()!.match ? i18n.t().myMissions.identifyUpload : i18n.t().myMissions.identifyUploadAnyway }}
+                      </button>
+                      <button class="identify-btn cancel" (click)="cancelUpload()">
+                        {{ i18n.t().myMissions.identifyCancel }}
+                      </button>
+                    </div>
+                  </div>
+                }
+              } @else {
+                <button class="found-button" (click)="markFound(plant.id)">
+                  {{ i18n.t().myMissions.markFound }}
+                </button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+
+      <!-- Add plant button -->
+      @if (addingPlantForMission() === mission.id) {
+        <span class="adding-plant-badge">{{ i18n.t().myMissions.addingPlant }}</span>
+      } @else {
+        <label class="add-plant-button">
+          {{ i18n.t().myMissions.addPlant }}
+          <input type="file" accept="image/jpeg,image/png" capture="environment"
+                 (change)="onAddPlant($event, mission.id)" hidden />
+        </label>
+      }
+
+      @if (addPlantMessage() && (addingPlantForMission() === null || addingPlantForMission() === mission.id)) {
+        <p class="add-plant-message">{{ addPlantMessage() }}</p>
+      }
+
+      <!-- User-added identified plants -->
+      @if (userPlants(mission.plants).length) {
+        <h5 class="section-title">{{ i18n.t().myMissions.myPlantsTitle }}</h5>
+        <div class="mission-plants">
+          @for (plant of userPlants(mission.plants); track plant.id) {
+            <article class="plant-card found user-plant-card">
+              <button class="user-plant-delete" (click)="deleteUserPlant(plant.id)">&times;</button>
+              <div class="plant-thumbnail" (click)="openGallery(userPhotos(plant.photos), plant.commonName)">
+                @if (userPhotos(plant.photos).length) {
+                  <img [src]="userPhotos(plant.photos)[0].url" [alt]="plant.commonName" />
+                } @else {
+                  <div class="no-photo">?</div>
+                }
+              </div>
+              <div class="plant-info">
+                <h4>{{ plant.commonName }}</h4>
+                <p class="scientific">{{ plant.scientificName }}</p>
+                @if (userPhotos(plant.photos).length > 1) {
+                  <div class="user-photos-box">
+                    @for (photo of userPhotos(plant.photos); track photo.id) {
+                      <div class="user-photo-wrapper">
+                        <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
+                             (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
+                        <button class="photo-delete-btn" (click)="deletePhoto(photo.id!)">&times;</button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+
+      <!-- Complete mission button -->
+      @if (mission.status !== 'completed') {
+        <button class="complete-mission-button" (click)="completeMission(mission.id)">
+          {{ i18n.t().myMissions.completeMission }}
+        </button>
+      }
+
+      <!-- Unidentified plants toggle -->
+      @if (unidentifiedPlants(mission.plants).length) {
+        <p class="unidentified-toggle" (click)="toggleUnidentified(mission.id)">
+          {{ i18n.t().myMissions.unidentifiedCount(unidentifiedPlants(mission.plants).length) }}
+          {{ showUnidentifiedFor() === mission.id ? '▾' : '▸' }}
+        </p>
+        @if (showUnidentifiedFor() === mission.id) {
+          <div class="unidentified-list">
+            @for (plant of unidentifiedPlants(mission.plants); track plant.id) {
+              <div class="unidentified-card">
+                <button class="unidentified-delete" (click)="deleteUserPlant(plant.id)">&times;</button>
+                @if (userPhotos(plant.photos).length) {
+                  <img class="unidentified-photo" [src]="userPhotos(plant.photos)[0].url" alt=""
+                       (click)="openGallery(userPhotos(plant.photos), '')" />
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  </section>
+</ng-template>
+
+@if (galleryImages().length) {
+  <app-photo-gallery
+    [images]="galleryImages()"
+    [plantName]="galleryPlantName()"
+    (closeGallery)="closeGallery()"
+  />
+}

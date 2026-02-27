@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Plant, PlantPhoto, PlaceSelection } from '../../models/plant.model';
 import { PlantService } from '../../services/plant.service';
-import { TrekService } from '../../services/trek.service';
+import { MissionService } from '../../services/mission.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { PlaceAutocompleteDirective } from '../../directives/place-autocomplete.directive';
@@ -19,7 +19,7 @@ import { getRarity } from '../../utils/rarity';
 })
 export class RoutePage {
   private readonly plantService = inject(PlantService);
-  private readonly trekService = inject(TrekService);
+  private readonly missionService = inject(MissionService);
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
 
@@ -139,13 +139,13 @@ export class RoutePage {
     }
   }
 
-  async onStartTrek(): Promise<void> {
+  async onStartMission(): Promise<void> {
     this.saving.set(true);
     try {
       const dest = this.mode() === 'zone' ? this.origin() : this.destination();
       const dLat = this.mode() === 'zone' ? this.originLat : this.destLat;
       const dLng = this.mode() === 'zone' ? this.originLng : this.destLng;
-      const trek = await this.trekService.createTrek(
+      const mission = await this.missionService.createMission(
         this.origin(),
         dest,
         this.description(),
@@ -159,7 +159,7 @@ export class RoutePage {
         dLat,
         dLng,
       );
-      this.router.navigate(['/my-treks'], { queryParams: { open: trek.id } });
+      this.router.navigate(['/my-missions'], { queryParams: { open: mission.id } });
     } catch (e) {
       if (e instanceof HttpErrorResponse && e.status === 429) {
         this.error.set(this.i18n.t().route.dailyLimitReached);
