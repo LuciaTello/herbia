@@ -11,6 +11,7 @@ export interface Plant {
   scientificName: string;
   rarity: string;
   description: string;
+  hint: string;
   photos: PlantPhoto[];
 }
 
@@ -21,6 +22,7 @@ export interface SuggestedPlant {
   scientificName: string;
   rarity: string;
   description: string;
+  hint: string;
   source?: string;  // "ai" | "user"
   photos: PlantPhoto[];
   found: boolean;

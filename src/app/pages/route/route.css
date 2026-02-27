@@ -229,6 +229,16 @@ h2 {
   margin: 0.5rem 0 0;
 }
 
+.hint {
+  font-size: 0.8rem;
+  color: #2d7d46;
+  background: #e8f5e9;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid #78b87a;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+}
+
 .start-mission-button {
   width: 100%;
   margin-top: 1rem;

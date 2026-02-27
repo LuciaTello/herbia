@@ -149,11 +149,11 @@ Write ONLY a JSON object (no markdown, no backticks) with this format:
 {
   "routeDescription": "A fun overview in ${langName} (2-3 sentences) about the landscape and environment along this route in ${monthName}.",
   "plants": [
-    { "scientificName": "Latin name", "description": "Brief fun description in ${langName} (2-3 sentences). Mention what it looks like, where to find it, include a touch of humor." }
+    { "scientificName": "Latin name", "description": "Interesting facts in ${langName} (2-3 sentences): what it is, what it looks like, what it's used for, a fun fact or touch of humor.", "hint": "Search tips in ${langName} (1-2 sentences): where to look for it, what terrain/altitude, how to recognize it from a distance." }
   ]
 }
 
-Include a "description" for each of the 5 plants above, in the same order. The "scientificName" must match exactly.`;
+Include a "description" and "hint" for each of the 5 plants above, in the same order. The "scientificName" must match exactly.`;
 }
 
 // Fallback: full LLM prompt when no coordinates are available (original behavior)
@@ -190,6 +190,10 @@ For each plant, assign a rarity category:
 
 Sort the results from most common to rarest.
 
+Each plant needs TWO separate text fields:
+- "description": interesting facts, what it is, what it looks like, what it's used for, a fun fact or touch of humor (2-3 sentences)
+- "hint": search tips — where to look for it, what terrain/altitude, how to recognize it from a distance (1-2 sentences)
+
 The description should be informative but also fun and slightly humorous — a joke, a pun, a witty remark about the plant or the user's suffering. Keep it light but still useful.
 
 Respond ONLY with a JSON object (no markdown, no backticks, no explanation), with this exact format:
@@ -201,7 +205,8 @@ Respond ONLY with a JSON object (no markdown, no backticks, no explanation), wit
       "commonName": "name in ${langName}",
       "scientificName": "Latin name",
       "rarity": "common",
-      "description": "Brief description in ${langName} (2-3 sentences). Mention what it looks like, where to find it, and include a touch of humor."
+      "description": "Interesting facts in ${langName} (2-3 sentences). What it is, what it looks like, what it's used for, a fun fact or touch of humor.",
+      "hint": "Search tips in ${langName} (1-2 sentences). Where to look, what terrain, how to spot it."
     }
   ]
 }`;
@@ -383,16 +388,17 @@ export async function getSuggestedPlants(
   const llmResult = JSON.parse(text);
 
   // Step 9: Merge LLM descriptions with iNat plant data
-  const descMap = new Map<string, string>();
+  const descMap = new Map<string, { description: string; hint: string }>();
   for (const p of llmResult.plants || []) {
-    descMap.set(p.scientificName, p.description);
+    descMap.set(p.scientificName, { description: p.description, hint: p.hint || '' });
   }
 
   const mergedPlants = selected.map(s => ({
     commonName: s.commonName,
     scientificName: s.scientificName,
     rarity: s.rarity,
-    description: descMap.get(s.scientificName) || '',
+    description: descMap.get(s.scientificName)?.description || '',
+    hint: descMap.get(s.scientificName)?.hint || '',
   }));
 
   // Step 10: Enrich with Wikipedia + iNat observation photos

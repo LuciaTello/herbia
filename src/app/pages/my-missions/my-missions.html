@@ -172,6 +172,9 @@
                 {{ rarity(plant.rarity).label }}
               </p>
               <p class="description">{{ plant.description }}</p>
+              @if (plant.hint) {
+                <p class="hint">{{ plant.hint }}</p>
+              }
               @if (plant.found) {
                 <span class="found-badge">{{ i18n.t().myMissions.found }}</span>
                 @if (plant.foundInMission && plant.foundInMissionId !== mission.id) {
