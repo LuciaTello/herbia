@@ -23,26 +23,32 @@ export function trekRouter(prisma: PrismaClient): Router {
   // POST /api/treks - Create a new trek or return existing one for this month
   router.post('/', async (req, res) => {
     try {
-      const { origin, destination, description, plants: clientPlants, country, countryCode, region, regionCode } = req.body;
+      const { origin, destination, description, plants: clientPlants, country, countryCode, region, regionCode, originLat, originLng, destLat, destLng } = req.body;
+      const dest = destination || origin;
       const now = new Date();
       const month = now.getMonth() + 1; // 1-12
       const year = now.getFullYear();
 
       // Normalize origin/destination for comparison (trim + uppercase to match frontend format)
       const normalizedOrigin = origin.trim().toUpperCase();
-      const normalizedDestination = destination.trim().toUpperCase();
+      const normalizedDestination = dest.trim().toUpperCase();
 
-      // Check if a trek already exists for this user + route + month
-      // Like findByUserIdAndOriginAndDestinationAndMonthAndYear in JPA
+      // Round coordinates to 2 decimals (~1km precision) for dedup comparison
+      const roundedOriginLat = originLat ? Math.round(originLat * 100) / 100 : null;
+      const roundedOriginLng = originLng ? Math.round(originLng * 100) / 100 : null;
+
+      // Check if a trek already exists for this user + route + coordinates + month
       const existing = await prisma.trek.findFirst({
         where: {
           userId: req.userId!,
           origin: normalizedOrigin,
           destination: normalizedDestination,
+          originLat: roundedOriginLat,
+          originLng: roundedOriginLng,
           month,
           year,
         },
-        include: { plants: { include: { photos: true }, orderBy: { rarity: 'asc' } } },
+        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
       });
 
       if (existing) {
@@ -74,6 +80,10 @@ export function trekRouter(prisma: PrismaClient): Router {
           countryCode: countryCode || null,
           region: region || null,
           regionCode: regionCode || null,
+          originLat: roundedOriginLat,
+          originLng: roundedOriginLng,
+          destLat: destLat ? Math.round(destLat * 100) / 100 : null,
+          destLng: destLng ? Math.round(destLng * 100) / 100 : null,
           userId: req.userId!,
           plants: {
             create: (clientPlants || []).map((p: any) => ({
@@ -90,7 +100,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             })),
           },
         },
-        include: { plants: { include: { photos: true }, orderBy: { rarity: 'asc' } } },
+        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
       });
 
       res.status(201).json(trek);
@@ -105,7 +115,7 @@ export function trekRouter(prisma: PrismaClient): Router {
     try {
       const treks = await prisma.trek.findMany({
         where: { userId: req.userId! },
-        include: { plants: { include: { photos: true }, orderBy: { rarity: 'asc' } } },
+        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
         orderBy: { createdAt: 'desc' },
       });
       res.json(treks);
@@ -134,16 +144,17 @@ export function trekRouter(prisma: PrismaClient): Router {
       const now = new Date();
 
       // Mark ALL suggested plants with the same scientificName for this user as found
+      // Store which trek it was originally found in
       await prisma.suggestedPlant.updateMany({
         where: {
           scientificName: plant.scientificName,
           found: false,
           trek: { userId: req.userId! },
         },
-        data: { found: true, foundAt: now },
+        data: { found: true, foundAt: now, foundInTrekId: plant.trekId },
       });
 
-      res.json({ scientificName: plant.scientificName, found: true, foundAt: now });
+      res.json({ scientificName: plant.scientificName, found: true, foundAt: now, foundInTrekId: plant.trekId });
     } catch (error) {
       console.error('Error marking plant as found:', error);
       res.status(500).json({ error: 'Failed to mark plant as found' });
@@ -286,6 +297,7 @@ export function trekRouter(prisma: PrismaClient): Router {
               rarity: 'common',
               found: true,
               foundAt: now,
+              foundInTrekId: trekId,
             },
             include: { photos: true },
           });
@@ -298,7 +310,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             found: false,
             trek: { userId: req.userId! },
           },
-          data: { found: true, foundAt: now },
+          data: { found: true, foundAt: now, foundInTrekId: trekId },
         });
 
         // Check global photo count for this species
@@ -324,6 +336,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             rarity: 'common',
             found: true,
             foundAt: now,
+            foundInTrekId: trekId,
           },
           include: { photos: true },
         });

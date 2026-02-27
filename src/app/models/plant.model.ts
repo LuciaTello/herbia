@@ -25,6 +25,8 @@ export interface SuggestedPlant {
   photos: PlantPhoto[];
   found: boolean;
   foundAt: string | null;
+  foundInTrekId?: number | null;
+  foundInTrek?: { origin: string; destination: string } | null;
   trekId: number;
   trek?: { origin: string; destination: string; country?: string | null; countryCode?: string | null; region?: string | null; regionCode?: string | null };
 }

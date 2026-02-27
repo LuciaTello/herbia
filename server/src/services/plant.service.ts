@@ -133,8 +133,13 @@ function buildDescriptionPrompt(
   const monthName = MONTH_NAMES[month];
   const plantList = plants.map((p, i) => `${i + 1}. ${p.commonName} (${p.scientificName})`).join('\n');
 
+  const isZone = origin === destination;
+  const routeContext = isZone
+    ? `A person is exploring around ${origin} in ${monthName}.`
+    : `A person is walking from ${origin} to ${destination} in ${monthName}.`;
+
   return `You are a botanist with a sharp sense of humor and a love for bad plant puns.
-A person is walking from ${origin} to ${destination} in ${monthName}.
+${routeContext}
 IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
 
 Here are 10 real plants found along this route:
@@ -160,12 +165,19 @@ function buildPlantPrompt(origin: string, destination: string, lang: string, mon
     ? `\n\nIMPORTANT: The traveler has already found these species on previous treks. Do NOT suggest any of them:\n${exclude.join(', ')}\n`
     : '';
 
+  const isZone = origin === destination;
+  const routeContext = isZone
+    ? `A person is exploring around ${origin}.`
+    : `A person is walking from ${origin} to ${destination}.`;
+  const tooFarBlock = isZone
+    ? ''
+    : `\nIMPORTANT: If the origin and destination are very far apart (different countries, different climate zones, or more than ~100 km), set "tooFar" to true in your response and leave plants as an empty array. The description should explain in ${langName} that the trek crosses multiple climates and suggest picking a shorter route.`;
+
   return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
-A person is walking from ${origin} to ${destination}.
+${routeContext}
 The current month is ${monthName}. Only suggest plants that are visible, blooming, or identifiable during this time of year.
 IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
-${exclusionBlock}
-IMPORTANT: If the origin and destination are very far apart (different countries, different climate zones, or more than ~100 km), set "tooFar" to true in your response and leave plants as an empty array. The description should explain in ${langName} that the trek crosses multiple climates and suggest picking a shorter route.
+${exclusionBlock}${tooFarBlock}
 
 Suggest exactly 10 plants that can be found along this path in ${monthName}.
 Consider the region, climate, season, and typical vegetation.
@@ -333,17 +345,18 @@ export async function getSuggestedPlants(
 
   // Step 2: Check distance
   const distance = haversine(originLat, originLng, destLat, destLng);
-  console.log(`Route distance: ${distance.toFixed(1)} km`);
+  const isZone = origin === destination;
+  console.log(isZone ? `Zone mode around ${origin}` : `Route distance: ${distance.toFixed(1)} km`);
 
-  // Step 3: Too far → return immediately without LLM call
-  if (distance > 100) {
+  // Step 3: Too far → return immediately without LLM call (skip for zone mode)
+  if (!isZone && distance > 100) {
     return { tooFar: true, description: TOO_FAR[lang] || TOO_FAR['es'], plants: [] };
   }
 
-  // Step 4: Compute midpoint and search radius
+  // Step 4: Compute midpoint and search radius (zone = fixed 10km around the point)
   const midLat = (originLat + destLat) / 2;
   const midLng = (originLng + destLng) / 2;
-  const radius = Math.max(5, Math.min(distance / 2, 50));
+  const radius = isZone ? 10 : Math.max(5, Math.min(distance / 2, 50));
 
   // Step 5: Fetch species from iNaturalist
   const species = await fetchSpeciesCounts(midLat, midLng, radius, currentMonth, lang);

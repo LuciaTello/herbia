@@ -23,6 +23,7 @@ export class RoutePage {
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
 
+  protected readonly mode = signal<'route' | 'zone'>('route');
   protected readonly origin = signal('');
   protected readonly destination = signal('');
   private originCountry = '';
@@ -81,6 +82,14 @@ export class RoutePage {
 
   protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
 
+  protected setMode(m: 'route' | 'zone'): void {
+    this.mode.set(m);
+    this.plants.set([]);
+    this.description.set('');
+    this.tooFar.set(false);
+    this.error.set('');
+  }
+
   protected onOriginSelected(selection: PlaceSelection): void {
     this.origin.set(selection.name);
     this.originCountry = selection.country || '';
@@ -102,14 +111,17 @@ export class RoutePage {
     this.error.set('');
     this.startLoadingMessages();
     try {
+      const dest = this.mode() === 'zone' ? this.origin() : this.destination();
+      const dLat = this.mode() === 'zone' ? this.originLat : this.destLat;
+      const dLng = this.mode() === 'zone' ? this.originLng : this.destLng;
       const result = await this.plantService.getSuggestedPlants(
         this.origin(),
-        this.destination(),
+        dest,
         this.i18n.currentLang(),
         this.originLat,
         this.originLng,
-        this.destLat,
-        this.destLng,
+        dLat,
+        dLng,
       );
       this.tooFar.set(result.tooFar);
       this.description.set(result.description);
@@ -130,15 +142,22 @@ export class RoutePage {
   async onStartTrek(): Promise<void> {
     this.saving.set(true);
     try {
+      const dest = this.mode() === 'zone' ? this.origin() : this.destination();
+      const dLat = this.mode() === 'zone' ? this.originLat : this.destLat;
+      const dLng = this.mode() === 'zone' ? this.originLng : this.destLng;
       const trek = await this.trekService.createTrek(
         this.origin(),
-        this.destination(),
+        dest,
         this.description(),
         this.plants(),
         this.originCountry,
         this.originCountryCode,
         this.originRegion,
         this.originRegionCode,
+        this.originLat,
+        this.originLng,
+        dLat,
+        dLng,
       );
       this.router.navigate(['/my-treks'], { queryParams: { open: trek.id } });
     } catch (e) {

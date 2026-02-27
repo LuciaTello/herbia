@@ -20,16 +20,33 @@
           <div class="trek-route" (click)="toggle(trek.id)">
             <span class="chevron">{{ expandedId() === trek.id ? '▾' : '▸' }}</span>
             <div>
-              <h3>{{ trek.origin }} → {{ trek.destination }}</h3>
+              <h3>
+                @if (trek.origin === trek.destination) {
+                  {{ trek.origin }}
+                } @else {
+                  {{ trek.origin }} → {{ trek.destination }}
+                }
+              </h3>
               <p class="trek-date">{{ trek.createdAt | date }}</p>
             </div>
           </div>
           <button class="delete-button" (click)="deleteTrek(trek.id)">&times;</button>
         </div>
 
-        <p class="trek-summary">
-          {{ i18n.t().myTreks.summary(trek.plants.length, foundCount(trek.plants)) }}
-        </p>
+        <div class="trek-progress">
+          <div class="progress-bar">
+            <div class="progress-fill"
+                 [class.complete]="foundCount(trek.plants) === trek.plants.length"
+                 [style.width.%]="trek.plants.length ? (foundCount(trek.plants) / trek.plants.length * 100) : 0"></div>
+          </div>
+          <p class="progress-text" [class.complete]="foundCount(trek.plants) === trek.plants.length">
+            @if (foundCount(trek.plants) === trek.plants.length) {
+              {{ i18n.t().myTreks.missionComplete }}
+            } @else {
+              {{ i18n.t().myTreks.summary(trek.plants.length, foundCount(trek.plants)) }}
+            }
+          </p>
+        </div>
 
         @if (expandedId() === trek.id) {
           @if (trek.description) {
@@ -38,7 +55,10 @@
 
           <div class="trek-plants">
             @for (plant of aiPlants(trek.plants); track plant.id) {
-              <article class="plant-card" [class.found]="plant.found">
+              <article class="plant-card" [class.found]="plant.found"
+                       [class.rarity-common]="plant.rarity === 'common' || !plant.rarity"
+                       [class.rarity-rare]="plant.rarity === 'rare'"
+                       [class.rarity-veryRare]="plant.rarity === 'veryRare'">
                 <div class="plant-thumbnail" (click)="openGallery(refPhotos(plant.photos), plant.commonName)">
                   @if (refPhotos(plant.photos).length) {
                     <img [src]="refPhotos(plant.photos)[0].url" [alt]="plant.commonName" />
@@ -55,6 +75,13 @@
                   <p class="description">{{ plant.description }}</p>
                   @if (plant.found) {
                     <span class="found-badge">{{ i18n.t().myTreks.found }}</span>
+                    @if (plant.foundInTrek && plant.foundInTrekId !== trek.id) {
+                      @if (plant.foundInTrek.origin === plant.foundInTrek.destination) {
+                        <span class="found-in-trek">Capturada en {{ plant.foundInTrek.origin }}</span>
+                      } @else {
+                        <span class="found-in-trek">{{ i18n.t().myTreks.foundInTrek(plant.foundInTrek.origin, plant.foundInTrek.destination) }}</span>
+                      }
+                    }
                     @if (userPhotos(plant.photos).length) {
                       <div class="user-photos-box">
                         @for (photo of userPhotos(plant.photos); track photo.id) {

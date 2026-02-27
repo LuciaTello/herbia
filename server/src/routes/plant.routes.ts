@@ -15,10 +15,11 @@ export function plantRouter(prisma: PrismaClient): Router {
     try {
       const { origin, destination, lang, originLat, originLng, destLat, destLng } = req.body;
 
-      if (!origin || !destination) {
-        res.status(400).json({ error: 'Origin and destination are required' });
+      if (!origin) {
+        res.status(400).json({ error: 'Origin is required' });
         return;
       }
+      const dest = destination || origin;
 
       // Check daily Google Maps quota (free tier limit)
       const withinQuota = await incrementQuota(prisma);
@@ -27,18 +28,18 @@ export function plantRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Get all scientific names the user already has (across all treks)
-      const existing = await prisma.suggestedPlant.findMany({
-        where: { trek: { userId: req.userId! } },
+      // Only exclude plants the user has already FOUND (not just suggested)
+      // Unfound plants can reappear in new treks
+      const found = await prisma.suggestedPlant.findMany({
+        where: { trek: { userId: req.userId! }, found: true },
         select: { scientificName: true },
         distinct: ['scientificName'],
       });
-      const exclude = existing.map(p => p.scientificName);
+      const exclude = found.map(p => p.scientificName);
 
-      const result = await getSuggestedPlants(origin, destination, lang || 'es', undefined, exclude, originLat, originLng, destLat, destLng);
+      const result = await getSuggestedPlants(origin, dest, lang || 'es', undefined, exclude, originLat, originLng, destLat, destLng);
 
-      // Hard filter: remove any plant whose scientificName is already in the user's collection
-      // (the LLM prompt asks to exclude them, but it can ignore the instruction)
+      // Hard filter: remove any found plant (the LLM/iNat might still return them)
       const excludeLower = new Set(exclude.map(name => name.toLowerCase()));
       const filteredPlants = (result.plants || [])
         .filter((p: any) => !excludeLower.has(p.scientificName.toLowerCase()))

@@ -19,6 +19,29 @@ h2 {
   margin: 0 0 1.5rem 0;
 }
 
+.mode-toggle {
+  display: flex;
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  border: 2px solid #2d7d46;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.mode-toggle button {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  background: white;
+  color: #2d7d46;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.mode-toggle button.active {
+  background: #2d7d46;
+  color: white;
+}
+
 .route-form {
   display: flex;
   flex-direction: column;
