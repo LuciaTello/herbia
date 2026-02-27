@@ -118,4 +118,20 @@ export const ES: Translations = {
     switchToRegister: 'Regístrate',
     genericError: 'Ha ocurrido un error. Inténtalo de nuevo.',
   },
+  onboarding: {
+    titles: [
+      'Bienvenida',
+      'Misiones',
+      'Captura',
+      'Colección',
+    ],
+    texts: [
+      'Tu herbario personal de viajera. Descubre las plantas que crecen en tus rutas, identifícalas y construye tu propia colección botánica mientras viajas. Sospechosamente, están en todas partes.',
+      'Cuéntanos dónde vas a estar hoy — ya sea una ruta entre dos ciudades o una zona que quieras explorar. Buscaremos qué plantas crecen por allí y te prepararemos una misión con las especies que puedes encontrar. Ellas ya están ahí. Observándote. Fotosintetizando.',
+      'Cuando encuentres una planta de tu misión, sácale una foto. La identificaremos automáticamente y la añadiremos a tu herbario con su nombre y ubicación. No hace falta que la planta coopere.',
+      'Todas tus capturas se guardan en tu colección, organizadas en un mapa del mundo por regiones. Completa misiones para llenar tu herbario de nuevas especies. Pronto sabrás demasiadas cosas sobre plantas.',
+    ],
+    next: 'Siguiente',
+    start: '¡Empezar!',
+  },
 };

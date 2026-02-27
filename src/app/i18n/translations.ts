@@ -103,6 +103,12 @@ export interface Translations {
     switchToRegister: string;
     genericError: string;
   };
+  onboarding: {
+    titles: string[];
+    texts: string[];
+    next: string;
+    start: string;
+  };
 }
 
 export type Lang = 'es' | 'fr';
