@@ -1,5 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
+h1, h2, h3, h4, h5, h6,
+button, a[class*="button"] {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+}
+
 /* Google Places autocomplete dropdown (injected into <body> by Google, outside Angular) */
 .pac-container {
   border-radius: 8px;
