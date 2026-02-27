@@ -118,4 +118,20 @@ export const FR: Translations = {
     switchToRegister: 'Inscrivez-vous',
     genericError: 'Une erreur est survenue. Réessayez.',
   },
+  onboarding: {
+    titles: [
+      'Bienvenue',
+      'Missions',
+      'Capture',
+      'Collection',
+    ],
+    texts: [
+      'Ton herbier personnel de voyageuse. Découvre les plantes qui poussent sur tes itinéraires, identifie-les et construis ta propre collection botanique en voyageant. Elles sont partout. C\'est suspect.',
+      'Dis-nous où tu seras aujourd\'hui — que ce soit un trajet entre deux villes ou une zone que tu veux explorer. On cherchera quelles plantes poussent par là et on te préparera une mission avec les espèces que tu peux trouver. Elles sont déjà là. Elles t\'observent. Elles photosynthétisent.',
+      'Quand tu trouves une plante de ta mission, prends-la en photo. On l\'identifiera automatiquement et on l\'ajoutera à ton herbier avec son nom et sa localisation. La plante n\'a pas besoin de coopérer.',
+      'Toutes tes captures sont sauvegardées dans ta collection, organisées sur une carte du monde par régions. Complète des missions pour remplir ton herbier de nouvelles espèces. Bientôt, tu sauras beaucoup trop de choses sur les plantes.',
+    ],
+    next: 'Suivant',
+    start: 'Commencer !',
+  },
 };
