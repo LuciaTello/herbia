@@ -1,0 +1,27 @@
+<div class="onboarding-overlay"
+     (touchstart)="onTouchStart($event)"
+     (touchend)="onTouchEnd($event)">
+  <div class="onboarding-content">
+    <div class="slide">
+      <span class="emoji">{{ emojis[currentSlide()] }}</span>
+      <h2>{{ i18n.t().onboarding.titles[currentSlide()] }}</h2>
+      <p>{{ i18n.t().onboarding.texts[currentSlide()] }}</p>
+    </div>
+
+    <div class="dots">
+      @for (dot of emojis; track $index) {
+        <button
+          class="dot"
+          [class.active]="$index === currentSlide()"
+          (click)="goTo($index)"
+        ></button>
+      }
+    </div>
+
+    <button class="next-button" (click)="next()">
+      {{ currentSlide() < totalSlides - 1
+        ? i18n.t().onboarding.next
+        : i18n.t().onboarding.start }}
+    </button>
+  </div>
+</div>

@@ -70,6 +70,7 @@ export function missionRouter(prisma: PrismaClient): Router {
               commonName: p.commonName,
               scientificName: p.scientificName,
               description: p.description,
+              hint: p.hint || '',
               rarity: p.rarity || 'common',
               photos: {
                 create: (p.photos || []).map((photo: any) => ({

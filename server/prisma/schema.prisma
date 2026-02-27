@@ -66,6 +66,7 @@ model SuggestedPlant {
   commonName     String
   scientificName String
   description    String
+  hint           String    @default("")
   rarity         String    @default("common")
   source         String    @default("ai")   // "ai" | "user"
   found          Boolean   @default(false)

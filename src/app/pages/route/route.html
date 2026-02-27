@@ -98,6 +98,9 @@
             {{ rarity(plant.rarity).label }}
           </p>
           <p>{{ plant.description }}</p>
+          @if (plant.hint) {
+            <p class="hint">{{ plant.hint }}</p>
+          }
         </div>
       </article>
     }
