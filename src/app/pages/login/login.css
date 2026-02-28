@@ -44,12 +44,12 @@
 }
 
 .cycle-es {
-  animation: cycle-lang 6s ease-in-out infinite;
+  animation: cycle-lang 10s ease-in-out infinite;
 }
 
 .cycle-fr {
-  animation: cycle-lang 6s ease-in-out infinite;
-  animation-delay: -3s;
+  animation: cycle-lang 10s ease-in-out infinite;
+  animation-delay: -5s;
 }
 
 @keyframes cycle-lang {
