@@ -251,8 +251,15 @@ export function missionRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Identify via PlantNet (no expected name — we just want to know what it is)
-      const result = await identifyPlant(file.buffer, file.mimetype, '');
+      // Use pre-identified result if provided (avoids double PlantNet call)
+      const preIdentifiedAs = req.body.identifiedAs;
+      const preCommonName = req.body.commonName;
+      let result;
+      if (preIdentifiedAs !== undefined) {
+        result = { match: false, score: 0, identifiedAs: preIdentifiedAs, commonName: preCommonName || '' };
+      } else {
+        result = await identifyPlant(file.buffer, file.mimetype, '');
+      }
       const identified = result.identifiedAs !== '';
       const now = new Date();
 

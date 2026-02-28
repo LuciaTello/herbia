@@ -111,9 +111,13 @@ export class MissionService {
     );
   }
 
-  async addUserPlant(missionId: number, file: File): Promise<{ plant: SuggestedPlant; identified: boolean }> {
+  async addUserPlant(missionId: number, file: File, prevResult?: IdentifyResult): Promise<{ plant: SuggestedPlant; identified: boolean }> {
     const formData = new FormData();
     formData.append('photo', file);
+    if (prevResult) {
+      formData.append('identifiedAs', prevResult.identifiedAs);
+      formData.append('commonName', prevResult.commonName);
+    }
     const result = await firstValueFrom(
       this.http.post<{ plant: SuggestedPlant; identified: boolean }>(
         `${this.apiUrl}/${missionId}/add-plant`, formData

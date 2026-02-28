@@ -7,6 +7,7 @@ import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { WorldMapComponent } from '../../components/world-map/world-map';
 import { getRarity } from '../../utils/rarity';
+import { resizeImage } from '../../utils/resize-image';
 import { getContinent, getContinentName, countryFlag } from '../../utils/continents';
 import { getCountryName } from '../../utils/country-names';
 
@@ -296,10 +297,11 @@ export class MyMissionsPage implements OnInit {
 
   async onPhotoSelected(event: Event, plantId: number): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
+    const raw = input.files?.[0];
+    if (!raw) return;
     input.value = '';
 
+    const file = await resizeImage(raw);
     this.pendingFile.set(file);
     this.pendingPlantId.set(plantId);
     this.identifyResult.set(null);
@@ -340,6 +342,7 @@ export class MyMissionsPage implements OnInit {
     const mission = this.missions().find(m => m.plants.some(p => p.id === plantId));
     if (!mission) return;
 
+    const prevResult = this.identifyResult()!;
     this.identifyResult.set(null);
     this.pendingFile.set(null);
     this.pendingPlantId.set(null);
@@ -347,7 +350,7 @@ export class MyMissionsPage implements OnInit {
     this.addPlantMessage.set(null);
 
     try {
-      await this.missionService.addUserPlant(mission.id, file);
+      await this.missionService.addUserPlant(mission.id, file, prevResult);
       this.addPlantMessage.set(this.i18n.t().myMissions.plantAdded);
       setTimeout(() => this.addPlantMessage.set(null), 3000);
       await this.checkAutoComplete();
@@ -421,10 +424,11 @@ export class MyMissionsPage implements OnInit {
 
   async onAddPlant(event: Event, missionId: number): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
+    const raw = input.files?.[0];
+    if (!raw) return;
     input.value = '';
 
+    const file = await resizeImage(raw);
     this.addingPlantForMission.set(missionId);
     this.addPlantMessage.set(null);
 
