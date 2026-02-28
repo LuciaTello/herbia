@@ -201,7 +201,7 @@
                     } @else if (userPhotos(plant.photos).length < 4) {
                       <label class="add-photo-button">
                         {{ i18n.t().myMissions.addPhoto }}
-                        <input type="file" accept="image/jpeg,image/png" capture="environment"
+                        <input type="file" accept="image/jpeg,image/png"
                                (change)="onPhotoSelected($event, plant.id)" hidden />
                       </label>
                     }
@@ -214,7 +214,7 @@
                   } @else {
                     <label class="add-photo-button">
                       {{ i18n.t().myMissions.addPhoto }}
-                      <input type="file" accept="image/jpeg,image/png" capture="environment"
+                      <input type="file" accept="image/jpeg,image/png"
                              (change)="onPhotoSelected($event, plant.id)" hidden />
                     </label>
                   }
@@ -263,7 +263,7 @@
       } @else {
         <label class="add-plant-button">
           {{ i18n.t().myMissions.addPlant }}
-          <input type="file" accept="image/jpeg,image/png" capture="environment"
+          <input type="file" accept="image/jpeg,image/png"
                  (change)="onAddPlant($event, mission.id)" hidden />
         </label>
       }
