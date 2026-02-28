@@ -56,7 +56,7 @@
                 }
               </div>
               <div class="found-info">
-                <p class="route">{{ plant.mission?.origin }} → {{ plant.mission?.destination }}</p>
+                <a class="route" [routerLink]="['/my-missions']" [queryParams]="{ open: plant.missionId }">{{ plant.mission?.origin }} → {{ plant.mission?.destination }}</a>
                 <p class="date">{{ plant.foundAt }}</p>
               </div>
             </article>
@@ -115,7 +115,7 @@
               <p class="chance" [style.color]="rarity(found.rarity).color">
                 {{ rarity(found.rarity).label }}
               </p>
-              <p class="route">{{ found.mission?.origin }} → {{ found.mission?.destination }}</p>
+              <a class="route" [routerLink]="['/my-missions']" [queryParams]="{ open: found.missionId }">{{ found.mission?.origin }} → {{ found.mission?.destination }}</a>
               <p class="date">{{ found.foundAt }}</p>
             </div>
             @if (userPhotos(found.photos).length) {

@@ -36,6 +36,7 @@ export class MyMissionsPage implements OnInit {
   protected readonly showUnidentifiedFor = signal<number | null>(null);
   protected readonly addPlantMessage = signal<string | null>(null);
   protected readonly completedPopup = signal(false);
+  protected readonly completingId = signal<number | null>(null);
 
   // Top-level toggle: active missions list vs completed missions map
   protected readonly showCompleted = signal(false);
@@ -50,7 +51,7 @@ export class MyMissionsPage implements OnInit {
   // --- Active missions (flat list, newest first) ---
   protected readonly activeMissions = computed(() =>
     this.missions()
-      .filter(m => m.status !== 'completed')
+      .filter(m => m.status !== 'completed' || m.id === this.completingId())
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   );
 
@@ -330,6 +331,36 @@ export class MyMissionsPage implements OnInit {
     }
   }
 
+  async addPendingAsUserPlant(): Promise<void> {
+    const file = this.pendingFile();
+    const plantId = this.pendingPlantId();
+    if (!file || !plantId) return;
+
+    // Find which mission this plant belongs to
+    const mission = this.missions().find(m => m.plants.some(p => p.id === plantId));
+    if (!mission) return;
+
+    this.identifyResult.set(null);
+    this.pendingFile.set(null);
+    this.pendingPlantId.set(null);
+    this.addingPlantForMission.set(mission.id);
+    this.addPlantMessage.set(null);
+
+    try {
+      await this.missionService.addUserPlant(mission.id, file);
+      this.addPlantMessage.set(this.i18n.t().myMissions.plantAdded);
+      setTimeout(() => this.addPlantMessage.set(null), 3000);
+      await this.checkAutoComplete();
+    } catch (err: any) {
+      if (err?.status === 409) {
+        this.addPlantMessage.set(this.i18n.t().myMissions.maxPhotosReached);
+        setTimeout(() => this.addPlantMessage.set(null), 4000);
+      }
+    } finally {
+      this.addingPlantForMission.set(null);
+    }
+  }
+
   cancelUpload(): void {
     this.pendingFile.set(null);
     this.pendingPlantId.set(null);
@@ -346,7 +377,10 @@ export class MyMissionsPage implements OnInit {
   }
 
   async completeMission(id: number): Promise<void> {
+    this.completingId.set(id);
     await this.missionService.completeMission(id);
+    await new Promise(resolve => setTimeout(resolve, 600));
+    this.completingId.set(null);
   }
 
   async deleteMission(id: number): Promise<void> {

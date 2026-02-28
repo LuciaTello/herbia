@@ -41,12 +41,12 @@ export class RouteMapComponent implements OnDestroy {
     strokeWeight: 4,
   };
 
-  private routeLib: any = null;
+  private directionsService: google.maps.DirectionsService | null = null;
 
   constructor() {
-    this.loader.load().then(async (ok) => {
+    this.loader.load().then((ok) => {
       if (!ok) return;
-      this.routeLib = await google.maps.importLibrary('routes');
+      this.directionsService = new google.maps.DirectionsService();
       this.ready.set(true);
     });
 
@@ -55,7 +55,7 @@ export class RouteMapComponent implements OnDestroy {
       const dest = this.destination();
       const isReady = this.ready();
 
-      if (!isReady || !orig || !dest || !this.routeLib) {
+      if (!isReady || !orig || !dest || !this.directionsService) {
         this.routePath.set([]);
         return;
       }
@@ -64,49 +64,40 @@ export class RouteMapComponent implements OnDestroy {
     });
   }
 
-  private async computeRoute(orig: string, dest: string): Promise<void> {
-    try {
-      const Route = this.routeLib.Route;
-      const { routes } = await Route.computeRoutes({
+  private computeRoute(orig: string, dest: string): void {
+    this.directionsService!.route(
+      {
         origin: orig,
         destination: dest,
-        travelMode: 'WALK',
-        fields: ['path'],
-      });
+        travelMode: google.maps.TravelMode.WALKING,
+      },
+      (result, status) => {
+        this.zone.run(() => {
+          if (status !== google.maps.DirectionsStatus.OK || !result?.routes?.length) {
+            this.routePath.set([]);
+            return;
+          }
 
-      if (!routes?.length) {
-        this.zone.run(() => this.routePath.set([]));
-        return;
-      }
+          const path: google.maps.LatLngLiteral[] = [];
+          for (const leg of result.routes[0].legs) {
+            for (const step of leg.steps) {
+              for (const pt of step.path) {
+                path.push({ lat: pt.lat(), lng: pt.lng() });
+              }
+            }
+          }
 
-      // Extract path from the route's polylines
-      const polylines: google.maps.Polyline[] = routes[0].createPolylines();
-      const path: google.maps.LatLngLiteral[] = [];
-      for (const pl of polylines) {
-        const plPath = pl.getPath();
-        for (let i = 0; i < plPath.getLength(); i++) {
-          const pt = plPath.getAt(i);
-          path.push({ lat: pt.lat(), lng: pt.lng() });
-        }
-        // Remove the polyline from any map (we manage rendering via Angular MapPolyline)
-        pl.setMap(null);
-      }
-
-      this.zone.run(() => {
-        this.routePath.set(path);
-        if (path.length) {
-          // Center map on midpoint of route
-          const mid = path[Math.floor(path.length / 2)];
-          this.center.set(mid);
-        }
-      });
-    } catch {
-      this.zone.run(() => this.routePath.set([]));
-    }
+          this.routePath.set(path);
+          if (path.length) {
+            const mid = path[Math.floor(path.length / 2)];
+            this.center.set(mid);
+          }
+        });
+      },
+    );
   }
 
   protected onMapReady(): void {
-    // Fit bounds once the map and path are ready
     const path = this.routePath();
     if (!path.length || !this.googleMap?.googleMap) return;
     const bounds = new google.maps.LatLngBounds();

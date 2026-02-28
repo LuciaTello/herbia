@@ -109,7 +109,8 @@
 
 <!-- Mission card template -->
 <ng-template #missionTpl let-mission>
-  <section class="mission-card" [class.expanded]="expandedId() === mission.id">
+  <section class="mission-card" [class.expanded]="expandedId() === mission.id"
+           [class.completing]="completingId() === mission.id">
     <div class="mission-header">
       <div class="mission-route" (click)="toggle(mission.id)">
         <span class="chevron">{{ expandedId() === mission.id ? '▾' : '▸' }}</span>
@@ -231,9 +232,15 @@
                       <span class="identify-text">{{ i18n.t().myMissions.identifyUnknown }}</span>
                     }
                     <div class="identify-actions">
-                      <button class="identify-btn confirm" (click)="confirmUpload()">
-                        {{ identifyResult()!.match ? i18n.t().myMissions.identifyUpload : i18n.t().myMissions.identifyUploadAnyway }}
-                      </button>
+                      @if (identifyResult()!.match) {
+                        <button class="identify-btn confirm" (click)="confirmUpload()">
+                          {{ i18n.t().myMissions.identifyUpload }}
+                        </button>
+                      } @else {
+                        <button class="identify-btn confirm" (click)="addPendingAsUserPlant()">
+                          {{ i18n.t().myMissions.identifyAddAsOther }}
+                        </button>
+                      }
                       <button class="identify-btn cancel" (click)="cancelUpload()">
                         {{ i18n.t().myMissions.identifyCancel }}
                       </button>
