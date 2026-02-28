@@ -1,129 +1,208 @@
 :host {
   display: block;
-  padding: 1rem;
+  min-height: 100dvh;
+  background: linear-gradient(160deg, #f0f7f2 0%, #e8f5e9 40%, #f5f0e8 100%);
 }
+
+/* ---------- layout ---------- */
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 2rem 1.25rem;
+  box-sizing: border-box;
+}
+
+/* ---------- header ---------- */
 
 .login-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .login-header h1 {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 700;
+  font-size: 2.75rem;
   color: #2d7d46;
-  font-size: 2rem;
-  margin: 0 0 0.25rem 0;
-}
-
-.login-header .subtitle {
-  color: #636e72;
-  font-size: 0.95rem;
   margin: 0;
-  white-space: pre-line;
+  letter-spacing: -0.5px;
 }
 
-.bilingual-hint {
+/* ---------- bilingual cycle animation ---------- */
+
+.cycle {
+  display: grid;
   text-align: center;
+}
+
+.cycle > * {
+  grid-area: 1 / 1;
+}
+
+.cycle-es {
+  animation: cycle-lang 6s ease-in-out infinite;
+}
+
+.cycle-fr {
+  animation: cycle-lang 6s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+@keyframes cycle-lang {
+  0%, 8%   { opacity: 0; transform: translateY(4px); }
+  14%, 42% { opacity: 1; transform: translateY(0); }
+  48%, 100% { opacity: 0; transform: translateY(-4px); }
+}
+
+/* subtitle styling */
+.login-header .cycle p {
   color: #636e72;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin-bottom: 1.5rem;
-  white-space: pre-line;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0.5rem 0 0 0;
+  font-style: italic;
+}
+
+/* hint styling */
+.hint {
+  color: #636e72;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+/* ---------- card ---------- */
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 2px 16px rgba(45, 125, 70, 0.08);
+  position: relative;
+}
+
+/* ---------- step email reminder ---------- */
+
+.step-email {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #b2bec3;
+  margin: 0 0 0.25rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 h2 {
   color: #2d7d46;
   text-align: center;
-  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  margin: 0 0 1.25rem 0;
 }
 
-.login-form {
-  max-width: 300px;
-  margin: 0 auto;
-}
+/* ---------- inputs ---------- */
 
-.field {
-  margin-bottom: 1rem;
-}
-
-.field label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  color: #2d3436;
-}
-
-.field input {
+input {
   width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #dfe6e9;
-  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  border: 1.5px solid #dfe6e9;
+  border-radius: 10px;
   font-size: 1rem;
   box-sizing: border-box;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fafffe;
 }
 
-.field input:focus {
+input:focus {
   outline: none;
   border-color: #2d7d46;
+  box-shadow: 0 0 0 3px rgba(45, 125, 70, 0.1);
 }
+
+input::placeholder {
+  color: #b2bec3;
+}
+
+/* ---------- primary button ---------- */
 
 .primary-button {
   display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.875rem;
   background: #2d7d46;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 0.875rem 2rem;
+  border-radius: 10px;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  width: 100%;
-  margin-top: 1rem;
+  transition: background 0.2s, transform 0.1s;
 }
 
 .primary-button:hover {
   background: #236b38;
 }
 
+.primary-button:active {
+  transform: scale(0.98);
+}
+
 .primary-button:disabled {
   background: #b2bec3;
   cursor: not-allowed;
+  transform: none;
 }
+
+/* ---------- error ---------- */
 
 .error-message {
   color: #d63031;
   text-align: center;
-  background: #ffeaa7;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  background: rgba(255, 234, 167, 0.8);
+  padding: 0.625rem 1rem;
+  border-radius: 10px;
   margin-bottom: 1rem;
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 340px;
+  font-size: 0.9rem;
 }
 
+/* ---------- back button ---------- */
+
 .back-button {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
   background: none;
   border: none;
   font-size: 1.25rem;
   cursor: pointer;
-  color: #2d7d46;
+  color: #b2bec3;
   padding: 0;
-  margin-bottom: 1rem;
+  line-height: 1;
+  transition: color 0.2s;
 }
 
 .back-button:hover {
-  color: #236b38;
+  color: #2d7d46;
 }
+
+/* ---------- lang picker ---------- */
 
 .lang-picker {
-  margin-top: 1rem;
+  margin-top: 1.25rem;
 }
 
-.lang-picker label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #2d3436;
+.lang-label {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #636e72;
+  margin: 0 0 0.5rem 0;
 }
 
 .lang-options {
@@ -134,17 +213,19 @@ h2 {
 .lang-option {
   flex: 1;
   padding: 0.625rem;
-  border: 2px solid #dfe6e9;
-  border-radius: 8px;
+  border: 1.5px solid #dfe6e9;
+  border-radius: 10px;
   background: white;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition: all 0.2s;
+  color: #636e72;
 }
 
 .lang-option:hover {
   border-color: #2d7d46;
+  color: #2d7d46;
 }
 
 .lang-option.selected {

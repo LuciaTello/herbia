@@ -9,11 +9,13 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
 
-// Only the first step is bilingual (before we know the user's language)
+// Bilingual constants — split ES/FR for cycling animation
 const BILINGUAL = {
-  title: 'herbia',
-  subtitle: 'Dime adónde vas y te diré qué plantas encontrarás\nDis-moi où tu vas et je te dirai quelles plantes tu trouveras',
-  explanation: 'Introduce tu email para entrar o crear una cuenta\nEntrez votre email pour vous connecter ou créer un compte',
+  subtitleEs: 'Dime adónde vas y te diré qué plantas encontrarás',
+  subtitleFr: 'Dis-moi où tu vas et je te dirai quelles plantes tu trouveras',
+  explanationEs: 'Introduce tu email para entrar o crear una cuenta',
+  explanationFr: 'Entrez votre email pour vous connecter ou créer un compte',
+  passwordPlaceholder: 'Contraseña / Mot de passe',
   next: 'Siguiente / Suivant',
   submitting: '...',
   chooseLang: 'Elige tu idioma / Choisis ta langue',
@@ -50,11 +52,9 @@ export class LoginPage {
     try {
       const result = await this.authService.checkEmail(this.email());
       if (result.exists) {
-        // Set i18n to the user's saved language for the login step
         this.i18n.setLang(result.lang as 'es' | 'fr');
         this.step.set('login');
       } else {
-        // For register, default to 'es' — user will pick
         this.i18n.setLang(this.selectedLang());
         this.step.set('register');
       }
