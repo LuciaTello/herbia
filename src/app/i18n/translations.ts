@@ -53,6 +53,7 @@ export interface Translations {
     identifyUpload: string;
     identifyCancel: string;
     identifyUploadAnyway: string;
+    identifyAddAsOther: string;
     summary: (total: number, found: number) => string;
     missionComplete: string;
     addPlant: string;
@@ -109,6 +110,7 @@ export interface Translations {
     texts: string[];
     next: string;
     start: string;
+    accept: string;
   };
 }
 

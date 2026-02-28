@@ -241,7 +241,7 @@ async function fetchFromWikipedia(scientificName: string): Promise<string> {
 // Uses "large" size (1024px) for better quality
 async function fetchFromINaturalist(scientificName: string): Promise<string[]> {
   try {
-    const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(scientificName)}&photos=true&per_page=5&quality_grade=research&order_by=votes`;
+    const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(scientificName)}&photos=true&per_page=10&quality_grade=research&order_by=votes`;
     const response = await fetch(url);
     if (!response.ok) {
       console.warn(`iNaturalist returned ${response.status} for "${scientificName}"`);
@@ -251,9 +251,10 @@ async function fetchFromINaturalist(scientificName: string): Promise<string[]> {
 
     const urls: string[] = [];
     for (const obs of data.results || []) {
-      const photo = obs.photos?.[0];
-      if (photo?.url) {
-        urls.push(photo.url.replace('square', 'large'));
+      for (const photo of obs.photos || []) {
+        if (photo?.url && urls.length < 12) {
+          urls.push(photo.url.replace('square', 'large'));
+        }
       }
     }
     return urls;

@@ -19,9 +19,13 @@
     </div>
 
     <button class="next-button" (click)="next()">
-      {{ currentSlide() < totalSlides - 1
-        ? i18n.t().onboarding.next
-        : i18n.t().onboarding.start }}
+      @if (currentSlide() < totalSlides - 2) {
+        {{ i18n.t().onboarding.next }}
+      } @else if (currentSlide() === totalSlides - 2) {
+        {{ i18n.t().onboarding.start }}
+      } @else {
+        {{ i18n.t().onboarding.accept }}
+      }
     </button>
   </div>
 </div>
