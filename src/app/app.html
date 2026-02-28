@@ -3,20 +3,19 @@
 }
 
 <main>
-  <header>
-    <div class="header-top">
-      <h1><a routerLink="/">herbia</a></h1>
-      <div class="header-actions">
-        <app-lang-selector />
-        @if (auth.isLoggedIn()) {
+  @if (auth.isLoggedIn()) {
+    <header>
+      <div class="header-top">
+        <h1><a routerLink="/">herbia</a></h1>
+        <div class="header-actions">
           <button class="logout-button" (click)="auth.logout()">
             {{ i18n.t().app.logout }}
           </button>
-        }
+        </div>
       </div>
-    </div>
-    <p>{{ i18n.t().app.subtitle }}</p>
-  </header>
+      <p>{{ i18n.t().app.subtitle }}</p>
+    </header>
+  }
 
   <router-outlet />
 </main>

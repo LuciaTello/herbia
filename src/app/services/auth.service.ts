@@ -9,6 +9,7 @@ import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { AuthResponse } from '../models/auth.model';
+import { I18nService } from '../i18n';
 
 // localStorage key where we store the JWT (like a cookie name)
 const TOKEN_KEY = 'herbia-token';
@@ -17,6 +18,7 @@ const TOKEN_KEY = 'herbia-token';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly i18n = inject(I18nService);
   private readonly apiUrl = `${environment.apiUrl}/auth`;
 
   // Signal holds the current JWT token (reactive, like CollectionService's signal)
@@ -28,15 +30,26 @@ export class AuthService {
   // Any template reading isLoggedIn() will automatically update when token changes
   readonly isLoggedIn = computed(() => this.token() !== null);
 
+  // In-memory only: true right after register, false otherwise
+  readonly justRegistered = signal(false);
+
   // Used by the HTTP interceptor to add "Authorization: Bearer <token>" to requests
   getToken(): string | null {
     return this.token();
   }
 
-  async register(email: string, password: string): Promise<void> {
-    const result = await firstValueFrom(
-      this.http.post<AuthResponse>(`${this.apiUrl}/register`, { email, password })
+  async checkEmail(email: string): Promise<{ exists: boolean; lang?: string }> {
+    return firstValueFrom(
+      this.http.post<{ exists: boolean; lang?: string }>(`${this.apiUrl}/check-email`, { email })
     );
+  }
+
+  async register(email: string, password: string, lang: string): Promise<void> {
+    const result = await firstValueFrom(
+      this.http.post<AuthResponse>(`${this.apiUrl}/register`, { email, password, lang })
+    );
+    this.i18n.setLang(lang as 'es' | 'fr');
+    this.justRegistered.set(true);
     this.setToken(result.token);
   }
 
@@ -44,6 +57,7 @@ export class AuthService {
     const result = await firstValueFrom(
       this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
     );
+    this.i18n.setLang(result.user.lang as 'es' | 'fr');
     this.setToken(result.token);
   }
 

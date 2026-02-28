@@ -16,6 +16,7 @@ model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique                        // Like @Column(unique = true)
   passwordHash String   @map("password_hash")          // NEVER store plain passwords!
+  lang         String   @default("es")                  // "es" | "fr"
   createdAt    DateTime @default(now())
 
   // One-to-many: a user has many missions

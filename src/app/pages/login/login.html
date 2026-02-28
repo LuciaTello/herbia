@@ -1,59 +1,97 @@
-<h2>
-  @if (isRegisterMode()) {
-    {{ i18n.t().login.registerTitle }}
-  } @else {
-    {{ i18n.t().login.loginTitle }}
-  }
-</h2>
+<div class="login-header">
+  <h1>herbia</h1>
+  <p class="subtitle">{{ BI.subtitle }}</p>
+</div>
 
 @if (error()) {
   <p class="error-message">{{ error() }}</p>
 }
 
-<form class="login-form" (ngSubmit)="onSubmit()">
-  <div class="field">
-    <label for="email">{{ i18n.t().login.emailLabel }}</label>
-    <input
-      id="email"
-      type="email"
-      [placeholder]="i18n.t().login.emailPlaceholder"
-      [ngModel]="email()"
-      (ngModelChange)="email.set($event)"
-      name="email"
-      required
-    />
-  </div>
+<!-- Step 1: Email (bilingual — no language chosen yet) -->
+@if (step() === 'email') {
+  <form class="login-form" (ngSubmit)="onCheckEmail()">
+    <p class="bilingual-hint">{{ BI.explanation }}</p>
+    <div class="field">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+        name="email"
+        required
+        autofocus
+      />
+    </div>
+    <button type="submit" class="primary-button" [disabled]="loading()">
+      @if (loading()) { {{ BI.submitting }} } @else { {{ BI.next }} }
+    </button>
+  </form>
+}
 
-  <div class="field">
-    <label for="password">{{ i18n.t().login.passwordLabel }}</label>
-    <input
-      id="password"
-      type="password"
-      [placeholder]="i18n.t().login.passwordPlaceholder"
-      [ngModel]="password()"
-      (ngModelChange)="password.set($event)"
-      name="password"
-      required
-    />
-  </div>
+<!-- Step 2a: Login (existing user — in their saved language) -->
+@if (step() === 'login') {
+  <form class="login-form" (ngSubmit)="onLogin()">
+    <button type="button" class="back-button" (click)="goBack()">&#8592;</button>
+    <h2>{{ i18n.t().login.loginTitle }}</h2>
+    <div class="field">
+      <label for="password">{{ i18n.t().login.passwordLabel }}</label>
+      <input
+        id="password"
+        type="password"
+        [placeholder]="i18n.t().login.passwordPlaceholder"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+        name="password"
+        required
+        autofocus
+      />
+    </div>
+    <button type="submit" class="primary-button" [disabled]="loading()">
+      @if (loading()) { {{ i18n.t().login.submitting }} } @else { {{ i18n.t().login.loginButton }} }
+    </button>
+  </form>
+}
 
-  <button type="submit" class="primary-button" [disabled]="loading()">
-    @if (loading()) {
-      {{ i18n.t().login.submitting }}
-    } @else if (isRegisterMode()) {
-      {{ i18n.t().login.registerButton }}
-    } @else {
-      {{ i18n.t().login.loginButton }}
-    }
-  </button>
-</form>
+<!-- Step 2b: Register (new user — in selected language) -->
+@if (step() === 'register') {
+  <form class="login-form" (ngSubmit)="onRegister()">
+    <button type="button" class="back-button" (click)="goBack()">&#8592;</button>
+    <h2>{{ i18n.t().login.registerTitle }}</h2>
+    <div class="field">
+      <label for="reg-password">{{ i18n.t().login.passwordLabel }}</label>
+      <input
+        id="reg-password"
+        type="password"
+        [placeholder]="i18n.t().login.passwordPlaceholder"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+        name="password"
+        required
+        autofocus
+      />
+    </div>
 
-<p class="toggle-mode">
-  @if (isRegisterMode()) {
-    {{ i18n.t().login.hasAccount }}
-    <a (click)="toggleMode()">{{ i18n.t().login.switchToLogin }}</a>
-  } @else {
-    {{ i18n.t().login.noAccount }}
-    <a (click)="toggleMode()">{{ i18n.t().login.switchToRegister }}</a>
-  }
-</p>
+    <div class="lang-picker">
+      <label>{{ BI.chooseLang }}</label>
+      <div class="lang-options">
+        <button
+          type="button"
+          class="lang-option"
+          [class.selected]="selectedLang() === 'es'"
+          (click)="onLangPick('es')"
+        >ES</button>
+        <button
+          type="button"
+          class="lang-option"
+          [class.selected]="selectedLang() === 'fr'"
+          (click)="onLangPick('fr')"
+        >FR</button>
+      </div>
+    </div>
+
+    <button type="submit" class="primary-button" [disabled]="loading()">
+      @if (loading()) { {{ i18n.t().login.submitting }} } @else { {{ i18n.t().login.registerButton }} }
+    </button>
+  </form>
+}

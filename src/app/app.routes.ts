@@ -7,7 +7,7 @@ import { LoginPage } from './pages/login/login';
 import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomePage },
+  { path: '', component: HomePage, canActivate: [authGuard] },
   { path: 'login', component: LoginPage },
   { path: 'route', component: RoutePage, canActivate: [authGuard] },           // Protected
   { path: 'collection', component: CollectionPage, canActivate: [authGuard] }, // Protected

@@ -3,6 +3,33 @@
   padding: 1rem;
 }
 
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h1 {
+  color: #2d7d46;
+  font-size: 2rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.login-header .subtitle {
+  color: #636e72;
+  font-size: 0.95rem;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.bilingual-hint {
+  text-align: center;
+  color: #636e72;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  white-space: pre-line;
+}
+
 h2 {
   color: #2d7d46;
   text-align: center;
@@ -69,20 +96,59 @@ h2 {
   padding: 0.5rem 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.toggle-mode {
-  text-align: center;
-  margin-top: 1.5rem;
-  color: #636e72;
-}
-
-.toggle-mode a {
-  color: #2d7d46;
+.back-button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
   cursor: pointer;
-  font-weight: 600;
+  color: #2d7d46;
+  padding: 0;
+  margin-bottom: 1rem;
 }
 
-.toggle-mode a:hover {
-  text-decoration: underline;
+.back-button:hover {
+  color: #236b38;
+}
+
+.lang-picker {
+  margin-top: 1rem;
+}
+
+.lang-picker label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #2d3436;
+}
+
+.lang-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lang-option {
+  flex: 1;
+  padding: 0.625rem;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  background: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.lang-option:hover {
+  border-color: #2d7d46;
+}
+
+.lang-option.selected {
+  border-color: #2d7d46;
+  background: #2d7d46;
+  color: white;
 }

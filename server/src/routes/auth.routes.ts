@@ -6,15 +6,31 @@
 
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
-import { registerUser, loginUser } from '../services/auth.service';
+import { registerUser, loginUser, checkEmailExists } from '../services/auth.service';
 
 export function authRouter(prisma: PrismaClient): Router {
   const router = Router();
 
+  // POST /api/auth/check-email - check if an email is already registered
+  router.post('/check-email', async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        res.status(400).json({ error: 'Email is required' });
+        return;
+      }
+      const result = await checkEmailExists(prisma, email);
+      res.json(result);
+    } catch (error: any) {
+      console.error('Check email error:', error);
+      res.status(500).json({ error: 'Check email failed' });
+    }
+  });
+
   // POST /api/auth/register - like @PostMapping("/register")
   router.post('/register', async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email, password, lang } = req.body;
 
       // Basic validation (in Spring you'd use @Valid + @RequestBody RegisterDto)
       if (!email || !password) {
@@ -26,7 +42,7 @@ export function authRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      const result = await registerUser(prisma, email, password);
+      const result = await registerUser(prisma, email, password, lang);
       res.status(201).json(result);
     } catch (error: any) {
       if (error.message === 'Email already registered') {
