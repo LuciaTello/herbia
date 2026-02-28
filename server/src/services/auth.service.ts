@@ -21,7 +21,7 @@ interface TokenPayload {
 // What register/login return to the caller (like a LoginResponseDto)
 export interface AuthResult {
   token: string;
-  user: { id: number; email: string };
+  user: { id: number; email: string; lang: string };
 }
 
 // --- Constants ---
@@ -36,6 +36,7 @@ export async function registerUser(
   prisma: PrismaClient,
   email: string,
   password: string,
+  lang: string = 'es',
 ): Promise<AuthResult> {
   // Check if email already exists (like repository.findByEmail())
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -49,13 +50,13 @@ export async function registerUser(
 
   // Save user (like repository.save(new User(email, passwordHash)))
   const user = await prisma.user.create({
-    data: { email, passwordHash },
+    data: { email, passwordHash, lang },
   });
 
   // Generate JWT token
   const token = generateToken(user.id);
 
-  return { token, user: { id: user.id, email: user.email } };
+  return { token, user: { id: user.id, email: user.email, lang: user.lang } };
 }
 
 export async function loginUser(
@@ -78,7 +79,16 @@ export async function loginUser(
   }
 
   const token = generateToken(user.id);
-  return { token, user: { id: user.id, email: user.email } };
+  return { token, user: { id: user.id, email: user.email, lang: user.lang } };
+}
+
+export async function checkEmailExists(
+  prisma: PrismaClient,
+  email: string,
+): Promise<{ exists: boolean; lang?: string }> {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return { exists: false };
+  return { exists: true, lang: user.lang };
 }
 
 // Verify a JWT and return the userId inside it
