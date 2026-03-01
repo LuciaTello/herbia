@@ -6,7 +6,7 @@
   @if (auth.isLoggedIn()) {
     <header>
       <div class="header-top">
-        <h1><a routerLink="/">herbia</a></h1>
+        <h1><a routerLink="/"><img src="favicon.png" alt="" class="logo-icon" />herbia</a></h1>
         <div class="header-actions">
           <button class="logout-button" (click)="auth.logout()">
             {{ i18n.t().app.logout }}

@@ -54,6 +54,14 @@ header h1 {
 header h1 a {
   color: #2d7d46;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.logo-icon {
+  height: 1.2em;
+  width: auto;
 }
 
 header p {
