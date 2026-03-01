@@ -1,0 +1,90 @@
+<a routerLink="/" class="back-link">{{ i18n.t().friends.back }}</a>
+
+<h2>{{ i18n.t().friends.title }}</h2>
+
+@if (loading()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+  </div>
+} @else {
+  <!-- Username setup (required to use friends) -->
+  @if (!auth.username()) {
+    <div class="username-setup">
+      <p>{{ i18n.t().friends.setUsername }}</p>
+      <div class="username-form">
+        <input
+          type="text"
+          [placeholder]="i18n.t().friends.usernamePlaceholder"
+          [ngModel]="usernameInput()"
+          (ngModelChange)="usernameInput.set($event)"
+        />
+        <button class="save-btn" (click)="saveUsername()">{{ i18n.t().friends.save }}</button>
+      </div>
+    </div>
+  } @else {
+    <p class="my-username">@{{ auth.username() }}</p>
+
+    <!-- Search -->
+    <div class="search-section">
+      <div class="search-bar">
+        <input
+          type="text"
+          [placeholder]="i18n.t().friends.searchPlaceholder"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          (input)="onSearch()"
+        />
+      </div>
+
+      @if (searchResults().length) {
+        <div class="search-results">
+          @for (user of searchResults(); track user.id) {
+            <div class="search-result">
+              <span class="result-emoji">{{ levelEmoji(user.points) }}</span>
+              <span class="result-name">{{ user.username }}</span>
+              <span class="result-points">{{ user.points }} pts</span>
+              <button class="add-btn" (click)="sendRequest(user.username!)">{{ i18n.t().friends.addFriend }}</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    @if (message()) {
+      <p class="message">{{ message() }}</p>
+    }
+
+    <!-- Pending requests -->
+    @if (friendService.pending().length) {
+      <h3 class="section-title">{{ i18n.t().friends.pending }}</h3>
+      <div class="friend-list">
+        @for (req of friendService.pending(); track req.friendshipId) {
+          <div class="friend-card pending-card">
+            <span class="friend-emoji">{{ levelEmoji(req.points) }}</span>
+            <span class="friend-name">{{ req.username }}</span>
+            <span class="friend-points">{{ req.points }} pts</span>
+            <div class="pending-actions">
+              <button class="accept-btn" (click)="accept(req.friendshipId)">{{ i18n.t().friends.accept }}</button>
+              <button class="reject-btn" (click)="reject(req.friendshipId)">{{ i18n.t().friends.reject }}</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Friends list -->
+    @if (friendService.friends().length) {
+      <div class="friend-list">
+        @for (friend of friendService.friends(); track friend.id) {
+          <div class="friend-card">
+            <span class="friend-emoji">{{ levelEmoji(friend.points) }}</span>
+            <span class="friend-name">{{ friend.username }}</span>
+            <span class="friend-points">{{ friend.points }} pts</span>
+          </div>
+        }
+      </div>
+    } @else if (!friendService.pending().length) {
+      <p class="empty">{{ i18n.t().friends.noFriends }}</p>
+    }
+  }
+}

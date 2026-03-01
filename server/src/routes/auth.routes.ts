@@ -30,7 +30,7 @@ export function authRouter(prisma: PrismaClient): Router {
   // POST /api/auth/register - like @PostMapping("/register")
   router.post('/register', async (req, res) => {
     try {
-      const { email, password, lang } = req.body;
+      const { email, password, lang, username } = req.body;
 
       // Basic validation (in Spring you'd use @Valid + @RequestBody RegisterDto)
       if (!email || !password) {
@@ -42,7 +42,7 @@ export function authRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      const result = await registerUser(prisma, email, password, lang);
+      const result = await registerUser(prisma, email, password, lang, username);
       res.status(201).json(result);
     } catch (error: any) {
       if (error.message === 'Email already registered') {

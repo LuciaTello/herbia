@@ -1,0 +1,36 @@
+<a routerLink="/" class="back-link">{{ i18n.t().level.back }}</a>
+
+<div class="level-container">
+  <div class="level-emoji">{{ i18n.t().level.levels[currentLevel()].emoji }}</div>
+  <h2 class="level-name">{{ i18n.t().level.levels[currentLevel()].name }}</h2>
+  <p class="level-description">{{ i18n.t().level.levels[currentLevel()].description }}</p>
+
+  <div class="points-display">
+    <span class="points-number">{{ auth.points() }}</span>
+    <span class="points-label">{{ i18n.t().level.pointsLabel }}</span>
+  </div>
+
+  @if (nextThreshold()) {
+    <div class="progress-section">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progressPercent()"></div>
+      </div>
+      <p class="next-level-text">{{ i18n.t().level.nextLevel(nextThreshold()! - auth.points()) }}</p>
+      <p class="next-level-preview">
+        {{ i18n.t().level.levels[currentLevel() + 1].emoji }}
+        {{ i18n.t().level.levels[currentLevel() + 1].name }}
+      </p>
+    </div>
+  } @else {
+    <p class="max-level">{{ i18n.t().level.maxLevel }}</p>
+  }
+
+  <div class="all-levels">
+    @for (level of i18n.t().level.levels; track $index) {
+      <div class="level-row" [class.active]="$index === currentLevel()" [class.locked]="$index > currentLevel()">
+        <span class="level-row-emoji">{{ level.emoji }}</span>
+        <span class="level-row-name">{{ level.name }}</span>
+      </div>
+    }
+  </div>
+</div>

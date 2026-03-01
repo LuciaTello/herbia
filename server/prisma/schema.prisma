@@ -17,12 +17,17 @@ model User {
   email        String   @unique                        // Like @Column(unique = true)
   passwordHash String   @map("password_hash")          // NEVER store plain passwords!
   lang         String   @default("es")                  // "es" | "fr"
+  username     String?  @unique
+  points       Int      @default(0)
   missionTipCount Int @default(0) @map("mission_tip_count")
   createdAt    DateTime @default(now())
 
   // One-to-many: a user has many missions
   // Like @OneToMany(mappedBy = "user") List<Mission> missions;
   missions     Mission[]
+
+  sentFriendships     Friendship[] @relation("sentFriendships")
+  receivedFriendships Friendship[] @relation("receivedFriendships")
 
   @@map("users")
 }
@@ -99,6 +104,20 @@ model PlantPhoto {
   plant    SuggestedPlant @relation(fields: [plantId], references: [id], onDelete: Cascade)
 
   @@map("plant_photos")
+}
+
+model Friendship {
+  id         Int      @id @default(autoincrement())
+  senderId   Int      @map("sender_id")
+  receiverId Int      @map("receiver_id")
+  status     String   @default("pending")  // "pending" | "accepted"
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("sentFriendships", fields: [senderId], references: [id])
+  receiver User @relation("receivedFriendships", fields: [receiverId], references: [id])
+
+  @@unique([senderId, receiverId])
+  @@map("friendships")
 }
 
 // Daily usage counter for Google Maps API calls (free tier = $200/month)

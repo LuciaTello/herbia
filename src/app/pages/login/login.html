@@ -69,6 +69,15 @@
       <h2>{{ i18n.t().login.registerTitle }}</h2>
       <form (ngSubmit)="onRegister()">
         <input
+          id="reg-username"
+          type="text"
+          placeholder="Pseudo / Nom d'utilisatrice"
+          [ngModel]="username()"
+          (ngModelChange)="username.set($event)"
+          name="username"
+          autofocus
+        />
+        <input
           id="reg-password"
           type="password"
           [placeholder]="BI.passwordPlaceholder"
@@ -76,7 +85,6 @@
           (ngModelChange)="password.set($event)"
           name="password"
           required
-          autofocus
         />
 
         <div class="lang-picker">

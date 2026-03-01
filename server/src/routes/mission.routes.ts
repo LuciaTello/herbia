@@ -171,6 +171,14 @@ export function missionRouter(prisma: PrismaClient): Router {
 
       const result = await identifyPlant(file.buffer, file.mimetype, plant.scientificName, plant.genus, plant.family);
 
+      // Award points based on taxonomic similarity (100/75/40/0)
+      if (result.similarity > 0) {
+        await prisma.user.update({
+          where: { id: req.userId! },
+          data: { points: { increment: result.similarity } },
+        });
+      }
+
       res.json(result);
     } catch (error) {
       console.error('Error identifying plant:', error);
