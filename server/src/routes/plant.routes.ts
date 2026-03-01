@@ -28,20 +28,35 @@ export function plantRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Exclude plants found in the same region within the last 30 days
+      // Exclude found plants (same region, last 30 days)
+      // + recently suggested but not found (same region, last 7 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const regionFilter: Record<string, unknown> = region
-        ? { mission: { userId: req.userId!, region } }
-        : { mission: { userId: req.userId! } };
+      const missionFilter = region
+        ? { userId: req.userId!, region }
+        : { userId: req.userId! };
 
-      const found = await prisma.suggestedPlant.findMany({
-        where: { ...regionFilter, found: true, foundAt: { gte: thirtyDaysAgo } },
-        select: { scientificName: true },
-        distinct: ['scientificName'],
-      });
-      const exclude = found.map(p => p.scientificName);
+      const [found, recentlySuggested] = await Promise.all([
+        prisma.suggestedPlant.findMany({
+          where: { mission: missionFilter, found: true, foundAt: { gte: thirtyDaysAgo } },
+          select: { scientificName: true },
+          distinct: ['scientificName'],
+        }),
+        prisma.suggestedPlant.findMany({
+          where: { mission: { ...missionFilter, createdAt: { gte: sevenDaysAgo } }, found: false },
+          select: { scientificName: true },
+          distinct: ['scientificName'],
+        }),
+      ]);
+
+      const excludeSet = new Set([
+        ...found.map(p => p.scientificName),
+        ...recentlySuggested.map(p => p.scientificName),
+      ]);
+      const exclude = [...excludeSet];
 
       const result = await getSuggestedPlants(origin, dest, lang || 'es', undefined, exclude, originLat, originLng, destLat, destLng);
 
