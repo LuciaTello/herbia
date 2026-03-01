@@ -33,6 +33,9 @@ export class AuthService {
   // In-memory only: true right after register, false otherwise
   readonly justRegistered = signal(false);
 
+  // Tracks whether the user has seen the first-mission tip
+  readonly hasSeenMissionTip = signal(true); // default true = don't show
+
   // Used by the HTTP interceptor to add "Authorization: Bearer <token>" to requests
   getToken(): string | null {
     return this.token();
@@ -50,6 +53,7 @@ export class AuthService {
     );
     this.i18n.setLang(lang as 'es' | 'fr');
     this.justRegistered.set(true);
+    this.hasSeenMissionTip.set(result.user.hasSeenMissionTip);
     this.setToken(result.token);
   }
 
@@ -58,7 +62,15 @@ export class AuthService {
       this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
     );
     this.i18n.setLang(result.user.lang as 'es' | 'fr');
+    this.hasSeenMissionTip.set(result.user.hasSeenMissionTip);
     this.setToken(result.token);
+  }
+
+  async dismissMissionTip(): Promise<void> {
+    this.hasSeenMissionTip.set(true);
+    await firstValueFrom(
+      this.http.patch(`${environment.apiUrl}/users/me`, { hasSeenMissionTip: true })
+    );
   }
 
   logout(): void {

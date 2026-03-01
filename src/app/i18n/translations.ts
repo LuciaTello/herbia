@@ -54,7 +54,7 @@ export interface Translations {
     identifyCancel: string;
     identifyUploadAnyway: string;
     identifyAddAsOther: string;
-    summary: (total: number, found: number) => string;
+    summary: (found: number) => string;
     missionComplete: string;
     addPlant: string;
     addingPlant: string;
@@ -111,6 +111,11 @@ export interface Translations {
     next: string;
     start: string;
     accept: string;
+  };
+  missionTip: {
+    title: string;
+    text: string;
+    dismiss: string;
   };
 }
 
