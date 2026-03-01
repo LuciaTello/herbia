@@ -394,10 +394,12 @@ h2 {
 .add-photo-button {
   display: inline-block;
   color: #2d7d46;
+  background: transparent;
   border: 1.5px solid #2d7d46;
   border-radius: 6px;
   padding: 0.375rem 0.75rem;
   font-size: 0.8rem;
+  font-family: inherit;
   margin-top: 0.5rem;
   margin-left: 0.5rem;
   cursor: pointer;

@@ -190,11 +190,9 @@
                     } @else if (uploadingPhotoId() === plant.id) {
                       <span class="uploading-badge">{{ i18n.t().myMissions.uploading }}</span>
                     } @else if (userPhotos(plant.photos).length < 4) {
-                      <label class="add-photo-button">
+                      <button class="add-photo-button" (click)="pickPhoto(plant.id)">
                         {{ i18n.t().myMissions.addPhoto }}
-                        <input type="file" accept="image/*"
-                               (change)="onPhotoSelected($event, plant.id)" hidden />
-                      </label>
+                      </button>
                     }
                   </div>
                 } @else {
@@ -203,11 +201,9 @@
                   } @else if (uploadingPhotoId() === plant.id) {
                     <span class="uploading-badge">{{ i18n.t().myMissions.uploading }}</span>
                   } @else {
-                    <label class="add-photo-button">
+                    <button class="add-photo-button" (click)="pickPhoto(plant.id)">
                       {{ i18n.t().myMissions.addPhoto }}
-                      <input type="file" accept="image/*"
-                             (change)="onPhotoSelected($event, plant.id)" hidden />
-                    </label>
+                    </button>
                   }
                 }
                 @if (identifyResult() && pendingPlantId() === plant.id) {
