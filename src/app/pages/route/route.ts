@@ -144,7 +144,7 @@ export class RoutePage {
   }
 
   protected onStartMissionClick(): void {
-    if (!this.auth.hasSeenMissionTip()) {
+    if (this.auth.missionTipCount() < 4) {
       this.showMissionTip.set(true);
       return;
     }
