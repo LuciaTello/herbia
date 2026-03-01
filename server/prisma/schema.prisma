@@ -17,7 +17,7 @@ model User {
   email        String   @unique                        // Like @Column(unique = true)
   passwordHash String   @map("password_hash")          // NEVER store plain passwords!
   lang         String   @default("es")                  // "es" | "fr"
-  hasSeenMissionTip Boolean @default(false) @map("has_seen_mission_tip")
+  missionTipCount Int @default(0) @map("mission_tip_count")
   createdAt    DateTime @default(now())
 
   // One-to-many: a user has many missions

@@ -21,7 +21,7 @@ interface TokenPayload {
 // What register/login return to the caller (like a LoginResponseDto)
 export interface AuthResult {
   token: string;
-  user: { id: number; email: string; lang: string; hasSeenMissionTip: boolean };
+  user: { id: number; email: string; lang: string; missionTipCount: number };
 }
 
 // --- Constants ---
@@ -56,7 +56,7 @@ export async function registerUser(
   // Generate JWT token
   const token = generateToken(user.id);
 
-  return { token, user: { id: user.id, email: user.email, lang: user.lang, hasSeenMissionTip: user.hasSeenMissionTip } };
+  return { token, user: { id: user.id, email: user.email, lang: user.lang, missionTipCount: user.missionTipCount } };
 }
 
 export async function loginUser(
@@ -79,7 +79,7 @@ export async function loginUser(
   }
 
   const token = generateToken(user.id);
-  return { token, user: { id: user.id, email: user.email, lang: user.lang, hasSeenMissionTip: user.hasSeenMissionTip } };
+  return { token, user: { id: user.id, email: user.email, lang: user.lang, missionTipCount: user.missionTipCount } };
 }
 
 export async function checkEmailExists(

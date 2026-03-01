@@ -7,9 +7,10 @@ export function userRouter(prisma: PrismaClient): Router {
   // PATCH /api/users/me - Update user preferences
   router.patch('/me', async (req, res) => {
     try {
-      const { hasSeenMissionTip } = req.body;
+      const { incrementMissionTip } = req.body;
+
       const data: Record<string, unknown> = {};
-      if (hasSeenMissionTip === true) data.hasSeenMissionTip = true;
+      if (incrementMissionTip) data.missionTipCount = { increment: 1 };
 
       await prisma.user.update({
         where: { id: req.userId! },

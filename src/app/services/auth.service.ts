@@ -33,8 +33,8 @@ export class AuthService {
   // In-memory only: true right after register, false otherwise
   readonly justRegistered = signal(false);
 
-  // Tracks whether the user has seen the first-mission tip
-  readonly hasSeenMissionTip = signal(true); // default true = don't show
+  // How many times the user has seen the mission tip (show until 4)
+  readonly missionTipCount = signal(4); // default 4 = don't show
 
   // Used by the HTTP interceptor to add "Authorization: Bearer <token>" to requests
   getToken(): string | null {
@@ -53,7 +53,7 @@ export class AuthService {
     );
     this.i18n.setLang(lang as 'es' | 'fr');
     this.justRegistered.set(true);
-    this.hasSeenMissionTip.set(result.user.hasSeenMissionTip);
+    this.missionTipCount.set(result.user.missionTipCount);
     this.setToken(result.token);
   }
 
@@ -62,14 +62,14 @@ export class AuthService {
       this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
     );
     this.i18n.setLang(result.user.lang as 'es' | 'fr');
-    this.hasSeenMissionTip.set(result.user.hasSeenMissionTip);
+    this.missionTipCount.set(result.user.missionTipCount);
     this.setToken(result.token);
   }
 
   async dismissMissionTip(): Promise<void> {
-    this.hasSeenMissionTip.set(true);
+    this.missionTipCount.update(c => c + 1);
     await firstValueFrom(
-      this.http.patch(`${environment.apiUrl}/users/me`, { hasSeenMissionTip: true })
+      this.http.patch(`${environment.apiUrl}/users/me`, { incrementMissionTip: true })
     );
   }
 
