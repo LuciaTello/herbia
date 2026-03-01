@@ -61,6 +61,7 @@ export interface Translations {
     myPlantsTitle: string;
     unidentifiedCount: (count: number) => string;
     maxPhotosReached: string;
+    uploadError: string;
     plantAdded: string;
     completeMission: string;
     completed: string;

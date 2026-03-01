@@ -76,6 +76,7 @@ export const FR: Translations = {
     myPlantsTitle: 'Mes plantes',
     unidentifiedCount: (count) => `${count} plante${count !== 1 ? 's' : ''} non identifiée${count !== 1 ? 's' : ''}`,
     maxPhotosReached: 'Max 4 photos par espèce. Supprimez-en une d\'abord.',
+    uploadError: 'Erreur lors du téléchargement. Réessayez.',
     plantAdded: 'Plante ajoutée !',
     completeMission: 'Terminer la mission',
     completed: 'Terminée',

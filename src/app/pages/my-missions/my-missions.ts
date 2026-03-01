@@ -350,6 +350,9 @@ export class MyMissionsPage implements OnInit {
     this.uploadingPhotoId.set(plantId);
     try {
       await this.missionService.uploadPlantPhoto(plantId, file);
+    } catch {
+      this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
+      setTimeout(() => this.addPlantMessage.set(null), 4000);
     } finally {
       this.uploadingPhotoId.set(null);
       this.pendingFile.set(null);
@@ -381,8 +384,10 @@ export class MyMissionsPage implements OnInit {
     } catch (err: any) {
       if (err?.status === 409) {
         this.addPlantMessage.set(this.i18n.t().myMissions.maxPhotosReached);
-        setTimeout(() => this.addPlantMessage.set(null), 4000);
+      } else {
+        this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
       }
+      setTimeout(() => this.addPlantMessage.set(null), 4000);
     } finally {
       this.addingPlantForMission.set(null);
     }
@@ -464,8 +469,10 @@ export class MyMissionsPage implements OnInit {
     } catch (err: any) {
       if (err?.status === 409) {
         this.addPlantMessage.set(this.i18n.t().myMissions.maxPhotosReached);
-        setTimeout(() => this.addPlantMessage.set(null), 4000);
+      } else {
+        this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
       }
+      setTimeout(() => this.addPlantMessage.set(null), 4000);
     } finally {
       this.addingPlantForMission.set(null);
     }
