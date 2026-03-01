@@ -1,6 +1,11 @@
 export interface Translations {
   app: {
     subtitle: string;
+  };
+  nav: {
+    home: string;
+    level: string;
+    friends: string;
     logout: string;
   };
   home: {
@@ -9,8 +14,6 @@ export interface Translations {
     startRoute: string;
     myMissions: string;
     myCollection: string;
-    myLevel: string;
-    myFriends: string;
   };
   route: {
     back: string;

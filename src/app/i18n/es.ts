@@ -3,6 +3,11 @@ import { Translations } from './translations';
 export const ES: Translations = {
   app: {
     subtitle: 'Dime adónde vas y te diré qué plantas encontrarás',
+  },
+  nav: {
+    home: 'Inicio',
+    level: 'Nivel',
+    friends: 'Amigas',
     logout: 'Salir',
   },
   home: {
@@ -12,8 +17,6 @@ export const ES: Translations = {
     startRoute: 'Nueva misión',
     myMissions: 'Mis misiones',
     myCollection: 'Mi colección',
-    myLevel: 'Mi nivel',
-    myFriends: 'Amigas',
   },
   route: {
     back: 'Volver al inicio',
@@ -160,7 +163,7 @@ export const ES: Translations = {
       { emoji: '🌱', name: 'Semilla curiosa', description: 'Acabas de plantar tu primer pie en el mundo botánico. Todo huele a tierra mojada y a posibilidades.' },
       { emoji: '🌿', name: 'Brote aventurera', description: 'Ya distingues un helecho de una lechuga. Tus vecinas están impresionadas (o preocupadas).' },
       { emoji: '🪻', name: 'Exploradora de senderos', description: 'No puedes dar un paseo sin pararte a mirar cada planta. Tu familia ha dejado de esperarte.' },
-      { emoji: '🌺', name: 'Cazadora de pétalos', description: 'Tienes más fotos de flores que de tu gato. Y eso es mucho decir.' },
+      { emoji: '🌺', name: 'Cazadora de pétalos', description: 'Tienes más fotos de flores que de tu familia. Y eso es mucho decir.' },
       { emoji: '🌳', name: 'Botánica viajera', description: 'Conoces más plantas por su nombre científico que personas por su nombre real.' },
       { emoji: '👑', name: 'Reina del jardín', description: 'Las plantas te saludan al pasar. Linneo estaría orgulloso. O celoso.' },
     ],

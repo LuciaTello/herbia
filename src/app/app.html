@@ -5,17 +5,31 @@
 <main>
   @if (auth.isLoggedIn()) {
     <header>
-      <div class="header-top">
-        <h1><a routerLink="/"><img src="favicon.png" alt="" class="logo-icon" />herbia</a></h1>
-        <div class="header-actions">
-          <button class="logout-button" (click)="auth.logout()">
-            {{ i18n.t().app.logout }}
-          </button>
-        </div>
-      </div>
+      <h1><a routerLink="/"><img src="favicon.png" alt="" class="logo-icon" />herbia</a></h1>
       <p>{{ i18n.t().app.subtitle }}</p>
     </header>
   }
 
   <router-outlet />
 </main>
+
+@if (auth.isLoggedIn()) {
+  <nav class="bottom-nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">{{ i18n.t().nav.home }}</span>
+    </a>
+    <a routerLink="/my-level" routerLinkActive="active">
+      <span class="nav-icon">{{ levelEmoji() }}</span>
+      <span class="nav-label">{{ i18n.t().nav.level }}</span>
+    </a>
+    <a routerLink="/friends" routerLinkActive="active">
+      <span class="nav-icon">👥</span>
+      <span class="nav-label">{{ i18n.t().nav.friends }}</span>
+    </a>
+    <button class="nav-logout" (click)="auth.logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-label">{{ i18n.t().nav.logout }}</span>
+    </button>
+  </nav>
+}
