@@ -3,7 +3,12 @@ import { Translations } from './translations';
 export const FR: Translations = {
   app: {
     subtitle: 'Dis-moi où tu vas, je te dirai quelles plantes tu trouveras',
-    logout: 'Déconnexion',
+  },
+  nav: {
+    home: 'Accueil',
+    level: 'Niveau',
+    friends: 'Amies',
+    logout: 'Quitter',
   },
   home: {
     title: 'Chaque chemin cache des plantes à découvrir',
@@ -12,8 +17,6 @@ export const FR: Translations = {
     startRoute: 'Nouvelle mission',
     myMissions: 'Mes missions',
     myCollection: 'Ma collection',
-    myLevel: 'Mon niveau',
-    myFriends: 'Amies',
   },
   route: {
     back: "Retour à l'accueil",
@@ -160,7 +163,7 @@ export const FR: Translations = {
       { emoji: '🌱', name: 'Graine curieuse', description: 'Tu viens de poser ton premier pied dans le monde botanique. Tout sent la terre mouill\u00e9e et les possibilit\u00e9s.' },
       { emoji: '🌿', name: 'Pousse aventuri\u00e8re', description: 'Tu distingues d\u00e9j\u00e0 une foug\u00e8re d\'une laitue. Tes voisines sont impressionn\u00e9es (ou inqui\u00e8tes).' },
       { emoji: '🪻', name: 'Exploratrice de sentiers', description: 'Tu ne peux plus te promener sans t\'arr\u00eater devant chaque plante. Ta famille a cess\u00e9 de t\'attendre.' },
-      { emoji: '🌺', name: 'Chasseuse de p\u00e9tales', description: 'Tu as plus de photos de fleurs que de ton chat. Et ce n\'est pas peu dire.' },
+      { emoji: '🌺', name: 'Chasseuse de p\u00e9tales', description: 'Tu as plus de photos de fleurs que de ta famille. Et ce n\'est pas peu dire.' },
       { emoji: '🌳', name: 'Botaniste voyageuse', description: 'Tu connais plus de plantes par leur nom scientifique que de personnes par leur pr\u00e9nom.' },
       { emoji: '👑', name: 'Reine du jardin', description: 'Les plantes te saluent quand tu passes. Linn\u00e9 serait fier. Ou jaloux.' },
     ],
