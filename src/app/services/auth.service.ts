@@ -38,6 +38,9 @@ export class AuthService {
 
   readonly username = signal<string | null>(null);
   readonly points = signal(0);
+  readonly photoUrl = signal<string | null>(null);
+  readonly bio = signal<string | null>(null);
+  readonly email = signal<string | null>(null);
 
   // Used by the HTTP interceptor to add "Authorization: Bearer <token>" to requests
   getToken(): string | null {
@@ -59,6 +62,9 @@ export class AuthService {
     this.missionTipCount.set(result.user.missionTipCount);
     this.username.set(result.user.username);
     this.points.set(result.user.points);
+    this.photoUrl.set(result.user.photoUrl);
+    this.bio.set(result.user.bio);
+    this.email.set(result.user.email);
     this.setToken(result.token);
   }
 
@@ -70,6 +76,9 @@ export class AuthService {
     this.missionTipCount.set(result.user.missionTipCount);
     this.username.set(result.user.username);
     this.points.set(result.user.points);
+    this.photoUrl.set(result.user.photoUrl);
+    this.bio.set(result.user.bio);
+    this.email.set(result.user.email);
     this.setToken(result.token);
   }
 
@@ -89,10 +98,40 @@ export class AuthService {
 
   async refreshProfile(): Promise<void> {
     const user = await firstValueFrom(
-      this.http.get<{ username: string | null; points: number }>(`${environment.apiUrl}/users/me`)
+      this.http.get<{ username: string | null; points: number; email: string; photoUrl: string | null; bio: string | null }>(`${environment.apiUrl}/users/me`)
     );
     this.username.set(user.username);
     this.points.set(user.points);
+    this.photoUrl.set(user.photoUrl);
+    this.bio.set(user.bio);
+    this.email.set(user.email);
+  }
+
+  async updateProfile(data: { email?: string; username?: string; bio?: string }): Promise<{ error?: string }> {
+    try {
+      const result = await firstValueFrom(
+        this.http.patch<{ id: number; username: string | null; points: number; email: string; bio: string | null; photoUrl: string | null }>(
+          `${environment.apiUrl}/users/me`, data
+        )
+      );
+      this.username.set(result.username);
+      this.email.set(result.email);
+      this.bio.set(result.bio);
+      this.photoUrl.set(result.photoUrl);
+      return {};
+    } catch (e: any) {
+      return { error: e?.error?.error || 'unknown' };
+    }
+  }
+
+  async uploadAvatar(file: File): Promise<string | null> {
+    const formData = new FormData();
+    formData.append('photo', file);
+    const result = await firstValueFrom(
+      this.http.post<{ photoUrl: string }>(`${environment.apiUrl}/users/me/photo`, formData)
+    );
+    this.photoUrl.set(result.photoUrl);
+    return result.photoUrl;
   }
 
   logout(): void {

@@ -13,23 +13,3 @@
   <router-outlet />
 </main>
 
-@if (auth.isLoggedIn()) {
-  <nav class="bottom-nav">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-      <span class="nav-icon">🏠</span>
-      <span class="nav-label">{{ i18n.t().nav.home }}</span>
-    </a>
-    <a routerLink="/my-level" routerLinkActive="active">
-      <span class="nav-icon">{{ levelEmoji() }}</span>
-      <span class="nav-label">{{ i18n.t().nav.level }}</span>
-    </a>
-    <a routerLink="/friends" routerLinkActive="active">
-      <span class="nav-icon">👥</span>
-      <span class="nav-label">{{ i18n.t().nav.friends }}</span>
-    </a>
-    <button class="nav-logout" (click)="auth.logout()">
-      <span class="nav-icon">🚪</span>
-      <span class="nav-label">{{ i18n.t().nav.logout }}</span>
-    </button>
-  </nav>
-}

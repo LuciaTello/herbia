@@ -1,0 +1,52 @@
+<a routerLink="/" class="back-link">← {{ i18n.t().profile.back }}</a>
+
+<h2>{{ i18n.t().profile.title }}</h2>
+
+<div class="avatar-section">
+  <div class="avatar">
+    @if (auth.photoUrl()) {
+      <img [src]="auth.photoUrl()" alt="avatar" />
+    } @else {
+      <span class="avatar-placeholder">👤</span>
+    }
+  </div>
+  <label class="change-photo-btn">
+    @if (uploading()) {
+      ...
+    } @else {
+      {{ i18n.t().profile.changePhoto }}
+    }
+    <input type="file" accept="image/jpeg,image/png" (change)="onPhotoChange($event)" hidden />
+  </label>
+</div>
+
+<form (ngSubmit)="onSave()" class="profile-form">
+  <label class="field">
+    <span>{{ i18n.t().profile.usernameLabel }}</span>
+    <input type="text" [(ngModel)]="username" name="username" />
+  </label>
+
+  <label class="field">
+    <span>{{ i18n.t().profile.emailLabel }}</span>
+    <input type="email" [(ngModel)]="email" name="email" required />
+  </label>
+
+  <label class="field">
+    <span>{{ i18n.t().profile.bioLabel }}</span>
+    <textarea [(ngModel)]="bio" name="bio" rows="3" [placeholder]="i18n.t().profile.bioPlaceholder"></textarea>
+  </label>
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <button type="submit" class="save-btn" [disabled]="saving()">
+    @if (saving()) {
+      ...
+    } @else if (saved()) {
+      {{ i18n.t().profile.saved }}
+    } @else {
+      {{ i18n.t().profile.save }}
+    }
+  </button>
+</form>

@@ -3,6 +3,7 @@ import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PlantPhoto, IdentifyResult, SuggestedPlant } from '../../models/plant.model';
 import { MissionService } from '../../services/mission.service';
+import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { WorldMapComponent } from '../../components/world-map/world-map';
@@ -23,6 +24,7 @@ type MapView = 'map' | 'countries' | 'regions' | 'missions';
 })
 export class MyMissionsPage implements OnInit {
   private readonly missionService = inject(MissionService);
+  private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   protected readonly cameraService = inject(CameraService);
   protected readonly i18n = inject(I18nService);
@@ -313,6 +315,7 @@ export class MyMissionsPage implements OnInit {
     try {
       const result = await this.missionService.identifyPlant(plantId, file);
       this.identifyResult.set(result);
+      if (result.similarity > 0) this.auth.points.update(p => p + result.similarity);
     } catch {
       await this.confirmUpload();
     } finally {
@@ -338,6 +341,7 @@ export class MyMissionsPage implements OnInit {
       try {
         const result = await this.missionService.identifyPlant(plantId, file);
         this.identifyResult.set(result);
+        if (result.similarity > 0) this.auth.points.update(p => p + result.similarity);
       } catch {
         await this.confirmUpload();
       } finally {

@@ -520,6 +520,17 @@ h2 {
   color: #e65100;
 }
 
+.points-badge {
+  display: inline-block;
+  background: #2d7d46;
+  color: white;
+  font-weight: 700;
+  font-size: .9rem;
+  border-radius: 6px;
+  padding: .25rem .6rem;
+  margin-top: .35rem;
+}
+
 .identify-actions {
   display: flex;
   gap: 0.5rem;

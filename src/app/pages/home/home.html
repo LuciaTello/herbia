@@ -12,3 +12,24 @@
     <a routerLink="/login" class="primary-button">{{ i18n.t().login.loginButton }}</a>
   }
 </section>
+
+@if (auth.isLoggedIn()) {
+  <nav class="bottom-nav">
+    <a routerLink="/profile">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">{{ i18n.t().nav.profile }}</span>
+    </a>
+    <a routerLink="/my-level">
+      <span class="nav-icon">{{ levelEmoji() }}</span>
+      <span class="nav-label">{{ i18n.t().nav.level }}</span>
+    </a>
+    <a routerLink="/friends">
+      <span class="nav-icon">👥</span>
+      <span class="nav-label">{{ i18n.t().nav.friends }}</span>
+    </a>
+    <button class="nav-logout" (click)="auth.logout()">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-label">{{ i18n.t().nav.logout }}</span>
+    </button>
+  </nav>
+}
