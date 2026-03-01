@@ -134,17 +134,8 @@
     </div>
 
     <div class="mission-progress">
-      <div class="progress-bar">
-        <div class="progress-fill"
-             [class.complete]="foundCount(mission.plants) === mission.plants.length"
-             [style.width.%]="mission.plants.length ? (foundCount(mission.plants) / mission.plants.length * 100) : 0"></div>
-      </div>
-      <p class="progress-text" [class.complete]="foundCount(mission.plants) === mission.plants.length">
-        @if (foundCount(mission.plants) === mission.plants.length) {
-          {{ i18n.t().myMissions.missionComplete }}
-        } @else {
-          {{ i18n.t().myMissions.summary(mission.plants.length, foundCount(mission.plants)) }}
-        }
+      <p class="progress-text">
+        {{ i18n.t().myMissions.summary(foundCount(mission.plants)) }}
       </p>
     </div>
 
@@ -257,15 +248,8 @@
         }
       </div>
 
-      <!-- Add plant button -->
       @if (addingPlantForMission() === mission.id) {
         <span class="adding-plant-badge">{{ i18n.t().myMissions.addingPlant }}</span>
-      } @else {
-        <label class="add-plant-button">
-          {{ i18n.t().myMissions.addPlant }}
-          <input type="file" accept="image/*"
-                 (change)="onAddPlant($event, mission.id)" hidden />
-        </label>
       }
 
       @if (addPlantMessage() && (addingPlantForMission() === null || addingPlantForMission() === mission.id)) {

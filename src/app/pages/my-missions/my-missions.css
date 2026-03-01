@@ -234,33 +234,10 @@ h2 {
   margin: 0.5rem 0 0;
 }
 
-.progress-bar {
-  height: 6px;
-  background: #dfe6e9;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: #2d7d46;
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.progress-fill.complete {
-  background: #daa520;
-}
-
 .progress-text {
   color: #636e72;
   font-size: 0.8rem;
-  margin: 0.25rem 0 0;
-}
-
-.progress-text.complete {
-  color: #b8860b;
-  font-weight: bold;
+  margin: 0;
 }
 
 .plant-card:not(.found) {

@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Plant, PlantPhoto, PlaceSelection } from '../../models/plant.model';
 import { PlantService } from '../../services/plant.service';
 import { MissionService } from '../../services/mission.service';
+import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { PlaceAutocompleteDirective } from '../../directives/place-autocomplete.directive';
@@ -20,6 +21,7 @@ import { getRarity } from '../../utils/rarity';
 export class RoutePage {
   private readonly plantService = inject(PlantService);
   private readonly missionService = inject(MissionService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
 
@@ -43,6 +45,7 @@ export class RoutePage {
   protected readonly loadingMessage = signal('');
   protected readonly galleryImages = signal<string[]>([]);
   protected readonly galleryPlantName = signal('');
+  protected readonly showMissionTip = signal(false);
 
   // setInterval returns a handle we need to clear later (like ScheduledFuture in Java)
   private messageInterval: ReturnType<typeof setInterval> | null = null;
@@ -122,6 +125,7 @@ export class RoutePage {
         this.originLng,
         dLat,
         dLng,
+        this.originRegion,
       );
       this.tooFar.set(result.tooFar);
       this.description.set(result.description);
@@ -137,6 +141,20 @@ export class RoutePage {
       this.loading.set(false);
       this.stopLoadingMessages();
     }
+  }
+
+  protected onStartMissionClick(): void {
+    if (!this.auth.hasSeenMissionTip()) {
+      this.showMissionTip.set(true);
+      return;
+    }
+    this.onStartMission();
+  }
+
+  protected async dismissMissionTip(): Promise<void> {
+    this.showMissionTip.set(false);
+    this.auth.dismissMissionTip();
+    this.onStartMission();
   }
 
   async onStartMission(): Promise<void> {

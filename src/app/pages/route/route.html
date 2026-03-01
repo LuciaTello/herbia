@@ -108,7 +108,7 @@
 
     <button
       class="primary-button start-mission-button"
-      (click)="onStartMission()"
+      (click)="onStartMissionClick()"
       [disabled]="saving()"
     >
       @if (saving()) {
@@ -126,4 +126,16 @@
     [plantName]="galleryPlantName()"
     (closeGallery)="closeGallery()"
   />
+}
+
+@if (showMissionTip()) {
+  <div class="mission-tip-overlay">
+    <div class="mission-tip-content">
+      <h3>{{ i18n.t().missionTip.title }}</h3>
+      <p>{{ i18n.t().missionTip.text }}</p>
+      <button class="primary-button" (click)="dismissMissionTip()">
+        {{ i18n.t().missionTip.dismiss }}
+      </button>
+    </div>
+  </div>
 }
