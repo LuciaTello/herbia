@@ -36,6 +36,9 @@ export class AuthService {
   // How many times the user has seen the mission tip (show until 4)
   readonly missionTipCount = signal(4); // default 4 = don't show
 
+  readonly username = signal<string | null>(null);
+  readonly points = signal(0);
+
   // Used by the HTTP interceptor to add "Authorization: Bearer <token>" to requests
   getToken(): string | null {
     return this.token();
@@ -47,13 +50,15 @@ export class AuthService {
     );
   }
 
-  async register(email: string, password: string, lang: string): Promise<void> {
+  async register(email: string, password: string, lang: string, username?: string): Promise<void> {
     const result = await firstValueFrom(
-      this.http.post<AuthResponse>(`${this.apiUrl}/register`, { email, password, lang })
+      this.http.post<AuthResponse>(`${this.apiUrl}/register`, { email, password, lang, username: username || undefined })
     );
     this.i18n.setLang(lang as 'es' | 'fr');
     this.justRegistered.set(true);
     this.missionTipCount.set(result.user.missionTipCount);
+    this.username.set(result.user.username);
+    this.points.set(result.user.points);
     this.setToken(result.token);
   }
 
@@ -63,6 +68,8 @@ export class AuthService {
     );
     this.i18n.setLang(result.user.lang as 'es' | 'fr');
     this.missionTipCount.set(result.user.missionTipCount);
+    this.username.set(result.user.username);
+    this.points.set(result.user.points);
     this.setToken(result.token);
   }
 
@@ -71,6 +78,21 @@ export class AuthService {
     await firstValueFrom(
       this.http.patch(`${environment.apiUrl}/users/me`, { incrementMissionTip: true })
     );
+  }
+
+  async updateUsername(username: string): Promise<void> {
+    const result = await firstValueFrom(
+      this.http.patch<{ id: number; username: string; points: number }>(`${environment.apiUrl}/users/me`, { username })
+    );
+    this.username.set(result.username);
+  }
+
+  async refreshProfile(): Promise<void> {
+    const user = await firstValueFrom(
+      this.http.get<{ username: string | null; points: number }>(`${environment.apiUrl}/users/me`)
+    );
+    this.username.set(user.username);
+    this.points.set(user.points);
   }
 
   logout(): void {

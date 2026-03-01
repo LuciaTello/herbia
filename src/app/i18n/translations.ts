@@ -9,6 +9,8 @@ export interface Translations {
     startRoute: string;
     myMissions: string;
     myCollection: string;
+    myLevel: string;
+    myFriends: string;
   };
   route: {
     back: string;
@@ -120,6 +122,31 @@ export interface Translations {
     title: string;
     text: string;
     dismiss: string;
+  };
+  level: {
+    back: string;
+    title: string;
+    pointsLabel: string;
+    nextLevel: (points: number) => string;
+    maxLevel: string;
+    levels: { emoji: string; name: string; description: string }[];
+  };
+  friends: {
+    back: string;
+    title: string;
+    searchPlaceholder: string;
+    addFriend: string;
+    pending: string;
+    accept: string;
+    reject: string;
+    noFriends: string;
+    requestSent: string;
+    setUsername: string;
+    usernamePlaceholder: string;
+    usernameRequired: string;
+    save: string;
+    alreadyFriends: string;
+    remove: string;
   };
 }
 

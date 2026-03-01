@@ -11,6 +11,7 @@ import { collectionRouter } from './routes/collection.routes';
 import { missionRouter } from './routes/mission.routes';
 import { authRouter } from './routes/auth.routes';
 import { userRouter } from './routes/user.routes';
+import { friendRouter } from './routes/friend.routes';
 import { configRouter } from './routes/config.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { initPlantService } from './services/plant.service';
@@ -68,6 +69,7 @@ app.use('/api/users', authMiddleware, userRouter(prisma));
 app.use('/api/plants', authMiddleware, plantRouter(prisma));
 app.use('/api/collection', authMiddleware, collectionRouter(prisma));
 app.use('/api/missions', authMiddleware, missionRouter(prisma));
+app.use('/api/friends', authMiddleware, friendRouter(prisma));
 
 // --- Start server (like SpringApplication.run()) ---
 

@@ -37,6 +37,7 @@ export class LoginPage {
   protected readonly email = signal('');
   protected readonly password = signal('');
   protected readonly selectedLang = signal<'es' | 'fr'>('es');
+  protected readonly username = signal('');
   protected readonly error = signal('');
   protected readonly loading = signal(false);
 
@@ -87,7 +88,7 @@ export class LoginPage {
     this.loading.set(true);
     this.error.set('');
     try {
-      await this.authService.register(this.email(), this.password(), this.selectedLang());
+      await this.authService.register(this.email(), this.password(), this.selectedLang(), this.username().trim() || undefined);
       this.router.navigate(['/']);
     } catch (e: any) {
       this.error.set(e?.error?.error || this.i18n.t().login.genericError);

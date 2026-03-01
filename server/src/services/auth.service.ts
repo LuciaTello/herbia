@@ -21,7 +21,7 @@ interface TokenPayload {
 // What register/login return to the caller (like a LoginResponseDto)
 export interface AuthResult {
   token: string;
-  user: { id: number; email: string; lang: string; missionTipCount: number };
+  user: { id: number; email: string; lang: string; missionTipCount: number; username: string | null; points: number };
 }
 
 // --- Constants ---
@@ -37,6 +37,7 @@ export async function registerUser(
   email: string,
   password: string,
   lang: string = 'es',
+  username?: string,
 ): Promise<AuthResult> {
   // Check if email already exists (like repository.findByEmail())
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -50,13 +51,13 @@ export async function registerUser(
 
   // Save user (like repository.save(new User(email, passwordHash)))
   const user = await prisma.user.create({
-    data: { email, passwordHash, lang },
+    data: { email, passwordHash, lang, username: username || null },
   });
 
   // Generate JWT token
   const token = generateToken(user.id);
 
-  return { token, user: { id: user.id, email: user.email, lang: user.lang, missionTipCount: user.missionTipCount } };
+  return { token, user: { id: user.id, email: user.email, lang: user.lang, missionTipCount: user.missionTipCount, username: user.username, points: user.points } };
 }
 
 export async function loginUser(
@@ -79,7 +80,7 @@ export async function loginUser(
   }
 
   const token = generateToken(user.id);
-  return { token, user: { id: user.id, email: user.email, lang: user.lang, missionTipCount: user.missionTipCount } };
+  return { token, user: { id: user.id, email: user.email, lang: user.lang, missionTipCount: user.missionTipCount, username: user.username, points: user.points } };
 }
 
 export async function checkEmailExists(
