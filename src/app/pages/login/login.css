@@ -30,6 +30,14 @@
   color: #2d7d46;
   margin: 0;
   letter-spacing: -0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.logo-icon {
+  height: 1.2em;
+  width: auto;
 }
 
 /* ---------- bilingual cycle animation ---------- */
