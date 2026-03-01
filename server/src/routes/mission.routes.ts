@@ -72,6 +72,8 @@ export function missionRouter(prisma: PrismaClient): Router {
               description: p.description,
               hint: p.hint || '',
               rarity: p.rarity || 'common',
+              genus: p.genus || '',
+              family: p.family || '',
               photos: {
                 create: (p.photos || []).map((photo: any) => ({
                   url: photo.url,
@@ -167,7 +169,8 @@ export function missionRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      const result = await identifyPlant(file.buffer, file.mimetype, plant.scientificName);
+      const result = await identifyPlant(file.buffer, file.mimetype, plant.scientificName, plant.genus, plant.family);
+
       res.json(result);
     } catch (error) {
       console.error('Error identifying plant:', error);
@@ -256,7 +259,7 @@ export function missionRouter(prisma: PrismaClient): Router {
       const preCommonName = req.body.commonName;
       let result;
       if (preIdentifiedAs !== undefined) {
-        result = { match: false, score: 0, identifiedAs: preIdentifiedAs, commonName: preCommonName || '' };
+        result = { match: false, score: 0, identifiedAs: preIdentifiedAs, commonName: preCommonName || '', similarity: 0 };
       } else {
         result = await identifyPlant(file.buffer, file.mimetype, '');
       }

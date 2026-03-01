@@ -12,6 +12,8 @@ export interface Plant {
   rarity: string;
   description: string;
   hint: string;
+  genus?: string;
+  family?: string;
   photos: PlantPhoto[];
 }
 
@@ -23,6 +25,8 @@ export interface SuggestedPlant {
   rarity: string;
   description: string;
   hint: string;
+  genus?: string;
+  family?: string;
   source?: string;  // "ai" | "user"
   photos: PlantPhoto[];
   found: boolean;
@@ -46,6 +50,9 @@ export interface IdentifyResult {
   score: number;
   identifiedAs: string;
   commonName: string;
+  similarity: number;
+  genus: string;
+  family: string;
 }
 
 // PlaceSelection: emitted by PlaceAutocomplete when a place is selected

@@ -36,6 +36,9 @@ interface INatSpecies {
   commonName: string;
   count: number;
   photoUrl: string;
+  taxonId: number;
+  genus: string;
+  family: string;
 }
 
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -79,9 +82,37 @@ async function fetchSpeciesCounts(
       commonName: taxon.preferred_common_name || taxon.name,
       count: result.count,
       photoUrl: taxon.default_photo?.medium_url || '',
+      taxonId: taxon.id,
+      genus: taxon.name.split(' ')[0],
+      family: '',
     });
   }
   return species;
+}
+
+async function enrichWithTaxonomy(species: INatSpecies[]): Promise<void> {
+  const ids = species.map(s => s.taxonId).join(',');
+  if (!ids) return;
+  try {
+    const url = `https://api.inaturalist.org/v1/taxa/${ids}`;
+    const response = await fetch(url, {
+      headers: { 'User-Agent': 'herbia-app' },
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    const familyMap = new Map<number, string>();
+    for (const taxon of data.results || []) {
+      const familyAncestor = (taxon.ancestors || []).find((a: any) => a.rank === 'family');
+      if (familyAncestor) {
+        familyMap.set(taxon.id, familyAncestor.name);
+      }
+    }
+    for (const s of species) {
+      s.family = familyMap.get(s.taxonId) || '';
+    }
+  } catch (e) {
+    console.warn('Failed to enrich taxonomy:', e);
+  }
 }
 
 function assignRarity(count: number, maxCount: number): 'common' | 'rare' | 'veryRare' {
@@ -91,7 +122,7 @@ function assignRarity(count: number, maxCount: number): 'common' | 'rare' | 'ver
   return 'veryRare';
 }
 
-function selectPlants(species: INatSpecies[], exclude: string[]): (INatSpecies & { rarity: string })[] {
+function selectPlants(species: INatSpecies[], exclude: string[]): (INatSpecies & { rarity: string; genus: string; family: string })[] {
   const excludeLower = new Set(exclude.map(n => n.toLowerCase()));
   const filtered = species.filter(s => !excludeLower.has(s.scientificName.toLowerCase()));
   if (filtered.length === 0) return [];
@@ -368,6 +399,9 @@ export async function getSuggestedPlants(
   // Step 7: Select 10 diverse plants with rarity
   const selected = selectPlants(species, exclude);
 
+  // Step 7b: Enrich with family taxonomy from iNaturalist
+  await enrichWithTaxonomy(selected);
+
   // Step 8: Ask LLM for descriptions only
   const descPrompt = buildDescriptionPrompt(selected, origin, destination, lang, currentMonth);
   const completion = await groq.chat.completions.create({
@@ -392,6 +426,8 @@ export async function getSuggestedPlants(
     rarity: s.rarity,
     description: descMap.get(s.scientificName)?.description || '',
     hint: descMap.get(s.scientificName)?.hint || '',
+    genus: s.genus,
+    family: s.family,
   }));
 
   // Step 10: Enrich with Wikipedia + iNat observation photos

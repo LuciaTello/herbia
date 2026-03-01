@@ -6,6 +6,7 @@ const PLANTNET_URL = 'https://my-api.plantnet.org/v2/identify/all';
 interface PlantNetSpecies {
   scientificNameWithoutAuthor: string;
   genus: { scientificNameWithoutAuthor: string };
+  family: { scientificNameWithoutAuthor: string };
   commonNames: string[];
 }
 
@@ -23,6 +24,9 @@ export interface IdentifyResult {
   score: number;
   identifiedAs: string;
   commonName: string;
+  similarity: number;
+  genus: string;
+  family: string;
 }
 
 /**
@@ -37,6 +41,8 @@ export async function identifyPlant(
   buffer: Buffer,
   mimetype: string,
   expectedScientificName: string,
+  expectedGenus: string = '',
+  expectedFamily: string = '',
 ): Promise<IdentifyResult> {
   const apiKey = process.env['PLANTNET_API_KEY'];
   if (!apiKey) {
@@ -58,7 +64,7 @@ export async function identifyPlant(
   if (!response.ok) {
     // 404 = PlantNet couldn't identify anything in the image (e.g. not a plant)
     if (response.status === 404) {
-      return { match: false, score: 0, identifiedAs: '', commonName: '' };
+      return { match: false, score: 0, identifiedAs: '', commonName: '', similarity: 0, genus: '', family: '' };
     }
     const text = await response.text();
     throw new Error(`PlantNet API error ${response.status}: ${text}`);
@@ -67,7 +73,7 @@ export async function identifyPlant(
   const data = (await response.json()) as PlantNetResponse;
 
   if (!data.results?.length) {
-    return { match: false, score: 0, identifiedAs: '', commonName: '' };
+    return { match: false, score: 0, identifiedAs: '', commonName: '', similarity: 0, genus: '', family: '' };
   }
 
   const expected = normalize(expectedScientificName);
@@ -82,16 +88,32 @@ export async function identifyPlant(
         score: Math.round(result.score * 100),
         identifiedAs: result.species.scientificNameWithoutAuthor,
         commonName: result.species.commonNames?.[0] || '',
+        similarity: 100,
+        genus: result.species.genus?.scientificNameWithoutAuthor || '',
+        family: result.species.family?.scientificNameWithoutAuthor || '',
       };
     }
   }
 
-  // No match — return the top result
+  // No match — compute taxonomic similarity from best result
   const best = data.results[0];
+  const bestGenus = best.species.genus?.scientificNameWithoutAuthor || '';
+  const bestFamily = best.species.family?.scientificNameWithoutAuthor || '';
+
+  let similarity = 0;
+  if (expectedGenus && bestGenus && bestGenus.toLowerCase() === expectedGenus.toLowerCase()) {
+    similarity = 75;
+  } else if (expectedFamily && bestFamily && bestFamily.toLowerCase() === expectedFamily.toLowerCase()) {
+    similarity = 40;
+  }
+
   return {
     match: false,
     score: Math.round(best.score * 100),
     identifiedAs: best.species.scientificNameWithoutAuthor,
     commonName: best.species.commonNames?.[0] || '',
+    similarity,
+    genus: bestGenus,
+    family: bestFamily,
   };
 }

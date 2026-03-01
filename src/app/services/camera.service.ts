@@ -1,26 +1,30 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { I18nService } from '../i18n';
 
-const LABELS = {
-  es: { header: 'Añadir foto', photo: 'Galería', picture: 'Cámara', cancel: 'Cancelar' },
-  fr: { header: 'Ajouter photo', photo: 'Galerie', picture: 'Appareil photo', cancel: 'Annuler' },
-} as const;
+type PickerLabels = { header: string; camera: string; gallery: string; cancel: string };
+
+const LABELS: Record<string, PickerLabels> = {
+  es: { header: 'Añadir foto', camera: 'Cámara', gallery: 'Galería', cancel: 'Cancelar' },
+  fr: { header: 'Ajouter photo', camera: 'Appareil photo', gallery: 'Galerie', cancel: 'Annuler' },
+};
 
 @Injectable({ providedIn: 'root' })
 export class CameraService {
   private readonly i18n = inject(I18nService);
 
+  readonly showPicker = signal(false);
+  readonly labels = signal(LABELS['es']);
+  private resolve: ((source: CameraSource | null) => void) | null = null;
+
   async takePhoto(): Promise<File> {
-    const labels = LABELS[this.i18n.currentLang()];
+    const source = await this.promptSource();
+    if (source === null) throw new Error('cancelled');
+
     const photo = await Camera.getPhoto({
       resultType: CameraResultType.Base64,
-      source: CameraSource.Prompt,
+      source,
       quality: 90,
-      promptLabelHeader: labels.header,
-      promptLabelPhoto: labels.photo,
-      promptLabelPicture: labels.picture,
-      promptLabelCancel: labels.cancel,
     });
 
     const byteString = atob(photo.base64String!);
@@ -31,5 +35,17 @@ export class CameraService {
 
     const mime = `image/${photo.format}`;
     return new File([bytes], `photo.${photo.format}`, { type: mime });
+  }
+
+  private promptSource(): Promise<CameraSource | null> {
+    this.labels.set(LABELS[this.i18n.currentLang()]);
+    this.showPicker.set(true);
+    return new Promise(resolve => { this.resolve = resolve; });
+  }
+
+  pick(source: CameraSource | null): void {
+    this.showPicker.set(false);
+    this.resolve?.(source);
+    this.resolve = null;
   }
 }

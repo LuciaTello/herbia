@@ -214,6 +214,11 @@
                     } @else if (identifyResult()!.identifiedAs) {
                       <span class="identify-icon">&#9888;</span>
                       <span class="identify-text">{{ i18n.t().myMissions.identifyNoMatch(identifyResult()!.identifiedAs, identifyResult()!.score) }}</span>
+                      @if (identifyResult()!.similarity === 75) {
+                        <span class="similarity-badge genus-badge">{{ i18n.t().myMissions.sameGenus(identifyResult()!.genus) }}</span>
+                      } @else if (identifyResult()!.similarity === 40) {
+                        <span class="similarity-badge family-badge">{{ i18n.t().myMissions.sameFamily(identifyResult()!.family) }}</span>
+                      }
                     } @else {
                       <span class="identify-icon">&#9888;</span>
                       <span class="identify-text">{{ i18n.t().myMissions.identifyUnknown }}</span>
@@ -329,4 +334,25 @@
     [plantName]="galleryPlantName()"
     (closeGallery)="closeGallery()"
   />
+}
+
+@if (cameraService.showPicker()) {
+  <div class="photo-picker-backdrop" (click)="cameraService.pick(null)">
+    <div class="photo-picker" (click)="$event.stopPropagation()">
+      <p class="photo-picker-title">{{ cameraService.labels().header }}</p>
+      <div class="photo-picker-options">
+        <button class="photo-picker-option" (click)="pickSource('camera')">
+          <span class="photo-picker-icon">&#x1F4F7;</span>
+          <span>{{ cameraService.labels().camera }}</span>
+        </button>
+        <button class="photo-picker-option" (click)="pickSource('gallery')">
+          <span class="photo-picker-icon">&#x1F5BC;</span>
+          <span>{{ cameraService.labels().gallery }}</span>
+        </button>
+      </div>
+      <button class="photo-picker-cancel" (click)="cameraService.pick(null)">
+        {{ cameraService.labels().cancel }}
+      </button>
+    </div>
+  </div>
 }
