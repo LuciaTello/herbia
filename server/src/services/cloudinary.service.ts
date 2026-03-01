@@ -28,6 +28,33 @@ export async function deletePhoto(url: string): Promise<void> {
   await cloudinary.uploader.destroy(match[1]);
 }
 
+export async function deleteAvatar(url: string): Promise<void> {
+  const match = url.match(/\/upload\/(?:v\d+\/)?(herbia\/avatars\/[^.]+)/);
+  if (!match) return;
+  await cloudinary.uploader.destroy(match[1]);
+}
+
+export function uploadAvatar(buffer: Buffer, userId: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'herbia/avatars',
+        public_id: `user_${userId}`,
+        overwrite: true,
+        transformation: [
+          { width: 256, height: 256, crop: 'fill', gravity: 'face' },
+          { quality: 'auto', fetch_format: 'auto' },
+        ],
+      },
+      (error, result) => {
+        if (error || !result) return reject(error || new Error('No result from Cloudinary'));
+        resolve(result.secure_url);
+      }
+    );
+    stream.end(buffer);
+  });
+}
+
 export function uploadPhoto(buffer: Buffer, plantId: number): Promise<string> {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(

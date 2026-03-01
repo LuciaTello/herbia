@@ -3,7 +3,7 @@ export interface Translations {
     subtitle: string;
   };
   nav: {
-    home: string;
+    profile: string;
     level: string;
     friends: string;
     logout: string;
@@ -60,6 +60,7 @@ export interface Translations {
     identifyUploadAnyway: string;
     identifyAddAsOther: string;
     similarity: (pct: number) => string;
+    pointsEarned: (pts: number) => string;
     sameGenus: (name: string) => string;
     sameFamily: (name: string) => string;
     summary: (found: number) => string;
@@ -150,6 +151,19 @@ export interface Translations {
     save: string;
     alreadyFriends: string;
     remove: string;
+  };
+  profile: {
+    back: string;
+    title: string;
+    changePhoto: string;
+    usernameLabel: string;
+    emailLabel: string;
+    bioLabel: string;
+    bioPlaceholder: string;
+    save: string;
+    saved: string;
+    emailTaken: string;
+    usernameTaken: string;
   };
 }
 

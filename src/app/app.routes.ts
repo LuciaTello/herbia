@@ -5,6 +5,7 @@ import { CollectionPage } from './pages/collection/collection';
 import { MyMissionsPage } from './pages/my-missions/my-missions';
 import { LevelPage } from './pages/level/level';
 import { FriendsPage } from './pages/friends/friends';
+import { ProfilePage } from './pages/profile/profile';
 import { LoginPage } from './pages/login/login';
 import { authGuard } from './auth/auth.guard';
 
@@ -16,4 +17,5 @@ export const routes: Routes = [
   { path: 'my-missions', component: MyMissionsPage, canActivate: [authGuard] },
   { path: 'my-level', component: LevelPage, canActivate: [authGuard] },
   { path: 'friends', component: FriendsPage, canActivate: [authGuard] },
+  { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
 ];

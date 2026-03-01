@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
 
-const LEVEL_THRESHOLDS = [0, 10, 30, 60, 100, 200];
+const LEVEL_THRESHOLDS = [0, 750, 1500, 3750, 7500, 25000];
 
 @Component({
   selector: 'app-level',

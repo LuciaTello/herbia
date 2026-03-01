@@ -19,6 +19,8 @@ model User {
   lang         String   @default("es")                  // "es" | "fr"
   username     String?  @unique
   points       Int      @default(0)
+  photoUrl     String?  @map("photo_url")
+  bio          String?
   missionTipCount Int @default(0) @map("mission_tip_count")
   createdAt    DateTime @default(now())
 

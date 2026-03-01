@@ -223,6 +223,9 @@
                       <span class="identify-icon">&#9888;</span>
                       <span class="identify-text">{{ i18n.t().myMissions.identifyUnknown }}</span>
                     }
+                    @if (identifyResult()!.similarity > 0) {
+                      <span class="points-badge">{{ i18n.t().myMissions.pointsEarned(identifyResult()!.similarity) }}</span>
+                    }
                     <div class="identify-actions">
                       @if (identifyResult()!.match) {
                         <button class="identify-btn confirm" (click)="confirmUpload()">
