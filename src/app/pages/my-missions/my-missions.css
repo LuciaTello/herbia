@@ -501,6 +501,25 @@ h2 {
   font-style: italic;
 }
 
+.similarity-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 0.125rem 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.genus-badge {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.family-badge {
+  background: #fff3e0;
+  color: #e65100;
+}
+
 .identify-actions {
   display: flex;
   gap: 0.5rem;
@@ -692,4 +711,87 @@ h2 {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+}
+
+/* Photo picker dialog */
+.photo-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.photo-picker {
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-width: 400px;
+  padding: 1.25rem 1rem 1rem;
+  animation: slideUp 0.2s ease-out;
+}
+
+.photo-picker-title {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+  margin: 0 0 1rem;
+}
+
+.photo-picker-options {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.photo-picker-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f0f7f2;
+  border: 1.5px solid #2d7d46;
+  border-radius: 12px;
+  padding: 1rem 0.5rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: #2d7d46;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.photo-picker-option:active {
+  background: #d4edda;
+}
+
+.photo-picker-icon {
+  font-size: 2rem;
+}
+
+.photo-picker-cancel {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #999;
+  padding: 0.625rem;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }

@@ -11,6 +11,7 @@ import { resizeImage } from '../../utils/resize-image';
 import { getContinent, getContinentName, countryFlag } from '../../utils/continents';
 import { getCountryName } from '../../utils/country-names';
 import { CameraService } from '../../services/camera.service';
+import { CameraSource } from '@capacitor/camera';
 
 type MapView = 'map' | 'countries' | 'regions' | 'missions';
 
@@ -23,7 +24,7 @@ type MapView = 'map' | 'countries' | 'regions' | 'missions';
 export class MyMissionsPage implements OnInit {
   private readonly missionService = inject(MissionService);
   private readonly route = inject(ActivatedRoute);
-  private readonly cameraService = inject(CameraService);
+  protected readonly cameraService = inject(CameraService);
   protected readonly i18n = inject(I18nService);
   protected readonly missions = this.missionService.getMissions();
   protected readonly loading = signal(true);
@@ -346,6 +347,10 @@ export class MyMissionsPage implements OnInit {
       this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
       setTimeout(() => this.addPlantMessage.set(null), 4000);
     }
+  }
+
+  protected pickSource(type: 'camera' | 'gallery'): void {
+    this.cameraService.pick(type === 'camera' ? CameraSource.Camera : CameraSource.Photos);
   }
 
   async confirmUpload(): Promise<void> {

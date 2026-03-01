@@ -54,6 +54,9 @@ export interface Translations {
     identifyCancel: string;
     identifyUploadAnyway: string;
     identifyAddAsOther: string;
+    similarity: (pct: number) => string;
+    sameGenus: (name: string) => string;
+    sameFamily: (name: string) => string;
     summary: (found: number) => string;
     missionComplete: string;
     addPlant: string;
