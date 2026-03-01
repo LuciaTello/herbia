@@ -10,6 +10,7 @@ import { getRarity } from '../../utils/rarity';
 import { resizeImage } from '../../utils/resize-image';
 import { getContinent, getContinentName, countryFlag } from '../../utils/continents';
 import { getCountryName } from '../../utils/country-names';
+import { CameraService } from '../../services/camera.service';
 
 type MapView = 'map' | 'countries' | 'regions' | 'missions';
 
@@ -22,6 +23,7 @@ type MapView = 'map' | 'countries' | 'regions' | 'missions';
 export class MyMissionsPage implements OnInit {
   private readonly missionService = inject(MissionService);
   private readonly route = inject(ActivatedRoute);
+  private readonly cameraService = inject(CameraService);
   protected readonly i18n = inject(I18nService);
   protected readonly missions = this.missionService.getMissions();
   protected readonly loading = signal(true);
@@ -314,6 +316,28 @@ export class MyMissionsPage implements OnInit {
       await this.confirmUpload();
     } finally {
       this.identifying.set(null);
+    }
+  }
+
+  async pickPhoto(plantId: number): Promise<void> {
+    try {
+      const raw = await this.cameraService.takePhoto();
+      const file = await resizeImage(raw);
+      this.pendingFile.set(file);
+      this.pendingPlantId.set(plantId);
+      this.identifyResult.set(null);
+      this.identifying.set(plantId);
+
+      try {
+        const result = await this.missionService.identifyPlant(plantId, file);
+        this.identifyResult.set(result);
+      } catch {
+        await this.confirmUpload();
+      } finally {
+        this.identifying.set(null);
+      }
+    } catch {
+      // User cancelled the camera/gallery prompt
     }
   }
 
