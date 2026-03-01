@@ -320,8 +320,14 @@ export class MyMissionsPage implements OnInit {
   }
 
   async pickPhoto(plantId: number): Promise<void> {
+    let raw: File;
     try {
-      const raw = await this.cameraService.takePhoto();
+      raw = await this.cameraService.takePhoto();
+    } catch {
+      return; // User cancelled the camera/gallery prompt
+    }
+
+    try {
       const file = await resizeImage(raw);
       this.pendingFile.set(file);
       this.pendingPlantId.set(plantId);
@@ -337,7 +343,8 @@ export class MyMissionsPage implements OnInit {
         this.identifying.set(null);
       }
     } catch {
-      // User cancelled the camera/gallery prompt
+      this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
+      setTimeout(() => this.addPlantMessage.set(null), 4000);
     }
   }
 
