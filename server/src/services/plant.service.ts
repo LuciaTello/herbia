@@ -143,11 +143,15 @@ IMPORTANT: Always use feminine gender when referring to the traveler in ${langNa
 Here are 5 real plants found along this route:
 ${plantList}
 
+For each plant, write TWO separate fields:
+- "description": A surprising or little-known fact that makes this plant fascinating (2-3 sentences in ${langName}). Focus on ONE curiosity: a cultural or historical anecdote, an unusual survival trick, a weird use, a record, or a fun etymology. Avoid generic descriptions like "it's a common plant" — make the reader think "wow, I didn't know that!".
+- "hint": Concrete visual clues to find and recognize this plant in the field (1-2 sentences in ${langName}). Mention leaf shape, flower color/size, typical height, and WHERE exactly to look (roadside, walls, shade, near water, forest edge...). If it can be confused with another plant, explain how to tell them apart.
+
 Write ONLY a JSON object (no markdown, no backticks) with this format:
 {
   "routeDescription": "A fun overview in ${langName} (2-3 sentences) about the landscape and environment along this route in ${monthName}.",
   "plants": [
-    { "scientificName": "Latin name", "description": "Interesting facts in ${langName} (2-3 sentences): what it is, what it looks like, what it's used for, a fun fact or touch of humor.", "hint": "Search tips in ${langName} (1-2 sentences): where to look for it, what terrain/altitude, how to recognize it from a distance." }
+    { "scientificName": "Latin name", "description": "...", "hint": "..." }
   ]
 }
 
@@ -189,10 +193,8 @@ For each plant, assign a rarity category:
 Sort the results from most common to rarest.
 
 Each plant needs TWO separate text fields:
-- "description": interesting facts, what it is, what it looks like, what it's used for, a fun fact or touch of humor (2-3 sentences)
-- "hint": search tips — where to look for it, what terrain/altitude, how to recognize it from a distance (1-2 sentences)
-
-The description should be informative but also fun and slightly humorous — a joke, a pun, a witty remark about the plant or the user's suffering. Keep it light but still useful.
+- "description": A surprising or little-known fact that makes this plant fascinating (2-3 sentences in ${langName}). Focus on ONE curiosity: a cultural or historical anecdote, an unusual survival trick, a weird use, a record, or a fun etymology. Avoid generic descriptions like "it's a common plant" — make the reader think "wow, I didn't know that!".
+- "hint": Concrete visual clues to find and recognize this plant in the field (1-2 sentences in ${langName}). Mention leaf shape, flower color/size, typical height, and WHERE exactly to look (roadside, walls, shade, near water, forest edge...). If it can be confused with another plant, explain how to tell them apart.
 
 Respond ONLY with a JSON object (no markdown, no backticks, no explanation), with this exact format:
 {
@@ -203,8 +205,8 @@ Respond ONLY with a JSON object (no markdown, no backticks, no explanation), wit
       "commonName": "name in ${langName}",
       "scientificName": "Latin name",
       "rarity": "common",
-      "description": "Interesting facts in ${langName} (2-3 sentences). What it is, what it looks like, what it's used for, a fun fact or touch of humor.",
-      "hint": "Search tips in ${langName} (1-2 sentences). Where to look, what terrain, how to spot it."
+      "description": "...",
+      "hint": "..."
     }
   ]
 }`;
