@@ -179,11 +179,11 @@ export function missionRouter(prisma: PrismaClient): Router {
         await prisma.suggestedPlant.update({ where: { id: plantId }, data: backfill });
       }
 
-      // Award points based on taxonomic similarity (100/75/40/0)
+      // Store pending similarity on plant (awarded when photo is actually uploaded)
       if (result.similarity > 0) {
-        await prisma.user.update({
-          where: { id: req.userId! },
-          data: { points: { increment: result.similarity } },
+        await prisma.suggestedPlant.update({
+          where: { id: plantId },
+          data: { pendingSimilarity: result.similarity },
         });
       }
 
@@ -242,9 +242,22 @@ export function missionRouter(prisma: PrismaClient): Router {
 
       const url = await uploadPhoto(file.buffer, plantId);
 
+      // Award pending similarity points and store on photo (for deduction on delete)
+      const similarity = plant.pendingSimilarity || 0;
       const photo = await prisma.plantPhoto.create({
-        data: { url, source: 'user', plantId },
+        data: { url, source: 'user', plantId, similarity },
       });
+
+      if (similarity > 0) {
+        await prisma.user.update({
+          where: { id: req.userId! },
+          data: { points: { increment: similarity } },
+        });
+        await prisma.suggestedPlant.update({
+          where: { id: plantId },
+          data: { pendingSimilarity: 0 },
+        });
+      }
 
       res.status(201).json(photo);
     } catch (error) {
@@ -394,12 +407,23 @@ export function missionRouter(prisma: PrismaClient): Router {
       }
 
       // Delete photos from Cloudinary
-      for (const photo of plant.photos.filter(p => p.source === 'user')) {
+      const userPhotos = plant.photos.filter(p => p.source === 'user');
+      for (const photo of userPhotos) {
         await deletePhoto(photo.url);
       }
 
+      // Deduct points earned from all user photos of this plant
+      const totalSimilarity = userPhotos.reduce((sum, p) => sum + p.similarity, 0);
+
       // Cascade: deleting the plant also deletes its PlantPhoto rows
       await prisma.suggestedPlant.delete({ where: { id: plantId } });
+
+      if (totalSimilarity > 0) {
+        await prisma.user.update({
+          where: { id: req.userId! },
+          data: { points: { decrement: totalSimilarity } },
+        });
+      }
 
       res.status(204).send();
     } catch (error) {
@@ -430,6 +454,14 @@ export function missionRouter(prisma: PrismaClient): Router {
 
       await deletePhoto(photo.url);
       await prisma.plantPhoto.deleteMany({ where: { id: photoId } });
+
+      // Deduct points that were earned from this photo
+      if (photo.similarity > 0) {
+        await prisma.user.update({
+          where: { id: req.userId! },
+          data: { points: { decrement: photo.similarity } },
+        });
+      }
 
       res.status(204).send();
     } catch (error) {
@@ -462,14 +494,16 @@ export function missionRouter(prisma: PrismaClient): Router {
     try {
       const id = parseInt(req.params['id']);
 
-      // Fetch user photos before cascade delete so we can clean up Cloudinary
+      // Fetch user photos before cascade delete so we can clean up Cloudinary + deduct points
       const userPhotos = await prisma.plantPhoto.findMany({
         where: {
           source: 'user',
           plant: { mission: { id, userId: req.userId! } },
         },
-        select: { url: true },
+        select: { url: true, similarity: true },
       });
+
+      const totalSimilarity = userPhotos.reduce((sum, p) => sum + p.similarity, 0);
 
       const result = await prisma.mission.deleteMany({
         where: { id, userId: req.userId! },
@@ -477,6 +511,14 @@ export function missionRouter(prisma: PrismaClient): Router {
       if (result.count === 0) {
         res.status(404).json({ error: 'Mission not found' });
         return;
+      }
+
+      // Deduct points earned from all photos in this mission
+      if (totalSimilarity > 0) {
+        await prisma.user.update({
+          where: { id: req.userId! },
+          data: { points: { decrement: totalSimilarity } },
+        });
       }
 
       // Clean up Cloudinary (best-effort, don't fail the request)

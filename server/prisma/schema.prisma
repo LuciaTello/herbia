@@ -80,6 +80,7 @@ model SuggestedPlant {
   genus          String    @default("")
   family         String    @default("")
   source         String    @default("ai")   // "ai" | "user"
+  pendingSimilarity Int    @default(0)      @map("pending_similarity")  // temp: similarity from last identify, consumed on upload
   found          Boolean   @default(false)
   foundAt        DateTime?
 
@@ -99,11 +100,12 @@ model SuggestedPlant {
 
 // A photo for a plant, fetched from Wikipedia or iNaturalist
 model PlantPhoto {
-  id       Int    @id @default(autoincrement())
-  url      String
-  source   String   // "wikipedia" | "inaturalist"
-  plantId  Int    @map("plant_id")
-  plant    SuggestedPlant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  id         Int    @id @default(autoincrement())
+  url        String
+  source     String   // "wikipedia" | "inaturalist" | "user"
+  similarity Int    @default(0)  // points earned for this photo (deducted on delete)
+  plantId    Int    @map("plant_id")
+  plant      SuggestedPlant @relation(fields: [plantId], references: [id], onDelete: Cascade)
 
   @@map("plant_photos")
 }

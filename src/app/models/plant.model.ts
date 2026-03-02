@@ -3,6 +3,7 @@ export interface PlantPhoto {
   id?: number;
   url: string;
   source: string;
+  similarity?: number;
 }
 
 // Plant: what the LLM returns (a suggestion, no id yet)

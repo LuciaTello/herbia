@@ -318,7 +318,6 @@ export class MyMissionsPage implements OnInit {
     try {
       const result = await this.missionService.identifyPlant(plantId, file);
       this.identifyResult.set(result);
-      if (result.similarity > 0) this.auth.points.update(p => p + result.similarity);
     } catch {
       await this.confirmUpload();
     } finally {
@@ -344,7 +343,6 @@ export class MyMissionsPage implements OnInit {
       try {
         const result = await this.missionService.identifyPlant(plantId, file);
         this.identifyResult.set(result);
-        if (result.similarity > 0) this.auth.points.update(p => p + result.similarity);
       } catch {
         await this.confirmUpload();
       } finally {
@@ -368,8 +366,9 @@ export class MyMissionsPage implements OnInit {
     this.identifyResult.set(null);
     this.uploadingPhotoId.set(plantId);
     try {
-      // Upload photo — backend auto-marks as found
-      await this.missionService.uploadPlantPhoto(plantId, file);
+      // Upload photo — backend awards points and auto-marks as found
+      const photo = await this.missionService.uploadPlantPhoto(plantId, file);
+      if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
       // Optimistic update: mark found locally
       this.missionService.markPlantFoundLocally(plantId);
       await this.checkAutoComplete();
@@ -425,7 +424,11 @@ export class MyMissionsPage implements OnInit {
   async deletePhoto(photoId: number): Promise<void> {
     const ok = await this.confirmService.confirm(this.i18n.t().confirm.deletePhoto);
     if (!ok) return;
+    // Find the photo's similarity before deleting (to deduct points locally)
+    const photo = this.missions().flatMap(m => m.plants).flatMap(p => p.photos).find(p => p.id === photoId);
+    const similarity = photo?.similarity ?? 0;
     await this.missionService.deletePlantPhoto(photoId);
+    if (similarity > 0) this.auth.points.update(p => Math.max(0, p - similarity));
   }
 
   async markFound(plantId: number): Promise<void> {

@@ -71,6 +71,15 @@ app.use('/api/collection', authMiddleware, collectionRouter(prisma));
 app.use('/api/missions', authMiddleware, missionRouter(prisma));
 app.use('/api/friends', authMiddleware, friendRouter(prisma));
 
+// --- Health endpoint (public, no auth) ---
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
+// --- Self-ping to prevent Render free tier cold start ---
+if (process.env['RENDER_EXTERNAL_URL']) {
+  const url = `${process.env['RENDER_EXTERNAL_URL']}/api/health`;
+  setInterval(() => fetch(url).catch(() => {}), 14 * 60 * 1000);
+}
+
 // --- Start server (like SpringApplication.run()) ---
 
 app.listen(port, () => {

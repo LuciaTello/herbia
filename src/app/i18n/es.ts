@@ -231,7 +231,7 @@ export const ES: Translations = {
   confirm: {
     cancel: 'Cancelar',
     confirm: 'Eliminar',
-    deletePhoto: '¿Segura que quieres borrar esta foto?',
+    deletePhoto: '¿Segura que quieres borrar esta foto? Se descontarán los puntos asociados.',
     deleteMission: '¿Segura que quieres borrar esta misión? Se perderán las plantas y fotos asociadas.',
     deleteUserPlant: '¿Segura que quieres borrar esta planta y sus fotos?',
     removePlant: '¿Segura que quieres quitar esta planta de tu colección?',

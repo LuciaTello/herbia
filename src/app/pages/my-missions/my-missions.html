@@ -227,7 +227,7 @@
                       <span class="points-badge">{{ i18n.t().myMissions.pointsEarned(identifyResult()!.similarity) }}</span>
                     }
                     <div class="identify-actions">
-                      @if (identifyResult()!.match) {
+                      @if (identifyResult()!.match || identifyResult()!.similarity > 0) {
                         <button class="identify-btn confirm" (click)="confirmUpload()">
                           {{ i18n.t().myMissions.identifyUpload }}
                         </button>
@@ -273,7 +273,7 @@
                       <span class="points-badge">{{ i18n.t().myMissions.pointsEarned(identifyResult()!.similarity) }}</span>
                     }
                     <div class="identify-actions">
-                      @if (identifyResult()!.match) {
+                      @if (identifyResult()!.match || identifyResult()!.similarity > 0) {
                         <button class="identify-btn confirm" (click)="confirmUpload()">
                           {{ i18n.t().myMissions.identifyUpload }}
                         </button>
