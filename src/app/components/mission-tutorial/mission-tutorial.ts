@@ -29,9 +29,9 @@ export class MissionTutorialComponent {
   protected readonly totalSlides = this.slides.length;
 
   protected readonly plantImages = [
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Single_lavender_flower02.jpg/160px-Single_lavender_flower02.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Lavandula_stoechas_1.jpg/160px-Lavandula_stoechas_1.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Mentha_spicata_Spearmint_%E0%B4%AA%E0%B5%81%E0%B4%A4%E0%B4%BF%E0%B4%A8.jpg/160px-Mentha_spicata_Spearmint_%E0%B4%AA%E0%B5%81%E0%B4%A4%E0%B4%BF%E0%B4%A8.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Single_lavender_flower02.jpg/250px-Single_lavender_flower02.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Lavandula_stoechas_1.JPG/250px-Lavandula_stoechas_1.JPG',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Mint_leaves_%28Mentha_spicata%29.jpg/250px-Mint_leaves_%28Mentha_spicata%29.jpg',
   ];
 
   private touchStartX = 0;
