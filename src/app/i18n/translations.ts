@@ -165,6 +165,14 @@ export interface Translations {
     emailTaken: string;
     usernameTaken: string;
   };
+  confirm: {
+    cancel: string;
+    confirm: string;
+    deletePhoto: string;
+    deleteMission: string;
+    deleteUserPlant: string;
+    removePlant: string;
+  };
 }
 
 export type Lang = 'es' | 'fr';

@@ -7,7 +7,7 @@ import { GoogleMapsLoaderService } from '../../services/google-maps-loader.servi
   imports: [GoogleMap, MapPolyline],
   template: `
     @if (ready() && routePath().length) {
-      <google-map width="100%" height="400px" [center]="center()" [zoom]="6"
+      <google-map width="100%" height="400px" [center]="center()" [zoom]="zoom()"
                   (mapInitialized)="onMapReady()">
         <map-polyline [path]="routePath()" [options]="polylineOptions" />
       </google-map>
@@ -31,6 +31,7 @@ export class RouteMapComponent implements OnDestroy {
 
   protected readonly ready = signal(false);
   protected readonly center = signal<google.maps.LatLngLiteral>({ lat: 40, lng: -3 });
+  protected readonly zoom = signal(12);
   protected readonly routePath = signal<google.maps.LatLngLiteral[]>([]);
 
   @ViewChild(GoogleMap) private googleMap?: GoogleMap;
@@ -91,6 +92,7 @@ export class RouteMapComponent implements OnDestroy {
           if (path.length) {
             const mid = path[Math.floor(path.length / 2)];
             this.center.set(mid);
+            this.fitToRoute(path);
           }
         });
       },
@@ -98,11 +100,14 @@ export class RouteMapComponent implements OnDestroy {
   }
 
   protected onMapReady(): void {
-    const path = this.routePath();
+    this.fitToRoute(this.routePath());
+  }
+
+  private fitToRoute(path: google.maps.LatLngLiteral[]): void {
     if (!path.length || !this.googleMap?.googleMap) return;
     const bounds = new google.maps.LatLngBounds();
     for (const pt of path) bounds.extend(pt);
-    this.googleMap.googleMap.fitBounds(bounds);
+    this.googleMap.googleMap.fitBounds(bounds, { top: 30, right: 30, bottom: 30, left: 30 });
   }
 
   ngOnDestroy(): void {

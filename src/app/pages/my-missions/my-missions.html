@@ -135,7 +135,7 @@
 
     <div class="mission-progress">
       <p class="progress-text">
-        {{ i18n.t().myMissions.summary(foundCount(mission.plants)) }}
+        {{ auth.points() }} {{ i18n.t().level.pointsLabel }}
       </p>
     </div>
 
@@ -243,9 +243,51 @@
                   </div>
                 }
               } @else {
-                <button class="found-button" (click)="markFound(plant.id)">
-                  {{ i18n.t().myMissions.markFound }}
-                </button>
+                @if (identifying() === plant.id) {
+                  <span class="uploading-badge">{{ i18n.t().myMissions.identifying }}</span>
+                } @else if (uploadingPhotoId() === plant.id) {
+                  <span class="uploading-badge">{{ i18n.t().myMissions.uploading }}</span>
+                } @else {
+                  <button class="add-photo-button" (click)="pickPhoto(plant.id)">
+                    &#x1F4F7; {{ i18n.t().myMissions.addPhoto }}
+                  </button>
+                }
+                @if (identifyResult() && pendingPlantId() === plant.id) {
+                  <div class="identify-banner" [class.match]="identifyResult()!.match" [class.no-match]="!identifyResult()!.match">
+                    @if (identifyResult()!.match) {
+                      <span class="identify-icon">&#10003;</span>
+                      <span class="identify-text">{{ i18n.t().myMissions.identifyMatch(identifyResult()!.identifiedAs, identifyResult()!.score) }}</span>
+                    } @else if (identifyResult()!.identifiedAs) {
+                      <span class="identify-icon">&#9888;</span>
+                      <span class="identify-text">{{ i18n.t().myMissions.identifyNoMatch(identifyResult()!.identifiedAs, identifyResult()!.score) }}</span>
+                      @if (identifyResult()!.similarity === 75) {
+                        <span class="similarity-badge genus-badge">{{ i18n.t().myMissions.sameGenus(identifyResult()!.genus) }}</span>
+                      } @else if (identifyResult()!.similarity === 40) {
+                        <span class="similarity-badge family-badge">{{ i18n.t().myMissions.sameFamily(identifyResult()!.family) }}</span>
+                      }
+                    } @else {
+                      <span class="identify-icon">&#9888;</span>
+                      <span class="identify-text">{{ i18n.t().myMissions.identifyUnknown }}</span>
+                    }
+                    @if (identifyResult()!.similarity > 0) {
+                      <span class="points-badge">{{ i18n.t().myMissions.pointsEarned(identifyResult()!.similarity) }}</span>
+                    }
+                    <div class="identify-actions">
+                      @if (identifyResult()!.match) {
+                        <button class="identify-btn confirm" (click)="confirmUpload()">
+                          {{ i18n.t().myMissions.identifyUpload }}
+                        </button>
+                      } @else {
+                        <button class="identify-btn confirm" (click)="addPendingAsUserPlant()">
+                          {{ i18n.t().myMissions.identifyAddAsOther }}
+                        </button>
+                      }
+                      <button class="identify-btn cancel" (click)="cancelUpload()">
+                        {{ i18n.t().myMissions.identifyCancel }}
+                      </button>
+                    </div>
+                  </div>
+                }
               }
             </div>
           </article>
@@ -338,6 +380,8 @@
     (closeGallery)="closeGallery()"
   />
 }
+
+<app-confirm-popup />
 
 @if (cameraService.showPicker()) {
   <div class="photo-picker-backdrop" (click)="cameraService.pick(null)">

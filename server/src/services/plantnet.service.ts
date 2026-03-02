@@ -37,6 +37,25 @@ function normalize(name: string): string {
   return name.trim().toLowerCase().split(/\s+/).slice(0, 2).join(' ');
 }
 
+/**
+ * Lookup family for a scientific name via iNaturalist taxa API.
+ * Returns the family name or '' if not found.
+ */
+async function lookupFamily(scientificName: string): Promise<string> {
+  try {
+    const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(scientificName)}&rank=species&per_page=1`;
+    const response = await fetch(url, { headers: { 'User-Agent': 'herbia-app' } });
+    if (!response.ok) return '';
+    const data = await response.json();
+    const taxon = data.results?.[0];
+    if (!taxon) return '';
+    const familyAncestor = (taxon.ancestors || []).find((a: any) => a.rank === 'family');
+    return familyAncestor?.name || '';
+  } catch {
+    return '';
+  }
+}
+
 export async function identifyPlant(
   buffer: Buffer,
   mimetype: string,
@@ -78,6 +97,11 @@ export async function identifyPlant(
 
   const expected = normalize(expectedScientificName);
 
+  // Derive genus from scientific name if missing (first word of binomial)
+  if (!expectedGenus && expectedScientificName) {
+    expectedGenus = expectedScientificName.trim().split(/\s+/)[0];
+  }
+
   // Check top 3 results for a genus+species match
   const top3 = data.results.slice(0, 3);
   for (const result of top3) {
@@ -103,8 +127,14 @@ export async function identifyPlant(
   let similarity = 0;
   if (expectedGenus && bestGenus && bestGenus.toLowerCase() === expectedGenus.toLowerCase()) {
     similarity = 75;
-  } else if (expectedFamily && bestFamily && bestFamily.toLowerCase() === expectedFamily.toLowerCase()) {
-    similarity = 40;
+  } else {
+    // Lookup family from iNaturalist if missing
+    if (!expectedFamily && expectedScientificName) {
+      expectedFamily = await lookupFamily(expectedScientificName);
+    }
+    if (expectedFamily && bestFamily && bestFamily.toLowerCase() === expectedFamily.toLowerCase()) {
+      similarity = 40;
+    }
   }
 
   return {

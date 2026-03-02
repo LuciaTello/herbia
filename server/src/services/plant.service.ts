@@ -169,7 +169,6 @@ function buildDescriptionPrompt(
 
   return `You are a botanist with a sharp sense of humor and a love for bad plant puns.
 ${routeContext}
-IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
 
 Here are 5 real plants found along this route:
 ${plantList}
@@ -177,6 +176,10 @@ ${plantList}
 For each plant, write TWO separate fields:
 - "description": A surprising or little-known fact that makes this plant fascinating (2-3 sentences in ${langName}). Focus on ONE curiosity: a cultural or historical anecdote, an unusual survival trick, a weird use, a record, or a fun etymology. Avoid generic descriptions like "it's a common plant" — make the reader think "wow, I didn't know that!".
 - "hint": Concrete visual clues to find and recognize this plant in the field (1-2 sentences in ${langName}). Mention leaf shape, flower color/size, typical height, and WHERE exactly to look (roadside, walls, shade, near water, forest edge...). If it can be confused with another plant, explain how to tell them apart.
+
+STYLE RULES for ${langName} text:
+- Write about the PLANTS, not about the traveler. Do not address or mention the user/traveler in descriptions or hints.
+- If you must refer to a person (only in the routeDescription), use feminine gender.
 
 Write ONLY a JSON object (no markdown, no backticks) with this format:
 {
@@ -209,7 +212,6 @@ function buildPlantPrompt(origin: string, destination: string, lang: string, mon
   return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
 ${routeContext}
 The current month is ${monthName}. Only suggest plants that are visible, blooming, or identifiable during this time of year.
-IMPORTANT: Always use feminine gender when referring to the traveler in ${langName} text.
 ${exclusionBlock}${tooFarBlock}
 
 Suggest exactly 5 plants that can be found along this path in ${monthName}.
@@ -226,6 +228,10 @@ Sort the results from most common to rarest.
 Each plant needs TWO separate text fields:
 - "description": A surprising or little-known fact that makes this plant fascinating (2-3 sentences in ${langName}). Focus on ONE curiosity: a cultural or historical anecdote, an unusual survival trick, a weird use, a record, or a fun etymology. Avoid generic descriptions like "it's a common plant" — make the reader think "wow, I didn't know that!".
 - "hint": Concrete visual clues to find and recognize this plant in the field (1-2 sentences in ${langName}). Mention leaf shape, flower color/size, typical height, and WHERE exactly to look (roadside, walls, shade, near water, forest edge...). If it can be confused with another plant, explain how to tell them apart.
+
+STYLE RULES for ${langName} text:
+- Write about the PLANTS, not about the traveler. Do not address or mention the user/traveler in descriptions or hints.
+- If you must refer to a person (only in the route description field), use feminine gender.
 
 Respond ONLY with a JSON object (no markdown, no backticks, no explanation), with this exact format:
 {
@@ -345,7 +351,14 @@ async function llmOnlyFlow(origin: string, destination: string, lang: string, mo
     return { tooFar: true, description: parsed.description, plants: [] };
   }
 
-  const plants = await enrichPlantsWithPhotos(parsed.plants);
+  // Add genus from scientific name for LLM-generated plants (family will be looked up at identify time)
+  const withGenus = (parsed.plants || []).map((p: any) => ({
+    ...p,
+    genus: p.genus || (p.scientificName ? p.scientificName.trim().split(/\s+/)[0] : ''),
+    family: p.family || '',
+  }));
+
+  const plants = await enrichPlantsWithPhotos(withGenus);
   return { tooFar: false, description: parsed.description, plants };
 }
 

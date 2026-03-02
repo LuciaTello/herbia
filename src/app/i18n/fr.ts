@@ -141,7 +141,7 @@ export const FR: Translations = {
     texts: [
       'Herbia transforme tes trajets en missions botaniques. Dis-nous où tu vas et on te dira quelles plantes poussent sur ton chemin. Il ne te reste qu\'à partir à leur recherche. Spoiler : elles sont partout.',
       'Choisis un trajet entre deux villes ou une zone à explorer. On te préparera une mission avec les espèces que tu peux trouver en chemin — avec photos, indices et niveau de rareté.',
-      'Quand tu trouves une plante, prends-la en photo. Herbia l\'identifiera et tu gagneras des points : espèce exacte = 100 pts, même genre = 75 pts, même famille = 40 pts. Chaque photo compte !',
+      'Quand tu trouves une plante de ta mission, prends-la en photo. Herbia l\'identifiera automatiquement. Tu peux aussi ajouter des plantes qui n\'étaient pas dans la liste — ton herbier s\'enrichit à chaque sortie.',
       'Tes points te font monter de niveau : de 🌱 Graine curieuse à 👑 Reine du jardin. Ajoute des amies pour voir leur niveau et explorer ensemble.',
       'Herbia est un outil ludique et éducatif. Les identifications peuvent contenir des erreurs. Ne consomme et n\'utilise jamais une plante en te basant uniquement sur les informations de cette app. Herbia décline toute responsabilité en cas d\'usage inapproprié des plantes.',
     ],
@@ -151,7 +151,7 @@ export const FR: Translations = {
   },
   missionTip: {
     title: 'Avant de commencer',
-    text: 'Les plantes que tu vois ici sont choisies d\'après ce qu\'on peut trouver dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu prends une photo, Herbia identifiera la plante : espèce exacte = 100 pts, même genre = 75 pts, même famille = 40 pts. Bonne chance !',
+    text: 'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu trouves une plante, appuie sur « Ajouter photo » et prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points :\n\n🎯 Espèce exacte → 100 pts\n🌿 Même genre → 75 pts\n🌳 Même famille → 40 pts\n\nTu peux aussi ajouter des plantes qui ne sont pas dans la liste avec le bouton « Ajouter d\'autres plantes ». Chaque espèce peut avoir jusqu\'à 4 photos.\n\nBonne chance, voyageuse !',
     dismiss: 'Compris !',
   },
   level: {
@@ -198,5 +198,13 @@ export const FR: Translations = {
     saved: 'Enregistré !',
     emailTaken: 'Cet email est déjà utilisé',
     usernameTaken: 'Ce pseudo est déjà utilisé',
+  },
+  confirm: {
+    cancel: 'Annuler',
+    confirm: 'Supprimer',
+    deletePhoto: 'Tu veux vraiment supprimer cette photo ?',
+    deleteMission: 'Tu veux vraiment supprimer cette mission ? Les plantes et photos associées seront perdues.',
+    deleteUserPlant: 'Tu veux vraiment supprimer cette plante et ses photos ?',
+    removePlant: 'Tu veux vraiment retirer cette plante de ta collection ?',
   },
 };

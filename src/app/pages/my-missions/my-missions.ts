@@ -13,21 +13,24 @@ import { getContinent, getContinentName, countryFlag } from '../../utils/contine
 import { getCountryName } from '../../utils/country-names';
 import { CameraService } from '../../services/camera.service';
 import { CameraSource } from '@capacitor/camera';
+import { ConfirmService } from '../../components/confirm-popup/confirm.service';
+import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
 
 type MapView = 'map' | 'countries' | 'regions' | 'missions';
 
 @Component({
   selector: 'app-my-missions',
-  imports: [RouterLink, DatePipe, NgTemplateOutlet, PhotoGalleryComponent, WorldMapComponent],
+  imports: [RouterLink, DatePipe, NgTemplateOutlet, PhotoGalleryComponent, WorldMapComponent, ConfirmPopupComponent],
   templateUrl: './my-missions.html',
   styleUrl: './my-missions.css',
 })
 export class MyMissionsPage implements OnInit {
   private readonly missionService = inject(MissionService);
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   protected readonly cameraService = inject(CameraService);
   protected readonly i18n = inject(I18nService);
+  private readonly confirmService = inject(ConfirmService);
   protected readonly missions = this.missionService.getMissions();
   protected readonly loading = signal(true);
   protected readonly expandedId = signal<number | null>(null);
@@ -365,7 +368,11 @@ export class MyMissionsPage implements OnInit {
     this.identifyResult.set(null);
     this.uploadingPhotoId.set(plantId);
     try {
+      // Upload photo — backend auto-marks as found
       await this.missionService.uploadPlantPhoto(plantId, file);
+      // Optimistic update: mark found locally
+      this.missionService.markPlantFoundLocally(plantId);
+      await this.checkAutoComplete();
     } catch {
       this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
       setTimeout(() => this.addPlantMessage.set(null), 4000);
@@ -416,6 +423,8 @@ export class MyMissionsPage implements OnInit {
   }
 
   async deletePhoto(photoId: number): Promise<void> {
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deletePhoto);
+    if (!ok) return;
     await this.missionService.deletePlantPhoto(photoId);
   }
 
@@ -432,10 +441,14 @@ export class MyMissionsPage implements OnInit {
   }
 
   async deleteMission(id: number): Promise<void> {
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deleteMission);
+    if (!ok) return;
     await this.missionService.deleteMission(id);
   }
 
   async deleteUserPlant(plantId: number): Promise<void> {
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deleteUserPlant);
+    if (!ok) return;
     await this.missionService.deleteUserPlant(plantId);
   }
 

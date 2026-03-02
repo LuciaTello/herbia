@@ -171,6 +171,14 @@ export function missionRouter(prisma: PrismaClient): Router {
 
       const result = await identifyPlant(file.buffer, file.mimetype, plant.scientificName, plant.genus, plant.family);
 
+      // Backfill genus/family in DB if they were missing (avoids repeated lookups)
+      const backfill: Record<string, string> = {};
+      if (!plant.genus && result.genus) backfill.genus = plant.scientificName.trim().split(/\s+/)[0];
+      if (!plant.family && result.family) backfill.family = result.family;
+      if (Object.keys(backfill).length) {
+        await prisma.suggestedPlant.update({ where: { id: plantId }, data: backfill });
+      }
+
       // Award points based on taxonomic similarity (100/75/40/0)
       if (result.similarity > 0) {
         await prisma.user.update({
@@ -210,9 +218,14 @@ export function missionRouter(prisma: PrismaClient): Router {
         res.status(404).json({ error: 'Plant not found' });
         return;
       }
+
+      // Auto-mark as found when uploading a photo
       if (!plant.found) {
-        res.status(400).json({ error: 'Plant must be marked as found before adding a photo' });
-        return;
+        const now = new Date();
+        await prisma.suggestedPlant.updateMany({
+          where: { scientificName: plant.scientificName, mission: { userId: req.userId! }, found: false },
+          data: { found: true, foundAt: now, foundInMissionId: plant.missionId },
+        });
       }
 
       // Count user photos GLOBALLY for this species (across all missions of this user)
@@ -448,6 +461,16 @@ export function missionRouter(prisma: PrismaClient): Router {
   router.delete('/:id', async (req, res) => {
     try {
       const id = parseInt(req.params['id']);
+
+      // Fetch user photos before cascade delete so we can clean up Cloudinary
+      const userPhotos = await prisma.plantPhoto.findMany({
+        where: {
+          source: 'user',
+          plant: { mission: { id, userId: req.userId! } },
+        },
+        select: { url: true },
+      });
+
       const result = await prisma.mission.deleteMany({
         where: { id, userId: req.userId! },
       });
@@ -455,6 +478,10 @@ export function missionRouter(prisma: PrismaClient): Router {
         res.status(404).json({ error: 'Mission not found' });
         return;
       }
+
+      // Clean up Cloudinary (best-effort, don't fail the request)
+      await Promise.allSettled(userPhotos.map(p => deletePhoto(p.url)));
+
       res.status(204).send();
     } catch (error) {
       console.error('Error deleting mission:', error);

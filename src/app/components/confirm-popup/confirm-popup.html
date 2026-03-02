@@ -1,0 +1,15 @@
+@if (confirm.pending()) {
+  <div class="confirm-backdrop" (click)="confirm.cancel()">
+    <div class="confirm-dialog" (click)="$event.stopPropagation()">
+      <p class="confirm-message">{{ confirm.pending()!.message }}</p>
+      <div class="confirm-actions">
+        <button class="confirm-btn cancel" (click)="confirm.cancel()">
+          {{ i18n.t().confirm.cancel }}
+        </button>
+        <button class="confirm-btn delete" (click)="confirm.accept()">
+          {{ i18n.t().confirm.confirm }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

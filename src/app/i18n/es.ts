@@ -141,7 +141,7 @@ export const ES: Translations = {
     texts: [
       'Herbia convierte tus viajes en misiones botánicas. Dinos adónde vas y te diremos qué plantas crecen en tu camino. Solo tienes que salir a buscarlas. Spoiler: están por todas partes.',
       'Elige una ruta entre dos ciudades o una zona que quieras explorar. Te prepararemos una misión con las especies que puedes encontrar por el camino — con fotos, pistas y nivel de rareza.',
-      'Cuando encuentres una planta, sácale una foto. Herbia la identificará y ganarás puntos: especie exacta = 100 pts, mismo género = 75 pts, misma familia = 40 pts. ¡Cada foto cuenta!',
+      'Cuando encuentres una planta de tu misión, sácale una foto. Herbia la identificará automáticamente. También puedes añadir plantas que no estaban en la lista — tu herbario se enriquece con cada salida.',
       'Tus puntos te hacen subir de nivel: de 🌱 Semilla curiosa a 👑 Reina del jardín. Añade amigas para ver su nivel y explorar juntas.',
       'Herbia es una herramienta lúdica y educativa. Las identificaciones pueden contener errores. No consumas ni utilices ninguna planta basándote únicamente en la información de esta app. Herbia no se hace responsable del uso indebido de las plantas.',
     ],
@@ -151,7 +151,7 @@ export const ES: Translations = {
   },
   missionTip: {
     title: 'Antes de empezar',
-    text: 'Las plantas que ves aquí se eligen según lo que se puede encontrar en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando saques una foto, Herbia identificará la planta: especie exacta = 100 pts, mismo género = 75 pts, misma familia = 40 pts. ¡Buena suerte!',
+    text: 'Las plantas que ves aquí se eligen según lo que crece en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando encuentres una planta, toca «Añadir foto» y sácale una foto. Herbia la identificará automáticamente y ganarás puntos:\n\n🎯 Especie exacta → 100 pts\n🌿 Mismo género → 75 pts\n🌳 Misma familia → 40 pts\n\nTambién puedes añadir plantas que no están en la lista con el botón «Añadir otras plantas». Cada especie admite hasta 4 fotos.\n\n¡Buena suerte, viajera!',
     dismiss: '¡Entendido!',
   },
   level: {
@@ -198,5 +198,13 @@ export const ES: Translations = {
     saved: '¡Guardado!',
     emailTaken: 'Este email ya está en uso',
     usernameTaken: 'Este pseudo ya está en uso',
+  },
+  confirm: {
+    cancel: 'Cancelar',
+    confirm: 'Eliminar',
+    deletePhoto: '¿Segura que quieres borrar esta foto?',
+    deleteMission: '¿Segura que quieres borrar esta misión? Se perderán las plantas y fotos asociadas.',
+    deleteUserPlant: '¿Segura que quieres borrar esta planta y sus fotos?',
+    removePlant: '¿Segura que quieres quitar esta planta de tu colección?',
   },
 };

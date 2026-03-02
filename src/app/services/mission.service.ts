@@ -65,6 +65,26 @@ export class MissionService {
     ).catch(() => {});
   }
 
+  markPlantFoundLocally(plantId: number): void {
+    const scientificName = this.missions()
+      .flatMap(m => m.plants)
+      .find(p => p.id === plantId)?.scientificName;
+
+    if (scientificName) {
+      const now = new Date().toISOString();
+      this.missions.update(list =>
+        list.map(mission => ({
+          ...mission,
+          plants: mission.plants.map(p =>
+            p.scientificName === scientificName
+              ? { ...p, found: true, foundAt: now }
+              : p
+          ),
+        }))
+      );
+    }
+  }
+
   async identifyPlant(plantId: number, file: File): Promise<IdentifyResult> {
     const formData = new FormData();
     formData.append('photo', file);

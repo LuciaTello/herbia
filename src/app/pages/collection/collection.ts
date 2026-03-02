@@ -9,12 +9,14 @@ import { WorldMapComponent } from '../../components/world-map/world-map';
 import { getRarity } from '../../utils/rarity';
 import { getContinent, getContinentName, countryFlag } from '../../utils/continents';
 import { getCountryName } from '../../utils/country-names';
+import { ConfirmService } from '../../components/confirm-popup/confirm.service';
+import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
 
 type CollectionView = 'map' | 'countries' | 'regions' | 'plants';
 
 @Component({
   selector: 'app-collection',
-  imports: [RouterLink, PhotoGalleryComponent, WorldMapComponent],
+  imports: [RouterLink, PhotoGalleryComponent, WorldMapComponent, ConfirmPopupComponent],
   templateUrl: './collection.html',
   styleUrl: './collection.css',
 })
@@ -22,6 +24,7 @@ export class CollectionPage implements OnInit {
   private readonly collectionService = inject(CollectionService);
   private readonly missionService = inject(MissionService);
   protected readonly i18n = inject(I18nService);
+  private readonly confirmService = inject(ConfirmService);
   protected readonly collection = this.collectionService.getCollection();
   protected readonly loading = signal(true);
   protected readonly galleryImages = signal<string[]>([]);
@@ -236,6 +239,8 @@ export class CollectionPage implements OnInit {
   }
 
   async deletePhoto(photoId: number, plantId: number): Promise<void> {
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deletePhoto);
+    if (!ok) return;
     await this.missionService.deletePlantPhoto(photoId);
     this.collectionService.getCollection().update(list =>
       list.map(p =>
@@ -247,6 +252,8 @@ export class CollectionPage implements OnInit {
   }
 
   async removePlant(id: number): Promise<void> {
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.removePlant);
+    if (!ok) return;
     await this.collectionService.removePlant(id);
   }
 }
