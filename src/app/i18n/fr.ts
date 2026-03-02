@@ -154,6 +154,31 @@ export const FR: Translations = {
     text: 'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu trouves une plante, appuie sur « Ajouter photo » et prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points :\n\n🎯 Espèce exacte → 100 pts\n🌿 Même genre → 75 pts\n🌳 Même famille → 40 pts\n\nTu peux aussi ajouter des plantes qui ne sont pas dans la liste avec le bouton « Ajouter d\'autres plantes ». Chaque espèce peut avoir jusqu\'à 4 photos.\n\nBonne chance, voyageuse !',
     dismiss: 'Compris !',
   },
+  missionTutorial: {
+    titles: [
+      'Comment ça marche ?',
+      'Identifie des plantes',
+      'Espèce exacte — 100 pts',
+      'Même genre — 75 pts',
+      'Même famille — 40 pts',
+      'Tes trouvailles',
+    ],
+    texts: [
+      'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !',
+      'Quand tu trouves une plante, prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points.',
+      'Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
+      'Le genre regroupe des espèces très proches. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
+      'La famille regroupe des genres apparentés. Par exemple, la lavande et la menthe appartiennent à la famille des Lamiaceae.',
+      'Tu peux aussi ajouter des plantes qui ne sont pas dans la liste. Chaque espèce peut avoir jusqu\'à 4 photos — qu\'elle soit suggérée, même genre, même famille ou trouvaille libre.',
+    ],
+    imageLabels: [
+      'Lavandula angustifolia',
+      'Lavandula stoechas',
+      'Mentha spicata',
+    ],
+    next: 'Suivant',
+    done: 'C\'est parti !',
+  },
   level: {
     back: 'Retour \u00e0 l\'accueil',
     title: 'Mon niveau',
@@ -201,6 +226,7 @@ export const FR: Translations = {
     saved: 'Enregistré !',
     emailTaken: 'Cet email est déjà utilisé',
     usernameTaken: 'Ce pseudo est déjà utilisé',
+    viewTutorial: 'Voir le tutoriel de mission',
   },
   confirm: {
     cancel: 'Annuler',

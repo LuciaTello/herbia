@@ -1,0 +1,40 @@
+<div class="tutorial-overlay"
+     (touchstart)="onTouchStart($event)"
+     (touchend)="onTouchEnd($event)">
+  <div class="tutorial-content">
+    <div class="slide">
+      <span class="emoji">{{ slides[currentSlide()].emoji }}</span>
+      <h2>{{ i18n.t().missionTutorial.titles[currentSlide()] }}</h2>
+      <p>{{ i18n.t().missionTutorial.texts[currentSlide()] }}</p>
+
+      @if (slides[currentSlide()].imageIndices.length > 0) {
+        <div class="tutorial-images">
+          @for (idx of slides[currentSlide()].imageIndices; track idx) {
+            <div class="tutorial-image">
+              <img [src]="plantImages[idx]" [alt]="i18n.t().missionTutorial.imageLabels[idx]" />
+              <span class="caption">{{ i18n.t().missionTutorial.imageLabels[idx] }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="dots">
+      @for (slide of slides; track $index) {
+        <button
+          class="dot"
+          [class.active]="$index === currentSlide()"
+          (click)="goTo($index)"
+        ></button>
+      }
+    </div>
+
+    <button class="next-button" (click)="next()">
+      @if (currentSlide() < totalSlides - 1) {
+        {{ i18n.t().missionTutorial.next }}
+      } @else {
+        {{ i18n.t().missionTutorial.done }}
+      }
+    </button>
+  </div>
+</div>

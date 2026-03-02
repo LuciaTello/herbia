@@ -10,11 +10,12 @@ import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { PlaceAutocompleteDirective } from '../../directives/place-autocomplete.directive';
 import { RouteMapComponent } from '../../components/route-map/route-map';
+import { MissionTutorialComponent } from '../../components/mission-tutorial/mission-tutorial';
 import { getRarity } from '../../utils/rarity';
 
 @Component({
   selector: 'app-route',
-  imports: [FormsModule, RouterLink, PhotoGalleryComponent, PlaceAutocompleteDirective, RouteMapComponent],
+  imports: [FormsModule, RouterLink, PhotoGalleryComponent, PlaceAutocompleteDirective, RouteMapComponent, MissionTutorialComponent],
   templateUrl: './route.html',
   styleUrl: './route.css',
 })
@@ -144,7 +145,7 @@ export class RoutePage {
   }
 
   protected onStartMissionClick(): void {
-    if (this.auth.missionTipCount() < 4) {
+    if (this.auth.missionTipCount() < 1) {
       this.showMissionTip.set(true);
       return;
     }

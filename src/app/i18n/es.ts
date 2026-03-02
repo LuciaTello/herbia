@@ -154,6 +154,31 @@ export const ES: Translations = {
     text: 'Las plantas que ves aquí se eligen según lo que crece en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando encuentres una planta, toca «Añadir foto» y sácale una foto. Herbia la identificará automáticamente y ganarás puntos:\n\n🎯 Especie exacta → 100 pts\n🌿 Mismo género → 75 pts\n🌳 Misma familia → 40 pts\n\nTambién puedes añadir plantas que no están en la lista con el botón «Añadir otras plantas». Cada especie admite hasta 4 fotos.\n\n¡Buena suerte, viajera!',
     dismiss: '¡Entendido!',
   },
+  missionTutorial: {
+    titles: [
+      '¿Cómo funciona?',
+      'Identifica plantas',
+      'Especie exacta — 100 pts',
+      'Mismo género — 75 pts',
+      'Misma familia — 40 pts',
+      'Tus hallazgos',
+    ],
+    texts: [
+      'Las plantas que ves aquí se eligen según lo que crece en esta zona y época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!',
+      'Cuando encuentres una planta, sácale una foto. Herbia la identificará automáticamente y ganarás puntos.',
+      'Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
+      'El género agrupa especies muy parecidas. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
+      'La familia agrupa géneros emparentados. Por ejemplo, la lavanda y la menta pertenecen a la familia Lamiaceae.',
+      'También puedes añadir plantas que no están en la lista. Cada especie admite hasta 4 fotos — ya sea sugerida, mismo género, misma familia o hallazgo libre.',
+    ],
+    imageLabels: [
+      'Lavandula angustifolia',
+      'Lavandula stoechas',
+      'Mentha spicata',
+    ],
+    next: 'Siguiente',
+    done: '¡Empezar!',
+  },
   level: {
     back: 'Volver al inicio',
     title: 'Mi nivel',
@@ -201,6 +226,7 @@ export const ES: Translations = {
     saved: '¡Guardado!',
     emailTaken: 'Este email ya está en uso',
     usernameTaken: 'Este pseudo ya está en uso',
+    viewTutorial: 'Ver tutorial de misión',
   },
   confirm: {
     cancel: 'Cancelar',

@@ -50,3 +50,11 @@
     }
   </button>
 </form>
+
+<button class="tutorial-btn" (click)="openTutorial()">
+  {{ i18n.t().profile.viewTutorial }}
+</button>
+
+@if (showTutorial()) {
+  <app-mission-tutorial (done)="closeTutorial()" />
+}

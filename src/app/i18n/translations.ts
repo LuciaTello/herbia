@@ -127,6 +127,13 @@ export interface Translations {
     text: string;
     dismiss: string;
   };
+  missionTutorial: {
+    titles: string[];
+    texts: string[];
+    imageLabels: string[];
+    next: string;
+    done: string;
+  };
   level: {
     back: string;
     title: string;
@@ -167,6 +174,7 @@ export interface Translations {
     saved: string;
     emailTaken: string;
     usernameTaken: string;
+    viewTutorial: string;
   };
   confirm: {
     cancel: string;

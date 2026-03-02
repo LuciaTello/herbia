@@ -109,3 +109,20 @@ h2 {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.tutorial-btn {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  border: 2px solid #2d7d46;
+  border-radius: 8px;
+  background: white;
+  color: #2d7d46;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tutorial-btn:hover {
+  background: #f0f9f0;
+}
