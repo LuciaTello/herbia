@@ -232,6 +232,7 @@ h2 {
 }
 
 .profile-card {
+  position: relative;
   background: white;
   border-radius: 16px;
   padding: 2rem;
@@ -325,13 +326,24 @@ h2 {
   color: #636e72;
 }
 
-.remove-btn {
-  padding: 0.5rem 1.25rem;
+.profile-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
   background: none;
-  color: #d63031;
-  border: 1px solid #d63031;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  border: none;
+  font-size: 1.5rem;
+  color: #b2bec3;
   cursor: pointer;
-  margin-top: 0.25rem;
+  line-height: 1;
+  padding: 0.25rem;
+}
+
+.remove-link {
+  background: none;
+  border: none;
+  color: #b2bec3;
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
 }

@@ -101,6 +101,7 @@
 @if (selectedFriend()) {
   <div class="profile-overlay" (click)="closeFriend()">
     <div class="profile-card" (click)="$event.stopPropagation()">
+      <button class="profile-close" (click)="closeFriend()">&times;</button>
       @if (selectedFriend()!.photoUrl) {
         <img class="profile-avatar" [src]="selectedFriend()!.photoUrl" alt="" />
       } @else {
@@ -127,7 +128,7 @@
           <span class="stat-label">{{ i18n.t().friends.plants }}</span>
         </div>
       </div>
-      <button class="remove-btn" (click)="removeFriend()">{{ i18n.t().friends.remove }}</button>
+      <button class="remove-link" (click)="removeFriend()">{{ i18n.t().friends.remove }}</button>
     </div>
   </div>
 }
