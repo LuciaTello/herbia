@@ -228,6 +228,12 @@ export const FR: Translations = {
     usernameTaken: 'Ce pseudo est déjà utilisé',
     viewTutorial: 'Voir le tutoriel de mission',
   },
+  familyPopup: {
+    title: (name) => `Famille ${name}`,
+    loading: 'Recherche des plantes de cette famille...',
+    empty: 'Aucune plante de cette famille dans la base de données.',
+    close: 'Fermer',
+  },
   confirm: {
     cancel: 'Annuler',
     confirm: 'Supprimer',

@@ -217,7 +217,7 @@
                       @if (identifyResult()!.similarity === 75) {
                         <span class="similarity-badge genus-badge">{{ i18n.t().myMissions.sameGenus(identifyResult()!.genus) }}</span>
                       } @else if (identifyResult()!.similarity === 40) {
-                        <span class="similarity-badge family-badge">{{ i18n.t().myMissions.sameFamily(identifyResult()!.family) }}</span>
+                        <span class="similarity-badge family-badge family-link" (click)="openFamily(identifyResult()!.family)">{{ i18n.t().myMissions.sameFamily(identifyResult()!.family) }}</span>
                       }
                     } @else {
                       <span class="identify-icon">&#9888;</span>
@@ -263,7 +263,7 @@
                       @if (identifyResult()!.similarity === 75) {
                         <span class="similarity-badge genus-badge">{{ i18n.t().myMissions.sameGenus(identifyResult()!.genus) }}</span>
                       } @else if (identifyResult()!.similarity === 40) {
-                        <span class="similarity-badge family-badge">{{ i18n.t().myMissions.sameFamily(identifyResult()!.family) }}</span>
+                        <span class="similarity-badge family-badge family-link" (click)="openFamily(identifyResult()!.family)">{{ i18n.t().myMissions.sameFamily(identifyResult()!.family) }}</span>
                       }
                     } @else {
                       <span class="identify-icon">&#9888;</span>
@@ -382,6 +382,13 @@
 }
 
 <app-confirm-popup />
+
+@if (selectedFamily()) {
+  <app-family-popup
+    [family]="selectedFamily()!"
+    (close)="closeFamily()"
+  />
+}
 
 @if (cameraService.showPicker()) {
   <div class="photo-picker-backdrop" (click)="cameraService.pick(null)">

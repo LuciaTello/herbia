@@ -176,6 +176,12 @@ export interface Translations {
     usernameTaken: string;
     viewTutorial: string;
   };
+  familyPopup: {
+    title: (name: string) => string;
+    loading: string;
+    empty: string;
+    close: string;
+  };
   confirm: {
     cancel: string;
     confirm: string;

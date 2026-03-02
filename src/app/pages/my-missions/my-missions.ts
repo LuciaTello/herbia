@@ -15,12 +15,13 @@ import { CameraService } from '../../services/camera.service';
 import { CameraSource } from '@capacitor/camera';
 import { ConfirmService } from '../../components/confirm-popup/confirm.service';
 import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
+import { FamilyPopupComponent } from '../../components/family-popup/family-popup';
 
 type MapView = 'map' | 'countries' | 'regions' | 'missions';
 
 @Component({
   selector: 'app-my-missions',
-  imports: [RouterLink, DatePipe, NgTemplateOutlet, PhotoGalleryComponent, WorldMapComponent, ConfirmPopupComponent],
+  imports: [RouterLink, DatePipe, NgTemplateOutlet, PhotoGalleryComponent, WorldMapComponent, ConfirmPopupComponent, FamilyPopupComponent],
   templateUrl: './my-missions.html',
   styleUrl: './my-missions.css',
 })
@@ -46,6 +47,7 @@ export class MyMissionsPage implements OnInit {
   protected readonly addPlantMessage = signal<string | null>(null);
   protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
+  protected readonly selectedFamily = signal<string | null>(null);
 
   // Top-level toggle: active missions list vs completed missions map
   protected readonly showCompleted = signal(false);
@@ -473,6 +475,14 @@ export class MyMissionsPage implements OnInit {
         setTimeout(() => this.completedPopup.set(false), 3500);
       }
     }
+  }
+
+  protected openFamily(family: string): void {
+    this.selectedFamily.set(family);
+  }
+
+  protected closeFamily(): void {
+    this.selectedFamily.set(null);
   }
 
   protected unidentifiedPlants(plants: SuggestedPlant[]): SuggestedPlant[] {

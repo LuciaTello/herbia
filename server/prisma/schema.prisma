@@ -68,6 +68,24 @@ model Mission {
   @@map("treks")
 }
 
+// Canonical plant species (one row per species, shared across all missions)
+model Plant {
+  id             Int      @id @default(autoincrement())
+  scientificName String   @unique @map("scientific_name")
+  commonNameEs   String?  @map("common_name_es")
+  commonNameFr   String?  @map("common_name_fr")
+  genus          String   @default("")
+  family         String   @default("")
+  photoUrl       String?  @map("photo_url")       // lazy-filled
+  photoSource    String?  @map("photo_source")     // "wikipedia" | "inaturalist"
+
+  suggestedPlants SuggestedPlant[]
+
+  @@index([family])
+  @@index([genus])
+  @@map("plants")
+}
+
 // A plant suggested by the AI for a specific mission
 // Like @Entity SuggestedPlant in JPA
 model SuggestedPlant {
@@ -83,6 +101,10 @@ model SuggestedPlant {
   pendingSimilarity Int    @default(0)      @map("pending_similarity")  // temp: similarity from last identify, consumed on upload
   found          Boolean   @default(false)
   foundAt        DateTime?
+
+  // Link to canonical Plant (null for unidentified user-added plants)
+  plantId        Int?      @map("plant_id")
+  plant          Plant?    @relation(fields: [plantId], references: [id], onDelete: SetNull)
 
   // Mission where this plant was originally found (null if not found yet)
   foundInMissionId  Int?      @map("found_in_trek_id")

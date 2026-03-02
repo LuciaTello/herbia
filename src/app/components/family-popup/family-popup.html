@@ -1,0 +1,32 @@
+<div class="family-backdrop" (click)="onBackdropClick($event)">
+  <div class="family-dialog">
+    <h3>{{ i18n.t().familyPopup.title(family()) }}</h3>
+
+    @if (loading()) {
+      <div class="family-loading">
+        <div class="family-spinner"></div>
+        <p>{{ i18n.t().familyPopup.loading }}</p>
+      </div>
+    } @else if (plants().length === 0) {
+      <p class="family-empty">{{ i18n.t().familyPopup.empty }}</p>
+    } @else {
+      <div class="family-grid">
+        @for (plant of plants(); track plant.scientificName) {
+          <div class="family-card">
+            @if (plant.photoUrl) {
+              <img class="family-photo" [src]="plant.photoUrl" [alt]="plant.commonName" />
+            } @else {
+              <div class="family-no-photo">?</div>
+            }
+            <p class="family-common">{{ plant.commonName }}</p>
+            <p class="family-scientific">{{ plant.scientificName }}</p>
+          </div>
+        }
+      </div>
+    }
+
+    <button class="family-close-btn" (click)="close.emit()">
+      {{ i18n.t().familyPopup.close }}
+    </button>
+  </div>
+</div>

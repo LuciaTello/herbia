@@ -362,6 +362,41 @@ async function llmOnlyFlow(origin: string, destination: string, lang: string, mo
   return { tooFar: false, description: parsed.description, plants };
 }
 
+// --- Lazy-load canonical plant photo ---
+
+import type { PrismaClient } from '../generated/prisma/client';
+
+// Ensure a canonical Plant has a photo; fetches from Wikipedia/iNaturalist if missing
+export async function ensurePlantPhoto(
+  plant: { id: number; photoUrl: string | null; scientificName: string },
+  prisma: PrismaClient,
+): Promise<string | null> {
+  if (plant.photoUrl) return plant.photoUrl;
+
+  // Try Wikipedia first (high-quality curated photo)
+  let url = await fetchFromWikipedia(plant.scientificName);
+  let source = 'wikipedia';
+
+  // Fallback to iNaturalist
+  if (!url) {
+    const iNatUrls = await fetchFromINaturalist(plant.scientificName);
+    if (iNatUrls.length > 0) {
+      url = iNatUrls[0];
+      source = 'inaturalist';
+    }
+  }
+
+  if (url) {
+    await prisma.plant.update({
+      where: { id: plant.id },
+      data: { photoUrl: url, photoSource: source },
+    });
+    return url;
+  }
+
+  return null;
+}
+
 // --- Public functions (exported = public, like public methods in Java) ---
 
 // Must be called once after dotenv.config() has loaded the env vars

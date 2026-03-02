@@ -48,6 +48,32 @@ export function missionRouter(prisma: PrismaClient): Router {
         return;
       }
 
+      // Get user language for canonical plant common names
+      const user = await prisma.user.findUnique({ where: { id: req.userId! }, select: { lang: true } });
+      const lang = user?.lang || 'es';
+
+      // Upsert canonical Plants for each suggested plant
+      const plantsWithIds = await Promise.all(
+        (clientPlants || []).map(async (p: any) => {
+          let plantId: number | null = null;
+          if (p.scientificName) {
+            const canonical = await prisma.plant.upsert({
+              where: { scientificName: p.scientificName },
+              update: {},
+              create: {
+                scientificName: p.scientificName,
+                commonNameEs: lang === 'es' ? p.commonName : null,
+                commonNameFr: lang === 'fr' ? p.commonName : null,
+                genus: p.genus || p.scientificName.trim().split(/\s+/)[0] || '',
+                family: p.family || '',
+              },
+            });
+            plantId = canonical.id;
+          }
+          return { ...p, plantId };
+        })
+      );
+
       // Plants come from the frontend preview (already fetched from LLM + enriched with photos)
       const mission = await prisma.mission.create({
         data: {
@@ -66,7 +92,7 @@ export function missionRouter(prisma: PrismaClient): Router {
           destLng: destLng ? Math.round(destLng * 100) / 100 : null,
           userId: req.userId!,
           plants: {
-            create: (clientPlants || []).map((p: any) => ({
+            create: plantsWithIds.map((p: any) => ({
               commonName: p.commonName,
               scientificName: p.scientificName,
               description: p.description,
@@ -74,6 +100,7 @@ export function missionRouter(prisma: PrismaClient): Router {
               rarity: p.rarity || 'common',
               genus: p.genus || '',
               family: p.family || '',
+              plantId: p.plantId,
               photos: {
                 create: (p.photos || []).map((photo: any) => ({
                   url: photo.url,

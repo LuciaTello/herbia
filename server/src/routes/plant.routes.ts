@@ -3,7 +3,7 @@
 
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
-import { getSuggestedPlants } from '../services/plant.service';
+import { getSuggestedPlants, ensurePlantPhoto } from '../services/plant.service';
 import { incrementQuota } from '../services/quota.service';
 
 // Factory function (same pattern as missionRouter/collectionRouter)
@@ -70,6 +70,51 @@ export function plantRouter(prisma: PrismaClient): Router {
     } catch (error) {
       console.error('Error fetching plant suggestions:', error);
       res.status(500).json({ error: 'Failed to get plant suggestions' });
+    }
+  });
+
+  // GET /api/plants/family/:familyName - Get plants from a specific family with lazy-loaded photos
+  router.get('/family/:familyName', async (req, res) => {
+    try {
+      const familyName = req.params['familyName'];
+      if (!familyName) {
+        res.status(400).json({ error: 'Family name is required' });
+        return;
+      }
+
+      // Get user language for common name
+      const user = await prisma.user.findUnique({ where: { id: req.userId! }, select: { lang: true } });
+      const lang = user?.lang || 'es';
+
+      const plants = await prisma.plant.findMany({
+        where: { family: familyName },
+        take: 20,
+        orderBy: { scientificName: 'asc' },
+      });
+
+      // Lazy-load photos for plants that don't have one (max 5 concurrent)
+      const CONCURRENCY = 5;
+      for (let i = 0; i < plants.length; i += CONCURRENCY) {
+        const batch = plants.slice(i, i + CONCURRENCY);
+        await Promise.all(
+          batch.map(async (p) => {
+            const url = await ensurePlantPhoto(p, prisma);
+            if (url) p.photoUrl = url;
+          })
+        );
+      }
+
+      const result = plants.map(p => ({
+        scientificName: p.scientificName,
+        commonName: lang === 'fr' ? (p.commonNameFr || p.commonNameEs || p.scientificName) : (p.commonNameEs || p.commonNameFr || p.scientificName),
+        photoUrl: p.photoUrl,
+        genus: p.genus,
+      }));
+
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching family plants:', error);
+      res.status(500).json({ error: 'Failed to fetch family plants' });
     }
   });
 
