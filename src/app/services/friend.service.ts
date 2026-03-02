@@ -7,6 +7,9 @@ export interface FriendInfo {
   id: number;
   username: string | null;
   points: number;
+  photoUrl: string | null;
+  bio: string | null;
+  friendshipId?: number;
 }
 
 export interface PendingRequest {
@@ -14,6 +17,18 @@ export interface PendingRequest {
   id: number;
   username: string | null;
   points: number;
+  photoUrl: string | null;
+  bio: string | null;
+}
+
+export interface FriendProfile {
+  id: number;
+  username: string | null;
+  points: number;
+  photoUrl: string | null;
+  bio: string | null;
+  missionCount: number;
+  plantCount: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -56,5 +71,9 @@ export class FriendService {
   async removeFriend(friendshipId: number): Promise<void> {
     await firstValueFrom(this.http.delete(`${this.apiUrl}/${friendshipId}`));
     await this.loadFriends();
+  }
+
+  async getProfile(userId: number): Promise<FriendProfile> {
+    return firstValueFrom(this.http.get<FriendProfile>(`${this.apiUrl}/${userId}/profile`));
   }
 }

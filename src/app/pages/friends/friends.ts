@@ -1,9 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { FriendService, FriendInfo } from '../../services/friend.service';
+import { FriendService, FriendInfo, FriendProfile } from '../../services/friend.service';
 import { I18nService } from '../../i18n';
+import { ConfirmService } from '../../components/confirm-popup/confirm.service';
+import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
 
 const LEVEL_THRESHOLDS = [0, 10, 30, 60, 100, 200];
 const LEVEL_EMOJIS = ['🌱', '🌿', '🪻', '🌺', '🌳', '👑'];
@@ -18,7 +20,7 @@ function getLevelEmoji(points: number): string {
 
 @Component({
   selector: 'app-friends',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, ConfirmPopupComponent],
   templateUrl: './friends.html',
   styleUrl: './friends.css',
 })
@@ -34,6 +36,20 @@ export class FriendsPage implements OnInit {
   protected readonly loading = signal(true);
 
   protected levelEmoji = getLevelEmoji;
+  protected readonly confirmService = inject(ConfirmService);
+  protected readonly selectedFriend = signal<(FriendProfile & { friendshipId: number }) | null>(null);
+
+  protected readonly friendLevel = computed(() => {
+    const f = this.selectedFriend();
+    if (!f) return null;
+    let idx = 0;
+    for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+      if (f.points >= LEVEL_THRESHOLDS[i]) { idx = i; break; }
+    }
+    const isMax = idx >= LEVEL_THRESHOLDS.length - 1;
+    const progress = isMax ? 100 : Math.round(((f.points - LEVEL_THRESHOLDS[idx]) / (LEVEL_THRESHOLDS[idx + 1] - LEVEL_THRESHOLDS[idx])) * 100);
+    return { emoji: LEVEL_EMOJIS[idx], name: this.i18n.t().level.levels[idx].name, progress };
+  });
 
   async ngOnInit(): Promise<void> {
     await this.auth.refreshProfile();
@@ -80,5 +96,23 @@ export class FriendsPage implements OnInit {
 
   async reject(friendshipId: number): Promise<void> {
     await this.friendService.rejectRequest(friendshipId);
+  }
+
+  async openFriend(friend: FriendInfo): Promise<void> {
+    const profile = await this.friendService.getProfile(friend.id);
+    this.selectedFriend.set({ ...profile, friendshipId: friend.friendshipId! });
+  }
+
+  closeFriend(): void {
+    this.selectedFriend.set(null);
+  }
+
+  async removeFriend(): Promise<void> {
+    const friend = this.selectedFriend();
+    if (!friend) return;
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.removeFriend);
+    if (!ok) return;
+    await this.friendService.removeFriend(friend.friendshipId);
+    this.closeFriend();
   }
 }

@@ -13,14 +13,15 @@ export function friendRouter(prisma: PrismaClient): Router {
           OR: [{ senderId: req.userId! }, { receiverId: req.userId! }],
         },
         include: {
-          sender: { select: { id: true, username: true, points: true } },
-          receiver: { select: { id: true, username: true, points: true } },
+          sender: { select: { id: true, username: true, points: true, photoUrl: true, bio: true } },
+          receiver: { select: { id: true, username: true, points: true, photoUrl: true, bio: true } },
         },
       });
 
-      const friends = friendships.map(f =>
-        f.senderId === req.userId! ? f.receiver : f.sender
-      );
+      const friends = friendships.map(f => {
+        const friend = f.senderId === req.userId! ? f.receiver : f.sender;
+        return { ...friend, friendshipId: f.id };
+      });
 
       res.json(friends);
     } catch (error) {
@@ -35,12 +36,12 @@ export function friendRouter(prisma: PrismaClient): Router {
       const pending = await prisma.friendship.findMany({
         where: { receiverId: req.userId!, status: 'pending' },
         include: {
-          sender: { select: { id: true, username: true, points: true } },
+          sender: { select: { id: true, username: true, points: true, photoUrl: true, bio: true } },
         },
         orderBy: { createdAt: 'desc' },
       });
 
-      res.json(pending.map(f => ({ friendshipId: f.id, id: f.sender.id, username: f.sender.username, points: f.sender.points })));
+      res.json(pending.map(f => ({ friendshipId: f.id, id: f.sender.id, username: f.sender.username, points: f.sender.points, photoUrl: f.sender.photoUrl, bio: f.sender.bio })));
     } catch (error) {
       console.error('Error fetching pending requests:', error);
       res.status(500).json({ error: 'Failed to fetch pending requests' });
@@ -147,7 +148,7 @@ export function friendRouter(prisma: PrismaClient): Router {
           username: { contains: q, mode: 'insensitive' },
           id: { not: req.userId! },
         },
-        select: { id: true, username: true, points: true },
+        select: { id: true, username: true, points: true, photoUrl: true, bio: true },
         take: 10,
       });
 
@@ -155,6 +156,53 @@ export function friendRouter(prisma: PrismaClient): Router {
     } catch (error) {
       console.error('Error searching users:', error);
       res.status(500).json({ error: 'Search failed' });
+    }
+  });
+
+  // GET /api/friends/:userId/profile - Friend profile (only if friendship accepted)
+  router.get('/:userId/profile', async (req, res) => {
+    try {
+      const userId = parseInt(req.params['userId']);
+
+      const friendship = await prisma.friendship.findFirst({
+        where: {
+          status: 'accepted',
+          OR: [
+            { senderId: req.userId!, receiverId: userId },
+            { senderId: userId, receiverId: req.userId! },
+          ],
+        },
+      });
+
+      if (!friendship) {
+        res.status(403).json({ error: 'Not friends' });
+        return;
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, username: true, points: true, photoUrl: true, bio: true },
+      });
+
+      if (!user) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      const [missionCount, plantCount] = await Promise.all([
+        prisma.mission.count({ where: { userId } }),
+        prisma.suggestedPlant.count({
+          where: {
+            mission: { userId },
+            OR: [{ found: true }, { source: 'user' }],
+          },
+        }),
+      ]);
+
+      res.json({ ...user, missionCount, plantCount });
+    } catch (error) {
+      console.error('Error fetching friend profile:', error);
+      res.status(500).json({ error: 'Failed to fetch profile' });
     }
   });
 

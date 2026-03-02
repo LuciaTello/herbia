@@ -185,6 +185,9 @@ export const FR: Translations = {
     save: 'Enregistrer',
     alreadyFriends: 'Vous \u00eates d\u00e9j\u00e0 amies',
     remove: 'Supprimer',
+    missions: 'missions',
+    plants: 'plantes',
+    noBio: 'Pas de description',
   },
   profile: {
     back: "Retour à l'accueil",
@@ -206,5 +209,6 @@ export const FR: Translations = {
     deleteMission: 'Tu veux vraiment supprimer cette mission ? Les plantes et photos associées seront perdues.',
     deleteUserPlant: 'Tu veux vraiment supprimer cette plante et ses photos ?',
     removePlant: 'Tu veux vraiment retirer cette plante de ta collection ?',
+    removeFriend: 'Tu veux vraiment supprimer cette amie ?',
   },
 };

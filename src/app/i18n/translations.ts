@@ -151,6 +151,9 @@ export interface Translations {
     save: string;
     alreadyFriends: string;
     remove: string;
+    missions: string;
+    plants: string;
+    noBio: string;
   };
   profile: {
     back: string;
@@ -172,6 +175,7 @@ export interface Translations {
     deleteMission: string;
     deleteUserPlant: string;
     removePlant: string;
+    removeFriend: string;
   };
 }
 

@@ -60,7 +60,11 @@
       <div class="friend-list">
         @for (req of friendService.pending(); track req.friendshipId) {
           <div class="friend-card pending-card">
-            <span class="friend-emoji">{{ levelEmoji(req.points) }}</span>
+            @if (req.photoUrl) {
+              <img class="friend-avatar" [src]="req.photoUrl" alt="" />
+            } @else {
+              <span class="friend-emoji">{{ levelEmoji(req.points) }}</span>
+            }
             <span class="friend-name">{{ req.username }}</span>
             <span class="friend-points">{{ req.points }} pts</span>
             <div class="pending-actions">
@@ -76,8 +80,12 @@
     @if (friendService.friends().length) {
       <div class="friend-list">
         @for (friend of friendService.friends(); track friend.id) {
-          <div class="friend-card">
-            <span class="friend-emoji">{{ levelEmoji(friend.points) }}</span>
+          <div class="friend-card" (click)="openFriend(friend)">
+            @if (friend.photoUrl) {
+              <img class="friend-avatar" [src]="friend.photoUrl" alt="" />
+            } @else {
+              <span class="friend-emoji">{{ levelEmoji(friend.points) }}</span>
+            }
             <span class="friend-name">{{ friend.username }}</span>
             <span class="friend-points">{{ friend.points }} pts</span>
           </div>
@@ -88,3 +96,40 @@
     }
   }
 }
+
+<!-- Friend profile overlay -->
+@if (selectedFriend()) {
+  <div class="profile-overlay" (click)="closeFriend()">
+    <div class="profile-card" (click)="$event.stopPropagation()">
+      @if (selectedFriend()!.photoUrl) {
+        <img class="profile-avatar" [src]="selectedFriend()!.photoUrl" alt="" />
+      } @else {
+        <div class="profile-avatar-placeholder">🌱</div>
+      }
+      <h3 class="profile-username">{{ selectedFriend()!.username }}</h3>
+      <div class="profile-level">
+        <span>{{ friendLevel()!.emoji }} {{ friendLevel()!.name }}</span>
+      </div>
+      <div class="profile-points">
+        <span>{{ selectedFriend()!.points }} pts</span>
+        <div class="profile-progress-bar">
+          <div class="profile-progress-fill" [style.width.%]="friendLevel()!.progress"></div>
+        </div>
+      </div>
+      <p class="profile-bio">{{ selectedFriend()!.bio || i18n.t().friends.noBio }}</p>
+      <div class="profile-stats">
+        <div class="stat">
+          <span class="stat-value">{{ selectedFriend()!.missionCount }}</span>
+          <span class="stat-label">{{ i18n.t().friends.missions }}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ selectedFriend()!.plantCount }}</span>
+          <span class="stat-label">{{ i18n.t().friends.plants }}</span>
+        </div>
+      </div>
+      <button class="remove-btn" (click)="removeFriend()">{{ i18n.t().friends.remove }}</button>
+    </div>
+  </div>
+}
+
+<app-confirm-popup />
