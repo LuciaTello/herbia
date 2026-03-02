@@ -44,16 +44,21 @@
       <p class="step-email">{{ email() }}</p>
       <h2>{{ i18n.t().login.loginTitle }}</h2>
       <form (ngSubmit)="onLogin()">
-        <input
-          id="password"
-          type="password"
-          [placeholder]="i18n.t().login.passwordPlaceholder"
-          [ngModel]="password()"
-          (ngModelChange)="password.set($event)"
-          name="password"
-          required
-          autofocus
-        />
+        <div class="password-wrapper">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            [placeholder]="i18n.t().login.passwordPlaceholder"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            name="password"
+            required
+            autofocus
+          />
+          <button type="button" class="toggle-password" (click)="showPassword.set(!showPassword())">
+            {{ showPassword() ? '🙈' : '👁' }}
+          </button>
+        </div>
         <button type="submit" class="primary-button" [disabled]="loading()">
           @if (loading()) { {{ i18n.t().login.submitting }} } @else { {{ i18n.t().login.loginButton }} }
         </button>
@@ -77,15 +82,20 @@
           name="username"
           autofocus
         />
-        <input
-          id="reg-password"
-          type="password"
-          [placeholder]="BI.passwordPlaceholder"
-          [ngModel]="password()"
-          (ngModelChange)="password.set($event)"
-          name="password"
-          required
-        />
+        <div class="password-wrapper">
+          <input
+            id="reg-password"
+            [type]="showPassword() ? 'text' : 'password'"
+            [placeholder]="BI.passwordPlaceholder"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            name="password"
+            required
+          />
+          <button type="button" class="toggle-password" (click)="showPassword.set(!showPassword())">
+            {{ showPassword() ? '🙈' : '👁' }}
+          </button>
+        </div>
 
         <div class="lang-picker">
           <p class="lang-label">{{ BI.chooseLang }}</p>

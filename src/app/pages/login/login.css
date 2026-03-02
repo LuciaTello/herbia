@@ -142,6 +142,29 @@ input::placeholder {
   color: #b2bec3;
 }
 
+/* ---------- password toggle ---------- */
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 3rem;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
 /* ---------- primary button ---------- */
 
 .primary-button {

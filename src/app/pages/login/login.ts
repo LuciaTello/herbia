@@ -40,6 +40,7 @@ export class LoginPage {
   protected readonly username = signal('');
   protected readonly error = signal('');
   protected readonly loading = signal(false);
+  protected readonly showPassword = signal(false);
 
   goBack(): void {
     this.step.set('email');
