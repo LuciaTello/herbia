@@ -169,7 +169,7 @@ export const ES: Translations = {
       'Cuando encuentres una planta, sácale una foto. Herbia la identificará automáticamente y ganarás puntos.',
       'Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
       'El género agrupa especies muy parecidas. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
-      'La familia agrupa géneros emparentados. Por ejemplo, la lavanda y la menta pertenecen a la familia Lamiaceae.',
+      'La familia agrupa géneros emparentados. Por ejemplo, la lavanda y la menta pertenecen a la familia Lamiaceae. Si no encuentras la planta exacta, clica en «Familia» bajo el nombre científico para ver otras plantas parecidas que podrías cruzarte.',
       'También puedes añadir plantas que no están en la lista. Cada especie admite hasta 4 fotos — ya sea sugerida, mismo género, misma familia o hallazgo libre.',
     ],
     imageLabels: [

@@ -169,7 +169,7 @@ export const FR: Translations = {
       'Quand tu trouves une plante, prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points.',
       'Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
       'Le genre regroupe des espèces très proches. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
-      'La famille regroupe des genres apparentés. Par exemple, la lavande et la menthe appartiennent à la famille des Lamiaceae.',
+      'La famille regroupe des genres apparentés. Par exemple, la lavande et la menthe appartiennent à la famille des Lamiaceae. Si tu ne trouves pas la plante exacte, clique sur « Famille » sous le nom scientifique pour découvrir d\'autres plantes proches que tu pourrais croiser.',
       'Tu peux aussi ajouter des plantes qui ne sont pas dans la liste. Chaque espèce peut avoir jusqu\'à 4 photos — qu\'elle soit suggérée, même genre, même famille ou trouvaille libre.',
     ],
     imageLabels: [
