@@ -50,6 +50,7 @@ export class PhotoGalleryComponent {
   }
 
   protected onTouchEnd(e: TouchEvent): void {
+    if (this.images.length <= 1) return;
     const delta = e.changedTouches[0].clientX - this.touchStartX;
     if (Math.abs(delta) > 50) {
       delta < 0 ? this.next() : this.prev();
@@ -59,6 +60,7 @@ export class PhotoGalleryComponent {
   @HostListener('document:keydown', ['$event'])
   onKeydown(e: KeyboardEvent): void {
     if (e.key === 'Escape') this.close();
+    if (this.images.length <= 1) return;
     if (e.key === 'ArrowLeft') this.prev();
     if (e.key === 'ArrowRight') this.next();
   }
