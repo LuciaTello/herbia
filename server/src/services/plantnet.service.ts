@@ -56,6 +56,33 @@ async function lookupFamily(scientificName: string): Promise<string> {
   }
 }
 
+/**
+ * Lookup synonyms for a scientific name via iNaturalist taxa API.
+ * Returns a Set of normalized synonyms (including the canonical name).
+ */
+async function lookupSynonyms(scientificName: string): Promise<Set<string>> {
+  const synonyms = new Set<string>([normalize(scientificName)]);
+  try {
+    const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(scientificName)}&rank=species&per_page=1`;
+    const response = await fetch(url, { headers: { 'User-Agent': 'herbia-app' } });
+    if (!response.ok) return synonyms;
+    const data = await response.json();
+    const taxon = data.results?.[0];
+    if (!taxon) return synonyms;
+    // Add the canonical iNaturalist name
+    if (taxon.name) synonyms.add(normalize(taxon.name));
+    // Add all known synonyms (listed under taxon.names with is_valid or synonym lexicons)
+    for (const n of taxon.names || []) {
+      if (n.lexicon === 'Scientific Names' || n.lexicon === 'scientific names') {
+        synonyms.add(normalize(n.name));
+      }
+    }
+  } catch {
+    // ignore — return what we have
+  }
+  return synonyms;
+}
+
 export async function identifyPlant(
   buffer: Buffer,
   mimetype: string,
@@ -102,9 +129,9 @@ export async function identifyPlant(
     expectedGenus = expectedScientificName.trim().split(/\s+/)[0];
   }
 
-  // Check top 3 results for a genus+species match
-  const top3 = data.results.slice(0, 3);
-  for (const result of top3) {
+  // Check ALL results for an exact genus+species match (not just top 3,
+  // because PlantNet may rank the correct species lower)
+  for (const result of data.results) {
     const candidate = normalize(result.species.scientificNameWithoutAuthor);
     if (candidate === expected) {
       return {
@@ -119,13 +146,40 @@ export async function identifyPlant(
     }
   }
 
+  // No direct match — check synonyms (e.g. Ficaria verna ↔ Ranunculus ficaria)
+  const synonyms = await lookupSynonyms(expectedScientificName);
+  if (synonyms.size > 1) {
+    for (const result of data.results) {
+      const candidate = normalize(result.species.scientificNameWithoutAuthor);
+      if (synonyms.has(candidate)) {
+        return {
+          match: true,
+          score: Math.round(result.score * 100),
+          identifiedAs: result.species.scientificNameWithoutAuthor,
+          commonName: result.species.commonNames?.[0] || '',
+          similarity: 100,
+          genus: result.species.genus?.scientificNameWithoutAuthor || '',
+          family: result.species.family?.scientificNameWithoutAuthor || '',
+        };
+      }
+    }
+  }
+
   // No match — compute taxonomic similarity from best result
   const best = data.results[0];
   const bestGenus = best.species.genus?.scientificNameWithoutAuthor || '';
   const bestFamily = best.species.family?.scientificNameWithoutAuthor || '';
 
   let similarity = 0;
-  if (expectedGenus && bestGenus && bestGenus.toLowerCase() === expectedGenus.toLowerCase()) {
+  // Check genus across all synonyms too (e.g. expectedGenus "Ficaria",
+  // but PlantNet says genus "Ranunculus" which is a synonym genus)
+  const expectedGenera = new Set([expectedGenus.toLowerCase()]);
+  for (const syn of synonyms) {
+    const g = syn.split(' ')[0];
+    if (g) expectedGenera.add(g);
+  }
+
+  if (bestGenus && expectedGenera.has(bestGenus.toLowerCase())) {
     similarity = 75;
   } else {
     // Lookup family from iNaturalist if missing
