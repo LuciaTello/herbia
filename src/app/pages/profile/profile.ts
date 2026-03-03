@@ -3,11 +3,10 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../../i18n';
 import { AuthService } from '../../services/auth.service';
-import { MissionTutorialComponent } from '../../components/mission-tutorial/mission-tutorial';
 
 @Component({
   selector: 'app-profile',
-  imports: [RouterLink, FormsModule, MissionTutorialComponent],
+  imports: [RouterLink, FormsModule],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -22,7 +21,6 @@ export class ProfilePage {
   protected saved = signal(false);
   protected error = signal<string | null>(null);
   protected uploading = signal(false);
-  protected showTutorial = signal(false);
 
   constructor() {
     this.username = this.auth.username() ?? '';
@@ -55,14 +53,6 @@ export class ProfilePage {
       this.saved.set(true);
       setTimeout(() => this.saved.set(false), 2000);
     }
-  }
-
-  protected openTutorial(): void {
-    this.showTutorial.set(true);
-  }
-
-  protected closeTutorial(): void {
-    this.showTutorial.set(false);
   }
 
   protected async onPhotoChange(event: Event): Promise<void> {

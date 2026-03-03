@@ -6,6 +6,7 @@ export interface Translations {
     profile: string;
     level: string;
     friends: string;
+    tutorial: string;
     logout: string;
   };
   home: {
@@ -175,7 +176,6 @@ export interface Translations {
     saved: string;
     emailTaken: string;
     usernameTaken: string;
-    viewTutorial: string;
   };
   familyPopup: {
     title: (name: string) => string;

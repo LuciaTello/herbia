@@ -110,19 +110,20 @@ h2 {
   cursor: not-allowed;
 }
 
-.tutorial-btn {
+.logout-btn {
   width: 100%;
   margin-top: 1.5rem;
   padding: 0.75rem;
-  border: 2px solid #2d7d46;
+  border: 2px solid #d63031;
   border-radius: 8px;
   background: white;
-  color: #2d7d46;
+  color: #d63031;
   font-size: 0.95rem;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
 }
 
-.tutorial-btn:hover {
-  background: #f0f9f0;
+.logout-btn:hover {
+  background: #ffeaea;
 }

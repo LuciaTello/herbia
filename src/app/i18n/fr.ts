@@ -8,6 +8,7 @@ export const FR: Translations = {
     profile: 'Profil',
     level: 'Niveau',
     friends: 'Amies',
+    tutorial: 'Tutoriel',
     logout: 'Quitter',
   },
   home: {
@@ -227,7 +228,6 @@ export const FR: Translations = {
     saved: 'Enregistré !',
     emailTaken: 'Cet email est déjà utilisé',
     usernameTaken: 'Ce pseudo est déjà utilisé',
-    viewTutorial: 'Voir le tutoriel de mission',
   },
   familyPopup: {
     title: (name) => `Famille ${name}`,

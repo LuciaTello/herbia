@@ -51,10 +51,6 @@
   </button>
 </form>
 
-<button class="tutorial-btn" (click)="openTutorial()">
-  {{ i18n.t().profile.viewTutorial }}
+<button class="logout-btn" (click)="auth.logout()">
+  {{ i18n.t().nav.logout }}
 </button>
-
-@if (showTutorial()) {
-  <app-mission-tutorial (done)="closeTutorial()" />
-}

@@ -85,7 +85,7 @@
 }
 
 .bottom-nav a,
-.bottom-nav .nav-logout {
+.bottom-nav .nav-tutorial {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -101,7 +101,7 @@
 }
 
 .bottom-nav a:hover,
-.bottom-nav .nav-logout:hover {
+.bottom-nav .nav-tutorial:hover {
   color: #2d7d46;
 }
 
