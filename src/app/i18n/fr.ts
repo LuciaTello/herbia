@@ -8,7 +8,7 @@ export const FR: Translations = {
     profile: 'Profil',
     level: 'Niveau',
     friends: 'Amies',
-    tutorial: 'Tutoriel',
+    tutorial: 'Tutoriels',
     logout: 'Déconnexion',
   },
   home: {
