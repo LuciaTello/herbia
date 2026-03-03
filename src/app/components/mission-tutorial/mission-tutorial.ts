@@ -30,7 +30,7 @@ export class MissionTutorialComponent {
 
   protected readonly plantImages = [
     'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Single_lavender_flower02.jpg/250px-Single_lavender_flower02.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Lavandula-stoechas-flower-close.JPG/250px-Lavandula-stoechas-flower-close.JPG',
+    'https://inaturalist-open-data.s3.amazonaws.com/photos/151051114/medium.jpeg',
     'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Mint_leaves_%28Mentha_spicata%29.jpg/250px-Mint_leaves_%28Mentha_spicata%29.jpg',
   ];
 
