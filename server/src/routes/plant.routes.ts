@@ -13,7 +13,7 @@ export function plantRouter(prisma: PrismaClient): Router {
   // POST /api/plants/suggest
   router.post('/suggest', async (req, res) => {
     try {
-      const { origin, destination, lang, originLat, originLng, destLat, destLng, region } = req.body;
+      const { origin, destination, lang, originLat, originLng, destLat, destLng, region, count } = req.body;
 
       if (!origin) {
         res.status(400).json({ error: 'Origin is required' });
@@ -58,7 +58,8 @@ export function plantRouter(prisma: PrismaClient): Router {
       ]);
       const exclude = [...excludeSet];
 
-      const result = await getSuggestedPlants(origin, dest, lang || 'es', undefined, exclude, originLat, originLng, destLat, destLng);
+      const plantCount = count === 10 ? 10 : 5;
+      const result = await getSuggestedPlants(origin, dest, lang || 'es', undefined, exclude, originLat, originLng, destLat, destLng, plantCount);
 
       // Hard filter: remove any found plant (the LLM/iNat might still return them)
       const excludeLower = new Set(exclude.map(name => name.toLowerCase()));

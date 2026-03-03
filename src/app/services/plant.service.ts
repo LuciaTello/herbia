@@ -20,12 +20,13 @@ export class PlantService {
     destLat?: number | null,
     destLng?: number | null,
     region?: string,
+    count?: number,
   ): Promise<SuggestResult> {
     // firstValueFrom converts an Observable to a Promise (so we can use async/await)
     // This is like calling restTemplate.postForObject() in Spring
     return firstValueFrom(
       this.http.post<SuggestResult>(`${this.apiUrl}/plants/suggest`, {
-        origin, destination, lang, originLat, originLng, destLat, destLng, region,
+        origin, destination, lang, originLat, originLng, destLat, destLng, region, count,
       })
     );
   }

@@ -44,6 +44,14 @@
     </div>
   }
 
+  <div class="plant-count-field">
+    <label>{{ i18n.t().route.plantCountLabel }}</label>
+    <div class="plant-count-toggle">
+      <button type="button" [class.active]="plantCount() === 5" (click)="plantCount.set(5)">5</button>
+      <button type="button" [class.active]="plantCount() === 10" (click)="plantCount.set(10)">10</button>
+    </div>
+  </div>
+
   <button type="submit" class="primary-button" [disabled]="loading()">
     @if (loading()) {
       {{ i18n.t().route.searching }}

@@ -122,7 +122,7 @@ function assignRarity(count: number, maxCount: number): 'common' | 'rare' | 'ver
   return 'veryRare';
 }
 
-function selectPlants(species: INatSpecies[], exclude: string[]): (INatSpecies & { rarity: string; genus: string; family: string })[] {
+function selectPlants(species: INatSpecies[], exclude: string[], count: number = 5): (INatSpecies & { rarity: string; genus: string; family: string })[] {
   const excludeLower = new Set(exclude.map(n => n.toLowerCase()));
   const filtered = species.filter(s => !excludeLower.has(s.scientificName.toLowerCase()));
   if (filtered.length === 0) return [];
@@ -134,21 +134,25 @@ function selectPlants(species: INatSpecies[], exclude: string[]): (INatSpecies &
   const rare = withRarity.filter(s => s.rarity === 'rare');
   const veryRare = withRarity.filter(s => s.rarity === 'veryRare');
 
-  const picked: (INatSpecies & { rarity: string })[] = [];
-  picked.push(...common.slice(0, 3));
-  picked.push(...rare.slice(0, 1));
-  picked.push(...veryRare.slice(0, 1));
+  const nCommon = Math.ceil(count * 0.6);
+  const nRare = Math.ceil(count * 0.2);
+  const nVeryRare = count - nCommon - nRare;
 
-  // If we didn't get 5, fill from remaining
-  if (picked.length < 5) {
+  const picked: (INatSpecies & { rarity: string })[] = [];
+  picked.push(...common.slice(0, nCommon));
+  picked.push(...rare.slice(0, nRare));
+  picked.push(...veryRare.slice(0, nVeryRare));
+
+  // If we didn't get enough, fill from remaining
+  if (picked.length < count) {
     const pickedNames = new Set(picked.map(p => p.scientificName));
     for (const s of withRarity) {
-      if (picked.length >= 5) break;
+      if (picked.length >= count) break;
       if (!pickedNames.has(s.scientificName)) picked.push(s);
     }
   }
 
-  return picked.slice(0, 5);
+  return picked.slice(0, count);
 }
 
 // --- LLM prompts ---
@@ -156,7 +160,7 @@ function selectPlants(species: INatSpecies[], exclude: string[]): (INatSpecies &
 // Description-only prompt: the LLM adds fun descriptions to real iNaturalist plants
 function buildDescriptionPrompt(
   plants: { scientificName: string; commonName: string }[],
-  origin: string, destination: string, lang: string, month: number,
+  origin: string, destination: string, lang: string, month: number, count: number = 5,
 ): string {
   const langName = LANG_NAMES[lang] || 'Spanish';
   const monthName = MONTH_NAMES[month];
@@ -170,7 +174,7 @@ function buildDescriptionPrompt(
   return `You are a botanist with a sharp sense of humor and a love for bad plant puns.
 ${routeContext}
 
-Here are 5 real plants found along this route:
+Here are ${count} real plants found along this route:
 ${plantList}
 
 For each plant, write TWO separate fields:
@@ -189,11 +193,11 @@ Write ONLY a JSON object (no markdown, no backticks) with this format:
   ]
 }
 
-Include a "description" and "hint" for each of the 5 plants above, in the same order. The "scientificName" must match exactly.`;
+Include a "description" and "hint" for each of the ${count} plants above, in the same order. The "scientificName" must match exactly.`;
 }
 
 // Fallback: full LLM prompt when no coordinates are available (original behavior)
-function buildPlantPrompt(origin: string, destination: string, lang: string, month: number, exclude: string[]): string {
+function buildPlantPrompt(origin: string, destination: string, lang: string, month: number, exclude: string[], count: number = 5): string {
   const langName = LANG_NAMES[lang] || 'Spanish';
   const monthName = MONTH_NAMES[month];
 
@@ -214,7 +218,7 @@ ${routeContext}
 The current month is ${monthName}. Only suggest plants that are visible, blooming, or identifiable during this time of year.
 ${exclusionBlock}${tooFarBlock}
 
-Suggest exactly 5 plants that can be found along this path in ${monthName}.
+Suggest exactly ${count} plants that can be found along this path in ${monthName}.
 Consider the region, climate, season, and typical vegetation.
 Try to include a balanced variety of plant types: trees, flowers, shrubs, grasses, herbs, ferns, etc. Don't force it if the route doesn't support it, but aim for diversity when possible.
 
@@ -334,8 +338,8 @@ async function enrichPlantsWithPhotos(plants: any[]): Promise<any[]> {
 
 // --- LLM-only fallback (original flow, used when no coordinates) ---
 
-async function llmOnlyFlow(origin: string, destination: string, lang: string, month: number, exclude: string[]): Promise<SuggestedPlantsResult> {
-  const prompt = buildPlantPrompt(origin, destination, lang, month, exclude);
+async function llmOnlyFlow(origin: string, destination: string, lang: string, month: number, exclude: string[], count: number = 5): Promise<SuggestedPlantsResult> {
+  const prompt = buildPlantPrompt(origin, destination, lang, month, exclude, count);
 
   const completion = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
@@ -413,13 +417,13 @@ export interface SuggestedPlantsResult {
 
 export async function getSuggestedPlants(
   origin: string, destination: string, lang: string = 'es', month?: number, exclude: string[] = [],
-  originLat?: number, originLng?: number, destLat?: number, destLng?: number,
+  originLat?: number, originLng?: number, destLat?: number, destLng?: number, count: number = 5,
 ): Promise<SuggestedPlantsResult> {
   const currentMonth = month || (new Date().getMonth() + 1);
 
   // Step 1: If no coordinates → fall back to LLM-only flow
   if (!originLat || !originLng || !destLat || !destLng) {
-    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude);
+    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
   }
 
   // Step 2: Check distance
@@ -441,17 +445,17 @@ export async function getSuggestedPlants(
 
   // Step 6: If too few species → fall back to LLM-only
   if (species.length < 3) {
-    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude);
+    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
   }
 
-  // Step 7: Select 10 diverse plants with rarity
-  const selected = selectPlants(species, exclude);
+  // Step 7: Select diverse plants with rarity
+  const selected = selectPlants(species, exclude, count);
 
   // Step 7b: Enrich with family taxonomy from iNaturalist
   await enrichWithTaxonomy(selected);
 
   // Step 8: Ask LLM for descriptions only
-  const descPrompt = buildDescriptionPrompt(selected, origin, destination, lang, currentMonth);
+  const descPrompt = buildDescriptionPrompt(selected, origin, destination, lang, currentMonth, count);
   const completion = await groq.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [{ role: 'user', content: descPrompt }],
