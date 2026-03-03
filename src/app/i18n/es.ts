@@ -42,10 +42,9 @@ export const ES: Translations = {
     tooFar: 'Esa ruta cruza múltiples climas — prueba con una misión más corta para mejores resultados.',
     error: 'Error al buscar plantas. Verifica que el servidor está arrancado.',
     dailyLimitReached: 'Has alcanzado el límite de 30 búsquedas por hoy. ¡Vuelve mañana!',
-    plantCount5: '🌿 5 plantas',
-    plantCount10: '🌺 10 plantas',
-    plantCountHint5: 'Buen comienzo, buen comienzo',
-    plantCountHint10: '¡Vaya motivación!',
+    plantCountLabel: '¿Cuántas plantas buscar?',
+    plantCount5: '🌱 5',
+    plantCount10: '🌳 10',
     loadingMessages: [
       'Preguntando a los botánicos del camino...',
       'Explorando entre arbustos y helechos...',

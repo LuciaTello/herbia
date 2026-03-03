@@ -42,10 +42,9 @@ export const FR: Translations = {
     tooFar: 'Cet itinéraire traverse plusieurs climats — essayez une mission plus courte pour de meilleurs résultats.',
     error: 'Erreur lors de la recherche. Vérifiez que le serveur est démarré.',
     dailyLimitReached: 'Vous avez atteint la limite de 30 recherches pour aujourd\'hui. Revenez demain !',
-    plantCount5: '🌿 5 plantes',
-    plantCount10: '🌺 10 plantes',
-    plantCountHint5: 'Bon début, bon début',
-    plantCountHint10: 'Quelle motivation !',
+    plantCountLabel: 'Combien de plantes chercher ?',
+    plantCount5: '🌱 5',
+    plantCount10: '🌳 10',
     loadingMessages: [
       'On interroge les botanistes du chemin...',
       'Exploration parmi les buissons et les fougères...',
