@@ -128,18 +128,18 @@ export function plantRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Find the photo and verify ownership (photo → suggestedPlant → mission → user)
+      // Find the photo and verify ownership (photo → plant (SuggestedPlant) → mission → user)
       const photo = await prisma.plantPhoto.findUnique({
         where: { id: photoId },
-        include: { suggestedPlant: { include: { mission: { select: { userId: true } } } } },
+        include: { plant: { include: { mission: { select: { userId: true } } } } },
       });
 
-      if (!photo || photo.suggestedPlant?.mission?.userId !== req.userId) {
+      if (!photo || photo.plant?.mission?.userId !== req.userId) {
         res.status(404).json({ error: 'Photo not found' });
         return;
       }
 
-      const scientificName = photo.suggestedPlant!.scientificName;
+      const scientificName = photo.plant!.scientificName;
 
       // Re-fetch based on original source
       let newUrl: string | null = null;
