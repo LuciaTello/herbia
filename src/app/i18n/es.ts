@@ -44,8 +44,8 @@ export const ES: Translations = {
     dailyLimitReached: 'Has alcanzado el límite de 30 búsquedas por hoy. ¡Vuelve mañana!',
     plantCount5: '🌿 5 plantas',
     plantCount10: '🌺 10 plantas',
-    plantCountHint5: 'Paseo tranquilo',
-    plantCountHint10: '¿Segura? Eso es mucha planta',
+    plantCountHint5: 'Buen comienzo, buen comienzo',
+    plantCountHint10: '¡Vaya motivación!',
     loadingMessages: [
       'Preguntando a los botánicos del camino...',
       'Explorando entre arbustos y helechos...',
