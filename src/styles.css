@@ -7,7 +7,7 @@ button, a[class*="button"] {
 }
 
 .back-link {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 /* Google Places autocomplete dropdown (injected into <body> by Google, outside Angular) */
