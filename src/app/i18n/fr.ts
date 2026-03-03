@@ -145,8 +145,8 @@ export const FR: Translations = {
     ],
     texts: [
       'Herbia transforme tes trajets en missions botaniques. Dis-nous où tu vas et on te dira quelles plantes poussent sur ton chemin. Il ne te reste qu\'à partir à leur recherche. Spoiler : elles sont partout.',
-      'Choisis un trajet entre deux villes ou une zone à explorer. On te préparera une mission avec les espèces que tu peux trouver en chemin — avec photos, indices et niveau de rareté.',
-      'Quand tu trouves une plante de ta mission, prends-la en photo. Herbia l\'identifiera automatiquement. Tu peux aussi ajouter des plantes qui n\'étaient pas dans la liste — ton herbier s\'enrichit à chaque sortie.',
+      'Choisis un trajet entre deux villes ou une zone à explorer. On te préparera une mission avec les espèces que tu peux trouver dans la zone choisie — avec photos, indices et niveau de rareté.',
+      'Essaie de trouver les plantes proposées dans la mission et les plantes de la même famille ou genre. Prends-les en photo et automatiquement Herbia te donnera des points.',
       'Tes points te font monter de niveau : de 🌱 Graine curieuse à 👑 Reine du jardin. Ajoute des amies pour voir leur niveau et explorer ensemble.',
       'Herbia est un outil ludique et éducatif. Les identifications peuvent contenir des erreurs. Ne consomme et n\'utilise jamais une plante en te basant uniquement sur les informations de cette app. Herbia décline toute responsabilité en cas d\'usage inapproprié des plantes.',
     ],
