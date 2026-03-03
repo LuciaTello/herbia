@@ -6,6 +6,10 @@ button, a[class*="button"] {
   font-weight: 600;
 }
 
+.back-link {
+  margin-bottom: 1rem;
+}
+
 /* Google Places autocomplete dropdown (injected into <body> by Google, outside Angular) */
 .pac-container {
   border-radius: 8px;
