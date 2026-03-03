@@ -9,7 +9,7 @@ export const ES: Translations = {
     level: 'Nivel',
     friends: 'Amigas',
     tutorial: 'Tutorial',
-    logout: 'Salir',
+    logout: 'Desconexión',
   },
   home: {
     title: 'Cada camino esconde plantas por descubrir',

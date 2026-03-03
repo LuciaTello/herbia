@@ -2,6 +2,12 @@
   display: block;
 }
 
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .back-link {
   color: #2d7d46;
   text-decoration: none;
@@ -111,19 +117,15 @@ h2 {
 }
 
 .logout-btn {
-  width: 100%;
-  margin-top: 1.5rem;
-  padding: 0.75rem;
-  border: 2px solid #d63031;
-  border-radius: 8px;
-  background: white;
-  color: #d63031;
-  font-size: 0.95rem;
-  font-weight: 600;
+  background: none;
+  border: none;
+  color: #b2bec3;
+  font-size: 0.8rem;
   font-family: inherit;
   cursor: pointer;
+  padding: 0;
 }
 
 .logout-btn:hover {
-  background: #ffeaea;
+  color: #d63031;
 }

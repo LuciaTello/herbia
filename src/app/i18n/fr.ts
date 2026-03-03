@@ -9,7 +9,7 @@ export const FR: Translations = {
     level: 'Niveau',
     friends: 'Amies',
     tutorial: 'Tutoriel',
-    logout: 'Quitter',
+    logout: 'Déconnexion',
   },
   home: {
     title: 'Chaque chemin cache des plantes à découvrir',
