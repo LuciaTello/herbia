@@ -247,4 +247,34 @@ export const FR: Translations = {
     removePlant: 'Tu veux vraiment retirer cette plante de ta collection ?',
     removeFriend: 'Tu veux vraiment supprimer cette amie ?',
   },
+  tutorials: {
+    back: 'Retour à l\'accueil',
+    title: 'Tutoriels',
+    missions: {
+      title: 'Comment gagner des points en mission',
+      description: 'Apprends comment fonctionnent les espèces, genres et familles pour gagner plus de points.',
+    },
+    taxonomy: {
+      title: 'Taxonomie des plantes',
+      description: 'Découvre comment les plantes sont classifiées et pourquoi certaines ont plusieurs noms.',
+    },
+  },
+  taxonomyTutorial: {
+    titles: [
+      'Les noms des plantes',
+      'Espèce, genre, famille',
+      'Une science vivante',
+      'Plusieurs noms, même plante',
+      'Herbia te couvre',
+    ],
+    texts: [
+      'Au XVIIIe siècle, le naturaliste Carl von Linné a créé le système binomial : chaque plante reçoit un nom universel composé du genre + espèce. Ainsi, Lavandula angustifolia est compris par les botanistes du monde entier, quelle que soit la langue.',
+      'Les plantes sont organisées en une hiérarchie : espèce (Lavandula angustifolia) → genre (Lavandula) → famille (Lamiaceae). Les plantes du même genre sont des cousines proches et partagent beaucoup de traits visibles. Celles de la même famille sont des cousines éloignées — comme la fraise et le pommier, toutes deux Rosacées.',
+      'La taxonomie n\'est pas figée : les botanistes continuent de rechercher, débattre et reclassifier les plantes. Quand ils découvrent qu\'une plante appartient à un autre genre, ils changent son nom scientifique.',
+      'Un exemple concret : la ficaire s\'appelait Ranunculus ficaria, mais les botanistes l\'ont déplacée dans le genre Ficaria. Son nom officiel est désormais Ficaria verna, même si Ranunculus ficaria apparaît encore dans beaucoup de livres et bases de données.',
+      'Dans herbia, quand tu identifies une plante, on vérifie automatiquement les synonymes scientifiques. Si une base de données utilise Ranunculus ficaria et une autre Ficaria verna, herbia sait que c\'est la même plante — tu ne perds pas de points.',
+    ],
+    next: 'Suivant',
+    done: 'Compris !',
+  },
 };

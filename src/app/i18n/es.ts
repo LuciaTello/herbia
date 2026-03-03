@@ -247,4 +247,34 @@ export const ES: Translations = {
     removePlant: '¿Segura que quieres quitar esta planta de tu colección?',
     removeFriend: '¿Segura que quieres eliminar a esta amiga?',
   },
+  tutorials: {
+    back: 'Volver al inicio',
+    title: 'Tutoriales',
+    missions: {
+      title: 'Cómo ganar puntos en las misiones',
+      description: 'Aprende cómo funcionan las especies, géneros y familias para ganar más puntos.',
+    },
+    taxonomy: {
+      title: 'Taxonomía de las plantas',
+      description: 'Descubre cómo se clasifican las plantas y por qué algunas tienen varios nombres.',
+    },
+  },
+  taxonomyTutorial: {
+    titles: [
+      'Los nombres de las plantas',
+      'Especie, género, familia',
+      'Una ciencia viva',
+      'Varios nombres, misma planta',
+      'Herbia te cubre',
+    ],
+    texts: [
+      'En el siglo XVIII, el naturalista Carl von Linné (Linneo) creó el sistema binomial: cada planta recibe un nombre universal compuesto de género + especie. Así, Lavandula angustifolia es entendida por botánicos de todo el mundo, sin importar el idioma.',
+      'Las plantas se organizan en una jerarquía: especie (Lavandula angustifolia) → género (Lavandula) → familia (Lamiaceae). Las plantas del mismo género son primas cercanas y comparten muchos rasgos visibles. Las de la misma familia son primas lejanas — como la fresa y el manzano, ambas Rosáceas.',
+      'La taxonomía no está fija: los botánicos siguen investigando, debatiendo y reclasificando plantas. Cuando descubren que una planta pertenece a otro género, le cambian el nombre científico.',
+      'Un ejemplo concreto: la celidonia menor se llamaba Ranunculus ficaria, pero los botánicos la movieron al género Ficaria. Ahora su nombre oficial es Ficaria verna, aunque Ranunculus ficaria sigue apareciendo en muchos libros y bases de datos.',
+      'En herbia, cuando identificas una planta, comprobamos automáticamente los sinónimos científicos. Si una base de datos usa Ranunculus ficaria y otra usa Ficaria verna, herbia sabe que es la misma planta — así no pierdes puntos.',
+    ],
+    next: 'Siguiente',
+    done: '¡Entendido!',
+  },
 };

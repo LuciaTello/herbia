@@ -1,0 +1,29 @@
+<a routerLink="/" class="back-link">← {{ i18n.t().tutorials.back }}</a>
+
+<h2 class="page-title">{{ i18n.t().tutorials.title }}</h2>
+
+<div class="tutorial-cards">
+  <button class="tutorial-card" (click)="open('missions')">
+    <span class="card-emoji">🎯</span>
+    <div class="card-text">
+      <strong>{{ i18n.t().tutorials.missions.title }}</strong>
+      <span>{{ i18n.t().tutorials.missions.description }}</span>
+    </div>
+  </button>
+
+  <button class="tutorial-card" (click)="open('taxonomy')">
+    <span class="card-emoji">🌱</span>
+    <div class="card-text">
+      <strong>{{ i18n.t().tutorials.taxonomy.title }}</strong>
+      <span>{{ i18n.t().tutorials.taxonomy.description }}</span>
+    </div>
+  </button>
+</div>
+
+@if (activeTutorial() === 'missions') {
+  <app-mission-tutorial (done)="close()" />
+}
+
+@if (activeTutorial() === 'taxonomy') {
+  <app-taxonomy-tutorial (done)="close()" />
+}

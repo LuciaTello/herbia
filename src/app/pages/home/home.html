@@ -27,13 +27,9 @@
       <span class="nav-icon">👥</span>
       <span class="nav-label">{{ i18n.t().nav.friends }}</span>
     </a>
-    <button class="nav-tutorial" (click)="openTutorial()">
+    <a routerLink="/tutorials">
       <span class="nav-icon">📖</span>
       <span class="nav-label">{{ i18n.t().nav.tutorial }}</span>
-    </button>
+    </a>
   </nav>
-}
-
-@if (showTutorial()) {
-  <app-mission-tutorial (done)="closeTutorial()" />
 }

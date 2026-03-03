@@ -1,21 +1,19 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18nService } from '../../i18n';
 import { AuthService } from '../../services/auth.service';
-import { MissionTutorialComponent } from '../../components/mission-tutorial/mission-tutorial';
 
 const LEVEL_THRESHOLDS = [0, 750, 1500, 3750, 7500, 25000];
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, MissionTutorialComponent],
+  imports: [RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class HomePage {
   protected readonly i18n = inject(I18nService);
   protected readonly auth = inject(AuthService);
-  protected readonly showTutorial = signal(false);
 
   protected readonly levelEmoji = computed(() => {
     const pts = this.auth.points();
@@ -26,12 +24,4 @@ export class HomePage {
     }
     return levels[idx]?.emoji ?? '🌱';
   });
-
-  protected openTutorial(): void {
-    this.showTutorial.set(true);
-  }
-
-  protected closeTutorial(): void {
-    this.showTutorial.set(false);
-  }
 }

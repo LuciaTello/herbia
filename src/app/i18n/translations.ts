@@ -195,6 +195,24 @@ export interface Translations {
     removePlant: string;
     removeFriend: string;
   };
+  tutorials: {
+    back: string;
+    title: string;
+    missions: {
+      title: string;
+      description: string;
+    };
+    taxonomy: {
+      title: string;
+      description: string;
+    };
+  };
+  taxonomyTutorial: {
+    titles: string[];
+    texts: string[];
+    next: string;
+    done: string;
+  };
 }
 
 export type Lang = 'es' | 'fr';
