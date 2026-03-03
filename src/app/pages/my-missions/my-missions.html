@@ -194,7 +194,10 @@
                       <div class="user-photo-row">
                         <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
                              (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
-                        <span class="photo-points">{{ i18n.t().myMissions.pointsEarned(photo.similarity || 0) }}</span>
+                        <div class="photo-row-info">
+                          <span class="photo-row-name">{{ plant.commonName }}</span>
+                          <span class="photo-points">{{ i18n.t().myMissions.pointsEarned(photo.similarity || 0) }}</span>
+                        </div>
                         <button class="photo-row-delete" (click)="deletePhoto(photo.id!)">&times;</button>
                       </div>
                     }
