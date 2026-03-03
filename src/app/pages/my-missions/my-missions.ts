@@ -196,6 +196,10 @@ export class MyMissionsPage implements OnInit {
     return plants.filter(p => p.found).length;
   }
 
+  protected missionPoints(plants: SuggestedPlant[]): number {
+    return plants.flatMap(p => p.photos).reduce((sum, ph) => sum + (ph.similarity || 0), 0);
+  }
+
   protected toggle(id: number): void {
     this.expandedId.set(this.expandedId() === id ? null : id);
   }
