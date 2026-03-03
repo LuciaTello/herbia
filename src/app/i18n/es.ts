@@ -165,7 +165,7 @@ export const ES: Translations = {
       'Tus hallazgos',
     ],
     texts: [
-      'Las plantas que ves aquí se eligen según lo que crece en esta zona y época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!',
+      'Las plantas que ves aquí se eligen según lo que crece en esta zona y época del año. No todas se dejarán encontrar — tu reto es descubrir cuántas puedes cazar.',
       'Cuando encuentres una planta, sácale una foto. Herbia la identificará automáticamente y ganarás puntos.',
       'La especie es el nivel más fino: las diferencias entre dos especies del mismo género son sutiles. Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
       'El género agrupa especies como hermanos o primos cercanos: comparten un ancestro reciente y conservan muchos rasgos visibles en común. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
