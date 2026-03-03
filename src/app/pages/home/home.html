@@ -5,16 +5,14 @@
 
   <section class="level-card">
     <span class="level-card-emoji">{{ levelEmoji() }}</span>
-    <div class="level-card-info">
-      <strong>{{ i18n.t().level.levels[currentLevel()].name }}</strong>
-      <div class="level-card-progress">
-        <div class="level-card-bar">
-          <div class="level-card-fill" [style.width.%]="progressPercent()"></div>
-        </div>
-        @if (nextLevel()) {
-          <span class="level-card-next">{{ nextLevel() }}</span>
-        }
+    <strong>{{ i18n.t().level.levels[currentLevel()].name }}</strong>
+    <div class="level-card-progress">
+      <div class="level-card-bar">
+        <div class="level-card-fill" [style.width.%]="progressPercent()"></div>
       </div>
+      @if (nextLevel()) {
+        <span class="level-card-next">{{ nextLevel() }}</span>
+      }
     </div>
   </section>
 
