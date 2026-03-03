@@ -334,6 +334,23 @@ h2 {
   margin: 0.125rem 0;
 }
 
+.plant-family-link {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #e65100;
+  background: #fff3e0;
+  border-radius: 4px;
+  padding: 0.1rem 0.4rem;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-bottom: 0.25rem;
+}
+
+.plant-family-link:hover {
+  background: #ffe0b2;
+}
+
 .plant-info .chance {
   font-weight: 600;
   font-size: 0.8rem;

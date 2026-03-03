@@ -63,6 +63,7 @@ export interface Translations {
     pointsEarned: (pts: number) => string;
     sameGenus: (name: string) => string;
     sameFamily: (name: string) => string;
+    viewFamily: (name: string) => string;
     summary: (found: number) => string;
     missionComplete: string;
     addPlant: string;

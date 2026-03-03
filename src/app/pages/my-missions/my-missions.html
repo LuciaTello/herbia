@@ -160,6 +160,9 @@
             <div class="plant-info">
               <h4>{{ plant.commonName }}</h4>
               <p class="scientific">{{ plant.scientificName }}</p>
+              @if (plant.family) {
+                <span class="plant-family-link" (click)="openFamily(plant.family!); $event.stopPropagation()">{{ i18n.t().myMissions.viewFamily(plant.family!) }}</span>
+              }
               <p class="chance" [style.color]="rarity(plant.rarity).color">
                 {{ rarity(plant.rarity).label }}
               </p>

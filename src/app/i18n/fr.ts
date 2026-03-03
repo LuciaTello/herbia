@@ -78,6 +78,7 @@ export const FR: Translations = {
     pointsEarned: (pts) => `+${pts} pts`,
     sameGenus: (name) => `Même genre ! (${name})`,
     sameFamily: (name) => `Même famille (${name})`,
+    viewFamily: (name) => `Famille ${name}`,
     summary: (found) => `${found} capturée${found !== 1 ? 's' : ''}`,
     missionComplete: 'Mission accomplie !',
     addPlant: 'Ajouter d\'autres plantes',

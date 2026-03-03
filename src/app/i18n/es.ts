@@ -78,6 +78,7 @@ export const ES: Translations = {
     pointsEarned: (pts) => `+${pts} pts`,
     sameGenus: (name) => `¡Mismo género! (${name})`,
     sameFamily: (name) => `Misma familia (${name})`,
+    viewFamily: (name) => `Familia ${name}`,
     summary: (found) => `${found} capturada${found !== 1 ? 's' : ''}`,
     missionComplete: '¡Misión completada!',
     addPlant: 'Añadir otras plantas',
