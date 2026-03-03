@@ -1,7 +1,4 @@
-<div class="top-bar">
-  <a routerLink="/" class="back-link">← {{ i18n.t().profile.back }}</a>
-  <button class="logout-btn" (click)="auth.logout()">{{ i18n.t().nav.logout }}</button>
-</div>
+<a routerLink="/" class="back-link">← {{ i18n.t().profile.back }}</a>
 
 <h2>{{ i18n.t().profile.title }}</h2>
 
@@ -53,3 +50,5 @@
     }
   </button>
 </form>
+
+<button class="logout-btn" (click)="auth.logout()">{{ i18n.t().nav.logout }}</button>
