@@ -38,7 +38,7 @@ export interface Translations {
     tooFar: string;
     error: string;
     dailyLimitReached: string;
-    plantCountLabel: string;
+    plantCountLabel: (n: number) => string;
     loadingMessages: string[];
   };
   myMissions: {
