@@ -167,9 +167,9 @@ export const ES: Translations = {
     texts: [
       'Las plantas que ves aquí se eligen según lo que crece en esta zona y época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!',
       'Cuando encuentres una planta, sácale una foto. Herbia la identificará automáticamente y ganarás puntos.',
-      'Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
-      'El género agrupa especies muy parecidas. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
-      'La familia agrupa géneros emparentados. Por ejemplo, la lavanda y la menta pertenecen a la familia Lamiaceae. Si no encuentras la planta exacta, clica en «Familia» bajo el nombre científico para ver otras plantas parecidas que podrías cruzarte.',
+      'La especie es el nivel más fino: las diferencias entre dos especies del mismo género son sutiles. Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
+      'El género agrupa especies como hermanos o primos cercanos: comparten un ancestro reciente y conservan muchos rasgos visibles en común. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
+      'La familia son primos muy lejanos: comparten un ancestro de hace millones de años. Por eso una fresa y un manzano (ambos Rosáceas) parecen tan distintos. Si no encuentras la planta exacta, clica en «Familia» bajo el nombre científico para ver otras plantas que podrías cruzarte.',
       'También puedes añadir plantas que no están en la lista. Cada especie admite hasta 4 fotos — ya sea sugerida, mismo género, misma familia o hallazgo libre.',
     ],
     imageLabels: [

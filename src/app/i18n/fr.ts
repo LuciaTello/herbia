@@ -167,9 +167,9 @@ export const FR: Translations = {
     texts: [
       'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !',
       'Quand tu trouves une plante, prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points.',
-      'Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
-      'Le genre regroupe des espèces très proches. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
-      'La famille regroupe des genres apparentés. Par exemple, la lavande et la menthe appartiennent à la famille des Lamiaceae. Si tu ne trouves pas la plante exacte, clique sur « Famille » sous le nom scientifique pour découvrir d\'autres plantes proches que tu pourrais croiser.',
+      'L\'espèce est le niveau le plus fin : les différences entre deux espèces du même genre sont subtiles. Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
+      'Le genre regroupe des espèces comme des frères ou cousins proches : ils partagent un ancêtre récent et gardent beaucoup de traits visibles en commun. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
+      'La famille, ce sont des cousins très éloignés : ils partagent un ancêtre vieux de millions d\'années. C\'est pour ça qu\'une fraise et un pommier (tous deux Rosacées) semblent si différents. Si tu ne trouves pas la plante exacte, clique sur « Famille » sous le nom scientifique pour voir d\'autres plantes que tu pourrais croiser.',
       'Tu peux aussi ajouter des plantes qui ne sont pas dans la liste. Chaque espèce peut avoir jusqu\'à 4 photos — qu\'elle soit suggérée, même genre, même famille ou trouvaille libre.',
     ],
     imageLabels: [
