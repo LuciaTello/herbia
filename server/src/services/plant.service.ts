@@ -262,7 +262,7 @@ function cleanForWikipedia(name: string): string {
 }
 
 // Fetch the hero image from Wikipedia (high-quality curated photo)
-async function fetchFromWikipedia(scientificName: string): Promise<string> {
+export async function fetchFromWikipedia(scientificName: string): Promise<string> {
   try {
     const clean = cleanForWikipedia(scientificName);
     const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(clean)}`;
@@ -278,7 +278,7 @@ async function fetchFromWikipedia(scientificName: string): Promise<string> {
 // Fetch up to 5 real photos from iNaturalist observations (free, no API key needed)
 // Each observation has photos taken by real people in the field
 // Uses "large" size (1024px) for better quality
-async function fetchFromINaturalist(scientificName: string): Promise<string[]> {
+export async function fetchFromINaturalist(scientificName: string): Promise<string[]> {
   try {
     const url = `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(scientificName)}&photos=true&per_page=10&quality_grade=research&order_by=votes`;
     const response = await fetch(url);

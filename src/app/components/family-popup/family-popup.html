@@ -15,7 +15,8 @@
           <div class="family-card">
             @if (plant.photoUrl) {
               <img class="family-photo" [src]="plant.photoUrl" [alt]="plant.commonName"
-                   (click)="openPhoto(plant.photoUrl!, plant.commonName)" />
+                   (click)="openPhoto(plant.photoUrl!, plant.commonName)"
+                   (error)="onPhotoError(plant)" />
             } @else {
               <div class="family-no-photo">?</div>
             }

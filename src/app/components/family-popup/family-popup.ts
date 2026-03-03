@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { PhotoGalleryComponent } from '../photo-gallery/photo-gallery';
 
 interface FamilyPlant {
+  id: number;
   scientificName: string;
   commonName: string;
   photoUrl: string | null;
@@ -54,6 +55,17 @@ export class FamilyPopupComponent implements OnInit {
   protected onBackdropClick(event: MouseEvent): void {
     if (event.target === event.currentTarget) {
       this.close.emit();
+    }
+  }
+
+  protected async onPhotoError(plant: FamilyPlant): Promise<void> {
+    try {
+      const result = await firstValueFrom(
+        this.http.post<{ url: string | null }>(`${environment.apiUrl}/plants/${plant.id}/refresh-photo`, {})
+      );
+      plant.photoUrl = result.url;
+    } catch {
+      plant.photoUrl = null;
     }
   }
 }

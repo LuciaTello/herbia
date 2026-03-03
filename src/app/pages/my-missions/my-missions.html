@@ -152,7 +152,8 @@
                    [class.rarity-veryRare]="plant.rarity === 'veryRare'">
             <div class="plant-thumbnail" (click)="openGallery(refPhotos(plant.photos), plant.commonName)">
               @if (refPhotos(plant.photos).length) {
-                <img [src]="refPhotos(plant.photos)[0].url" [alt]="plant.commonName" />
+                <img [src]="refPhotos(plant.photos)[0].url" [alt]="plant.commonName"
+                     (error)="onRefPhotoError(refPhotos(plant.photos)[0])" />
               } @else {
                 <div class="no-photo">?</div>
               }

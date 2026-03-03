@@ -1,7 +1,10 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { PlantPhoto, IdentifyResult, SuggestedPlant } from '../../models/plant.model';
+import { environment } from '../../../environments/environment';
 import { MissionService } from '../../services/mission.service';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
@@ -27,6 +30,7 @@ type MapView = 'map' | 'countries' | 'regions' | 'missions';
 })
 export class MyMissionsPage implements OnInit {
   private readonly missionService = inject(MissionService);
+  private readonly http = inject(HttpClient);
   protected readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   protected readonly cameraService = inject(CameraService);
@@ -483,6 +487,22 @@ export class MyMissionsPage implements OnInit {
 
   protected closeFamily(): void {
     this.selectedFamily.set(null);
+  }
+
+  protected async onRefPhotoError(photo: PlantPhoto): Promise<void> {
+    if (!photo.id) return;
+    try {
+      const result = await firstValueFrom(
+        this.http.post<{ url: string | null }>(`${environment.apiUrl}/plants/photos/${photo.id}/refresh`, {})
+      );
+      if (result.url) {
+        photo.url = result.url;
+      } else {
+        photo.url = '';
+      }
+    } catch {
+      photo.url = '';
+    }
   }
 
   protected unidentifiedPlants(plants: SuggestedPlant[]): SuggestedPlant[] {

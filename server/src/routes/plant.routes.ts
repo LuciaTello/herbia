@@ -3,7 +3,7 @@
 
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
-import { getSuggestedPlants, ensurePlantPhoto } from '../services/plant.service';
+import { getSuggestedPlants, ensurePlantPhoto, fetchFromWikipedia, fetchFromINaturalist } from '../services/plant.service';
 import { incrementQuota } from '../services/quota.service';
 
 // Factory function (same pattern as missionRouter/collectionRouter)
@@ -105,6 +105,7 @@ export function plantRouter(prisma: PrismaClient): Router {
       }
 
       const result = plants.map(p => ({
+        id: p.id,
         scientificName: p.scientificName,
         commonName: lang === 'fr' ? (p.commonNameFr || p.commonNameEs || p.scientificName) : (p.commonNameEs || p.commonNameFr || p.scientificName),
         photoUrl: p.photoUrl,
@@ -115,6 +116,85 @@ export function plantRouter(prisma: PrismaClient): Router {
     } catch (error) {
       console.error('Error fetching family plants:', error);
       res.status(500).json({ error: 'Failed to fetch family plants' });
+    }
+  });
+
+  // POST /api/plants/photos/:photoId/refresh — re-fetch a broken mission photo
+  router.post('/photos/:photoId/refresh', async (req, res) => {
+    try {
+      const photoId = Number(req.params['photoId']);
+      if (!photoId) {
+        res.status(400).json({ error: 'Invalid photo ID' });
+        return;
+      }
+
+      // Find the photo and verify ownership (photo → suggestedPlant → mission → user)
+      const photo = await prisma.plantPhoto.findUnique({
+        where: { id: photoId },
+        include: { suggestedPlant: { include: { mission: { select: { userId: true } } } } },
+      });
+
+      if (!photo || photo.suggestedPlant?.mission?.userId !== req.userId) {
+        res.status(404).json({ error: 'Photo not found' });
+        return;
+      }
+
+      const scientificName = photo.suggestedPlant!.scientificName;
+
+      // Re-fetch based on original source
+      let newUrl: string | null = null;
+      if (photo.source === 'wikipedia') {
+        const url = await fetchFromWikipedia(scientificName);
+        if (url) newUrl = url;
+      } else {
+        const urls = await fetchFromINaturalist(scientificName);
+        if (urls.length > 0) newUrl = urls[0];
+      }
+
+      if (newUrl) {
+        await prisma.plantPhoto.update({ where: { id: photoId }, data: { url: newUrl } });
+        res.json({ url: newUrl });
+      } else {
+        // No replacement found — remove the broken photo
+        await prisma.plantPhoto.delete({ where: { id: photoId } });
+        res.json({ url: null });
+      }
+    } catch (error) {
+      console.error('Error refreshing photo:', error);
+      res.status(500).json({ error: 'Failed to refresh photo' });
+    }
+  });
+
+  // POST /api/plants/:plantId/refresh-photo — re-fetch a broken canonical plant photo
+  router.post('/:plantId/refresh-photo', async (req, res) => {
+    try {
+      const plantId = Number(req.params['plantId']);
+      if (!plantId) {
+        res.status(400).json({ error: 'Invalid plant ID' });
+        return;
+      }
+
+      const plant = await prisma.plant.findUnique({ where: { id: plantId } });
+      if (!plant) {
+        res.status(404).json({ error: 'Plant not found' });
+        return;
+      }
+
+      // Clear existing broken photo so ensurePlantPhoto will re-fetch
+      await prisma.plant.update({
+        where: { id: plantId },
+        data: { photoUrl: null, photoSource: null },
+      });
+
+      const url = await ensurePlantPhoto(
+        { id: plantId, photoUrl: null, scientificName: plant.scientificName },
+        prisma,
+      );
+
+      res.json({ url: url || null });
+    } catch (error) {
+      console.error('Error refreshing plant photo:', error);
+      res.status(500).json({ error: 'Failed to refresh plant photo' });
     }
   });
 

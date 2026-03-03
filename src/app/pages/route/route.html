@@ -83,7 +83,8 @@
       <article class="plant-card">
         <div class="plant-thumbnail" (click)="openGallery(plant.photos, plant.commonName)">
           @if (plant.photos.length) {
-            <img [src]="plant.photos[0].url" [alt]="plant.commonName" />
+            <img [src]="plant.photos[0].url" [alt]="plant.commonName"
+                 (error)="$event.target.style.display='none'" />
           } @else {
             <div class="no-photo">{{ plant.commonName }}</div>
           }
