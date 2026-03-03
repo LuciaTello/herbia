@@ -15,13 +15,37 @@ export class HomePage {
   protected readonly i18n = inject(I18nService);
   protected readonly auth = inject(AuthService);
 
-  protected readonly levelEmoji = computed(() => {
+  protected readonly currentLevel = computed(() => {
     const pts = this.auth.points();
-    const levels = this.i18n.t().level.levels;
     let idx = 0;
     for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
       if (pts >= LEVEL_THRESHOLDS[i]) { idx = i; break; }
     }
-    return levels[idx]?.emoji ?? '🌱';
+    return idx;
+  });
+
+  protected readonly levelEmoji = computed(() => {
+    return this.i18n.t().level.levels[this.currentLevel()]?.emoji ?? '🌱';
+  });
+
+  protected readonly nextThreshold = computed(() => {
+    const idx = this.currentLevel();
+    return idx < LEVEL_THRESHOLDS.length - 1 ? LEVEL_THRESHOLDS[idx + 1] : null;
+  });
+
+  protected readonly progressPercent = computed(() => {
+    const idx = this.currentLevel();
+    const pts = this.auth.points();
+    const current = LEVEL_THRESHOLDS[idx];
+    const next = this.nextThreshold();
+    if (!next) return 100;
+    return Math.round(((pts - current) / (next - current)) * 100);
+  });
+
+  protected readonly nextLevel = computed(() => {
+    const next = this.nextThreshold();
+    if (!next) return null;
+    const remaining = next - this.auth.points();
+    return this.i18n.t().level.nextLevel(remaining);
   });
 }

@@ -12,12 +12,13 @@ export const FR: Translations = {
     logout: 'Déconnexion',
   },
   home: {
-    title: 'Chaque chemin cache des plantes à découvrir',
-    description:
-      'Indique un itinéraire ou une zone — on cherchera quelles plantes y poussent. Pars à leur recherche, prends-les en photo et complète ton herbier de voyageuse.',
+    greeting: (name) => `Salut, ${name} !`,
     startRoute: 'Nouvelle mission',
+    missionSubtitle: 'Choisis un trajet ou une zone',
     myMissions: 'Mes missions',
+    missionsSubtitle: 'Tes plantes t\'attendent',
     myCollection: 'Ma collection',
+    collectionSubtitle: 'Ton herbier de voyageuse',
   },
   route: {
     back: "Retour à l'accueil",

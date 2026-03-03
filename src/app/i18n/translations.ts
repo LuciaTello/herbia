@@ -10,11 +10,13 @@ export interface Translations {
     logout: string;
   };
   home: {
-    title: string;
-    description: string;
+    greeting: (name: string) => string;
     startRoute: string;
+    missionSubtitle: string;
     myMissions: string;
+    missionsSubtitle: string;
     myCollection: string;
+    collectionSubtitle: string;
   };
   route: {
     back: string;

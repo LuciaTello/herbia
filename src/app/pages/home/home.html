@@ -1,17 +1,56 @@
-<section class="hero">
-  <h2>{{ i18n.t().home.title }}</h2>
-  <p>{{ i18n.t().home.description }}</p>
-</section>
+@if (auth.isLoggedIn()) {
+  <section class="greeting">
+    <h2>{{ i18n.t().home.greeting(auth.username() ?? '') }}</h2>
+  </section>
 
-<section class="actions">
-  @if (auth.isLoggedIn()) {
-    <a routerLink="/route" class="primary-button">{{ i18n.t().home.startRoute }}</a>
-    <a routerLink="/my-missions" class="secondary-button">{{ i18n.t().home.myMissions }}</a>
-    <a routerLink="/collection" class="secondary-button">{{ i18n.t().home.myCollection }}</a>
-  } @else {
-    <a routerLink="/login" class="primary-button">{{ i18n.t().login.loginButton }}</a>
-  }
-</section>
+  <section class="level-card" routerLink="/my-level">
+    <span class="level-card-emoji">{{ levelEmoji() }}</span>
+    <div class="level-card-info">
+      <strong>{{ i18n.t().level.levels[currentLevel()].name }}</strong>
+      <div class="level-card-progress">
+        <div class="level-card-bar">
+          <div class="level-card-fill" [style.width.%]="progressPercent()"></div>
+        </div>
+        @if (nextLevel()) {
+          <span class="level-card-next">{{ nextLevel() }}</span>
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="actions">
+    <a routerLink="/route" class="action-card">
+      <span class="action-emoji">🌱</span>
+      <div class="action-text">
+        <strong>{{ i18n.t().home.startRoute }}</strong>
+        <span>{{ i18n.t().home.missionSubtitle }}</span>
+      </div>
+    </a>
+    <a routerLink="/my-missions" class="action-card">
+      <span class="action-emoji">🗺️</span>
+      <div class="action-text">
+        <strong>{{ i18n.t().home.myMissions }}</strong>
+        <span>{{ i18n.t().home.missionsSubtitle }}</span>
+      </div>
+    </a>
+    <a routerLink="/collection" class="action-card">
+      <span class="action-emoji">🌿</span>
+      <div class="action-text">
+        <strong>{{ i18n.t().home.myCollection }}</strong>
+        <span>{{ i18n.t().home.collectionSubtitle }}</span>
+      </div>
+    </a>
+  </section>
+} @else {
+  <section class="actions">
+    <a routerLink="/login" class="action-card">
+      <span class="action-emoji">🌱</span>
+      <div class="action-text">
+        <strong>{{ i18n.t().login.loginButton }}</strong>
+      </div>
+    </a>
+  </section>
+}
 
 @if (auth.isLoggedIn()) {
   <nav class="bottom-nav">
