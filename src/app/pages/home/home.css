@@ -162,3 +162,12 @@
 .nav-label {
   font-weight: 500;
 }
+
+.nav-logo {
+  padding: 0.25rem !important;
+}
+
+.nav-logo-icon {
+  height: 1.6rem;
+  width: auto;
+}
