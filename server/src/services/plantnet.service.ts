@@ -63,7 +63,7 @@ async function lookupFamily(scientificName: string): Promise<string> {
 async function lookupSynonyms(scientificName: string): Promise<Set<string>> {
   const synonyms = new Set<string>([normalize(scientificName)]);
   try {
-    const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(scientificName)}&rank=species&per_page=1`;
+    const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(scientificName)}&rank=species&per_page=1&all_names=true`;
     const response = await fetch(url, { headers: { 'User-Agent': 'herbia-app' } });
     if (!response.ok) return synonyms;
     const data = await response.json();
@@ -71,9 +71,9 @@ async function lookupSynonyms(scientificName: string): Promise<Set<string>> {
     if (!taxon) return synonyms;
     // Add the canonical iNaturalist name
     if (taxon.name) synonyms.add(normalize(taxon.name));
-    // Add all known synonyms (listed under taxon.names with is_valid or synonym lexicons)
+    // Add all scientific name synonyms (lexicon is "scientific-names" with kebab-case)
     for (const n of taxon.names || []) {
-      if (n.lexicon === 'Scientific Names' || n.lexicon === 'scientific names') {
+      if (n.lexicon === 'scientific-names') {
         synonyms.add(normalize(n.name));
       }
     }
