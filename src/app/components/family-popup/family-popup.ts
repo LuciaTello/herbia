@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { I18nService } from '../../i18n';
 import { environment } from '../../../environments/environment';
+import { PhotoGalleryComponent } from '../photo-gallery/photo-gallery';
 
 interface FamilyPlant {
   scientificName: string;
@@ -13,6 +14,7 @@ interface FamilyPlant {
 
 @Component({
   selector: 'app-family-popup',
+  imports: [PhotoGalleryComponent],
   templateUrl: './family-popup.html',
   styleUrl: './family-popup.css',
 })
@@ -25,6 +27,8 @@ export class FamilyPopupComponent implements OnInit {
 
   protected readonly loading = signal(true);
   protected readonly plants = signal<FamilyPlant[]>([]);
+  protected readonly galleryImage = signal<string | null>(null);
+  protected readonly galleryName = signal('');
 
   async ngOnInit(): Promise<void> {
     try {
@@ -36,6 +40,15 @@ export class FamilyPopupComponent implements OnInit {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  protected openPhoto(url: string, name: string): void {
+    this.galleryImage.set(url);
+    this.galleryName.set(name);
+  }
+
+  protected closeGallery(): void {
+    this.galleryImage.set(null);
   }
 
   protected onBackdropClick(event: MouseEvent): void {

@@ -14,7 +14,8 @@
         @for (plant of plants(); track plant.scientificName) {
           <div class="family-card">
             @if (plant.photoUrl) {
-              <img class="family-photo" [src]="plant.photoUrl" [alt]="plant.commonName" />
+              <img class="family-photo" [src]="plant.photoUrl" [alt]="plant.commonName"
+                   (click)="openPhoto(plant.photoUrl!, plant.commonName)" />
             } @else {
               <div class="family-no-photo">?</div>
             }
@@ -30,3 +31,11 @@
     </button>
   </div>
 </div>
+
+@if (galleryImage()) {
+  <app-photo-gallery
+    [images]="[galleryImage()!]"
+    [plantName]="galleryName()"
+    (closeGallery)="closeGallery()"
+  />
+}

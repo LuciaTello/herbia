@@ -74,6 +74,7 @@
   object-fit: cover;
   display: block;
   margin: 0 auto 0.375rem;
+  cursor: pointer;
 }
 
 .family-no-photo {
