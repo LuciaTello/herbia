@@ -1,12 +1,12 @@
 import { Component, computed, effect, inject } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { I18nService } from './i18n';
 import { AuthService } from './services/auth.service';
 import { OnboardingComponent } from './components/onboarding/onboarding';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, OnboardingComponent],
+  imports: [RouterOutlet, OnboardingComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
