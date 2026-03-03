@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18nService } from '../../i18n';
 import { AuthService } from '../../services/auth.service';
@@ -11,9 +11,13 @@ const LEVEL_THRESHOLDS = [0, 750, 1500, 3750, 7500, 25000];
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class HomePage {
+export class HomePage implements OnInit {
   protected readonly i18n = inject(I18nService);
   protected readonly auth = inject(AuthService);
+
+  async ngOnInit(): Promise<void> {
+    await this.auth.refreshProfile();
+  }
 
   protected readonly currentLevel = computed(() => {
     const pts = this.auth.points();
