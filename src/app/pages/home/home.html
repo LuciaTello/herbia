@@ -3,7 +3,7 @@
     <h2>{{ i18n.t().home.greeting(auth.username() ?? '') }}</h2>
   </section>
 
-  <section class="level-card" routerLink="/my-level">
+  <section class="level-card">
     <span class="level-card-emoji">{{ levelEmoji() }}</span>
     <div class="level-card-info">
       <strong>{{ i18n.t().level.levels[currentLevel()].name }}</strong>
@@ -20,7 +20,7 @@
 
   <section class="actions">
     <a routerLink="/route" class="action-card">
-      <span class="action-emoji">🌱</span>
+      <span class="action-emoji">🧭</span>
       <div class="action-text">
         <strong>{{ i18n.t().home.startRoute }}</strong>
         <span>{{ i18n.t().home.missionSubtitle }}</span>

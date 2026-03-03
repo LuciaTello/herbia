@@ -21,17 +21,8 @@
   gap: 1rem;
   margin: 0 1rem 1.5rem;
   padding: 1rem 1.25rem;
-  border: 2px solid #e8f5e9;
   border-radius: 12px;
-  background: white;
-  cursor: pointer;
-  text-decoration: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.level-card:hover {
-  border-color: #2d7d46;
-  box-shadow: 0 2px 8px rgba(45, 125, 70, 0.1);
+  background: transparent;
 }
 
 .level-card-emoji {
@@ -82,9 +73,11 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 0 1rem;
+  padding: 1.25rem 1rem;
   max-width: 400px;
   margin: 0 auto;
+  background: rgba(45, 125, 70, 0.04);
+  border-radius: 16px;
 }
 
 .action-card {
