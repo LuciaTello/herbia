@@ -8,7 +8,7 @@ export const ES: Translations = {
     profile: 'Perfil',
     level: 'Nivel',
     friends: 'Amigas',
-    tutorial: 'Tutorial',
+    tutorial: 'Tutoriales',
     logout: 'Desconexión',
   },
   home: {
