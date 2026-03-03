@@ -44,6 +44,18 @@
     </div>
   }
 
+  <div class="plant-count-toggle">
+    <button type="button" [class.active]="plantCount() === 5" (click)="plantCount.set(5)">
+      {{ i18n.t().route.plantCount5 }}
+    </button>
+    <button type="button" [class.active]="plantCount() === 10" (click)="plantCount.set(10)">
+      {{ i18n.t().route.plantCount10 }}
+    </button>
+  </div>
+  <p class="plant-count-hint">
+    {{ plantCount() === 5 ? i18n.t().route.plantCountHint5 : i18n.t().route.plantCountHint10 }}
+  </p>
+
   <button type="submit" class="primary-button" [disabled]="loading()">
     @if (loading()) {
       {{ i18n.t().route.searching }}
@@ -51,10 +63,6 @@
       {{ mode() === 'zone' ? i18n.t().route.searchZone : i18n.t().route.search }}
     }
   </button>
-
-  <p class="plant-count-hint" (click)="plantCount.set(plantCount() === 5 ? 10 : 5)">
-    {{ i18n.t().route.plantCountLabel(plantCount()) }}
-  </p>
 </form>
 
 @if (loading()) {
