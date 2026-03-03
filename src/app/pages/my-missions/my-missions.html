@@ -172,7 +172,6 @@
                 <p class="hint">{{ plant.hint }}</p>
               }
               @if (plant.found) {
-                <span class="found-badge">{{ i18n.t().myMissions.found }}</span>
                 @if (plant.foundInMission && plant.foundInMissionId !== mission.id) {
                   @if (plant.foundInMission.origin === plant.foundInMission.destination) {
                     <span class="found-in-mission">Capturada en {{ plant.foundInMission.origin }}</span>
@@ -180,35 +179,26 @@
                     <span class="found-in-mission">{{ i18n.t().myMissions.foundInMission(plant.foundInMission.origin, plant.foundInMission.destination) }}</span>
                   }
                 }
+                @if (identifying() === plant.id) {
+                  <span class="uploading-badge">{{ i18n.t().myMissions.identifying }}</span>
+                } @else if (uploadingPhotoId() === plant.id) {
+                  <span class="uploading-badge">{{ i18n.t().myMissions.uploading }}</span>
+                } @else if (userPhotos(plant.photos).length < 4) {
+                  <button class="add-photo-button" (click)="pickPhoto(plant.id)">
+                    &#x1F4F7; {{ i18n.t().myMissions.addPhoto }}
+                  </button>
+                }
                 @if (userPhotos(plant.photos).length) {
-                  <div class="user-photos-box">
+                  <div class="user-photos-list">
                     @for (photo of userPhotos(plant.photos); track photo.id) {
-                      <div class="user-photo-wrapper">
+                      <div class="user-photo-row">
                         <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
                              (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
-                        <button class="photo-delete-btn" (click)="deletePhoto(photo.id!)">&times;</button>
+                        <span class="photo-points">{{ i18n.t().myMissions.pointsEarned(photo.similarity || 0) }}</span>
+                        <button class="photo-row-delete" (click)="deletePhoto(photo.id!)">&times;</button>
                       </div>
                     }
-                    @if (identifying() === plant.id) {
-                      <span class="uploading-badge">{{ i18n.t().myMissions.identifying }}</span>
-                    } @else if (uploadingPhotoId() === plant.id) {
-                      <span class="uploading-badge">{{ i18n.t().myMissions.uploading }}</span>
-                    } @else if (userPhotos(plant.photos).length < 4) {
-                      <button class="add-photo-button" (click)="pickPhoto(plant.id)">
-                        &#x1F4F7; {{ i18n.t().myMissions.addPhoto }}
-                      </button>
-                    }
                   </div>
-                } @else {
-                  @if (identifying() === plant.id) {
-                    <span class="uploading-badge">{{ i18n.t().myMissions.identifying }}</span>
-                  } @else if (uploadingPhotoId() === plant.id) {
-                    <span class="uploading-badge">{{ i18n.t().myMissions.uploading }}</span>
-                  } @else {
-                    <button class="add-photo-button" (click)="pickPhoto(plant.id)">
-                      &#x1F4F7; {{ i18n.t().myMissions.addPhoto }}
-                    </button>
-                  }
                 }
                 @if (identifyResult() && pendingPlantId() === plant.id) {
                   <div class="identify-banner" [class.match]="identifyResult()!.match" [class.no-match]="!identifyResult()!.match">
