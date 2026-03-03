@@ -34,7 +34,7 @@
       </div>
     </a>
     <a routerLink="/collection" class="action-card">
-      <span class="action-emoji">🌿</span>
+      <span class="action-emoji">🍃</span>
       <div class="action-text">
         <strong>{{ i18n.t().home.myCollection }}</strong>
         <span>{{ i18n.t().home.collectionSubtitle }}</span>
@@ -55,19 +55,15 @@
 @if (auth.isLoggedIn()) {
   <nav class="bottom-nav">
     <a routerLink="/profile">
-      <span class="nav-icon">👤</span>
       <span class="nav-label">{{ i18n.t().nav.profile }}</span>
     </a>
     <a routerLink="/my-level">
-      <span class="nav-icon">{{ levelEmoji() }}</span>
       <span class="nav-label">{{ i18n.t().nav.level }}</span>
     </a>
     <a routerLink="/friends">
-      <span class="nav-icon">👥</span>
       <span class="nav-label">{{ i18n.t().nav.friends }}</span>
     </a>
     <a routerLink="/tutorials">
-      <span class="nav-icon">📖</span>
       <span class="nav-label">{{ i18n.t().nav.tutorial }}</span>
     </a>
   </nav>
