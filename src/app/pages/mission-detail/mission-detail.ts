@@ -38,7 +38,7 @@ export class MissionDetailPage implements OnInit {
   protected readonly identifying = signal(false);
   protected readonly identifyResult = signal<IdentifyAllResult | null>(null);
   protected readonly pendingFile = signal<File | null>(null);
-  protected readonly resultOverlay = signal<{ name: string; points: number; type: 'match' | 'noMatch' } | null>(null);
+  protected readonly resultOverlay = signal<{ name: string; points: number; type: 'match' | 'noMatch'; photoUrl?: string; identifiedAs?: string } | null>(null);
   protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
   protected readonly uploadingPhoto = signal(false);
@@ -116,23 +116,26 @@ export class MissionDetailPage implements OnInit {
 
     try {
       const file = await resizeImage(raw);
+      const photoUrl = URL.createObjectURL(file);
       this.pendingFile.set(file);
       this.identifyResult.set(null);
       this.identifying.set(true);
 
       try {
         const result = await this.missionService.identifyAll(this.missionId, file);
+        const identifiedAs = result.plantnetResult.identifiedAs;
 
         const available = result.matches.filter(m => !m.alreadyCaptured);
         if (available.length === 0) {
-          await this.addToCollection(file, result);
+          await this.addToCollection(file, result, photoUrl);
         } else if (available.length === 1) {
-          await this.confirmUpload(available[0].plantId, available[0].similarity, available[0].commonName);
+          await this.confirmUpload(available[0].plantId, available[0].similarity, available[0].commonName, photoUrl, identifiedAs);
         } else {
           this.identifyResult.set({ ...result, matches: available });
+          URL.revokeObjectURL(photoUrl);
         }
       } catch {
-        this.resultOverlay.set({ name: this.i18n.t().myMissions.uploadError, points: 0, type: 'noMatch' });
+        this.resultOverlay.set({ name: this.i18n.t().myMissions.uploadError, points: 0, type: 'noMatch', photoUrl });
       } finally {
         this.identifying.set(false);
       }
@@ -141,13 +144,14 @@ export class MissionDetailPage implements OnInit {
     }
   }
 
-  private async addToCollection(file: File, result: IdentifyAllResult): Promise<void> {
+  private async addToCollection(file: File, result: IdentifyAllResult, photoUrl?: string): Promise<void> {
+    const identifiedAs = result.plantnetResult.identifiedAs;
     try {
-      const prevResult = result.plantnetResult.identifiedAs
-        ? { match: false, score: result.plantnetResult.score, identifiedAs: result.plantnetResult.identifiedAs, commonName: result.plantnetResult.commonName, similarity: 0, genus: result.plantnetResult.genus, family: result.plantnetResult.family }
+      const prevResult = identifiedAs
+        ? { match: false, score: result.plantnetResult.score, identifiedAs, commonName: result.plantnetResult.commonName, similarity: 0, genus: result.plantnetResult.genus, family: result.plantnetResult.family }
         : undefined;
       await this.missionService.addUserPlant(this.missionId, file, prevResult);
-      this.resultOverlay.set({ name: this.i18n.t().myMissions.noMatchInMission, points: 0, type: 'noMatch' });
+      this.resultOverlay.set({ name: this.i18n.t().myMissions.noMatchInMission, points: 0, type: 'noMatch', photoUrl, identifiedAs });
     } catch (err: any) {
       let msg = this.i18n.t().myMissions.uploadError;
       if (err?.status === 409) {
@@ -155,13 +159,13 @@ export class MissionDetailPage implements OnInit {
           ? this.i18n.t().myMissions.regionLimitReached
           : this.i18n.t().myMissions.maxPhotosReached;
       }
-      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch' });
+      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl });
     } finally {
       this.pendingFile.set(null);
     }
   }
 
-  async confirmUpload(plantId: number, similarity: number, plantName?: string): Promise<void> {
+  async confirmUpload(plantId: number, similarity: number, plantName?: string, photoUrl?: string, identifiedAs?: string): Promise<void> {
     const file = this.pendingFile();
     if (!file) return;
 
@@ -172,7 +176,7 @@ export class MissionDetailPage implements OnInit {
       if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
       this.missionService.markPlantFoundLocally(plantId);
       const name = plantName || this.missions().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
-      this.resultOverlay.set({ name, points: similarity, type: 'match' });
+      this.resultOverlay.set({ name, points: similarity, type: 'match', photoUrl, identifiedAs });
       await this.checkAutoComplete();
     } catch (err: any) {
       let msg = this.i18n.t().myMissions.uploadError;
@@ -181,7 +185,7 @@ export class MissionDetailPage implements OnInit {
           ? this.i18n.t().myMissions.alreadyCaptured
           : this.i18n.t().myMissions.maxPhotosReached;
       }
-      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch' });
+      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl });
     } finally {
       this.uploadingPhoto.set(false);
       this.pendingFile.set(null);
@@ -190,6 +194,19 @@ export class MissionDetailPage implements OnInit {
 
   protected selectMatch(match: { plantId: number; similarity: number; commonName: string }): void {
     this.confirmUpload(match.plantId, match.similarity, match.commonName);
+  }
+
+  protected dismissOverlay(): void {
+    const r = this.resultOverlay();
+    if (r?.photoUrl) URL.revokeObjectURL(r.photoUrl);
+    this.resultOverlay.set(null);
+  }
+
+  protected matchReason(points: number): string {
+    if (points >= 100) return this.i18n.t().myMissions.matchSpecies;
+    if (points >= 75) return this.i18n.t().myMissions.matchGenus;
+    if (points >= 40) return this.i18n.t().myMissions.matchFamily;
+    return '';
   }
 
   protected cancelUpload(): void {

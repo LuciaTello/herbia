@@ -136,14 +136,26 @@
 }
 
 @if (resultOverlay(); as r) {
-  <div class="result-overlay" (click)="resultOverlay.set(null)">
+  <div class="result-overlay" (click)="dismissOverlay()">
     <div class="result-card" [class.match]="r.type === 'match'" [class.no-match]="r.type === 'noMatch'">
+      @if (r.photoUrl) {
+        <img class="result-photo" [src]="r.photoUrl" alt="" />
+      }
       @if (r.type === 'match') {
         <span class="result-emoji">&#10003;</span>
         <p class="result-name">{{ r.name }}</p>
+        @if (r.identifiedAs) {
+          <p class="result-scientific">{{ r.identifiedAs }}</p>
+        }
+        @if (matchReason(r.points)) {
+          <p class="result-reason">{{ matchReason(r.points) }}</p>
+        }
         <p class="result-points">+{{ r.points }} pts</p>
       } @else {
         <span class="result-emoji">&#128247;</span>
+        @if (r.identifiedAs) {
+          <p class="result-identified">{{ r.identifiedAs }}</p>
+        }
         <p class="result-name">{{ r.name }}</p>
       }
     </div>

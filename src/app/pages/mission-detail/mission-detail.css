@@ -295,6 +295,39 @@ h2 {
   color: #2d7d46;
 }
 
+.result-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-bottom: 0.75rem;
+}
+
+.result-scientific {
+  font-style: italic;
+  color: #636e72;
+  font-size: 0.85rem;
+  margin: 0 0 0.375rem;
+}
+
+.result-reason {
+  display: inline-block;
+  background: #e8f5e9;
+  color: #2d7d46;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  margin: 0 0 0.5rem;
+}
+
+.result-identified {
+  font-style: italic;
+  color: #636e72;
+  font-size: 0.85rem;
+  margin: 0 0 0.375rem;
+}
+
 .result-name {
   font-size: 1.15rem;
   font-weight: 600;

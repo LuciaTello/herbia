@@ -91,6 +91,9 @@ export interface Translations {
     photoLooksLike: string;
     selectPlant: string;
     noMatchInMission: string;
+    matchSpecies: string;
+    matchGenus: string;
+    matchFamily: string;
     pointsFor: (name: string, pts: number) => string;
     takingPhoto: string;
   };
