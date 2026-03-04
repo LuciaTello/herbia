@@ -2,6 +2,8 @@ import { Injectable, signal } from '@angular/core';
 
 interface PendingConfirm {
   message: string;
+  destructive: boolean;
+  confirmLabel?: string;
   resolve: (value: boolean) => void;
 }
 
@@ -9,9 +11,9 @@ interface PendingConfirm {
 export class ConfirmService {
   readonly pending = signal<PendingConfirm | null>(null);
 
-  confirm(message: string): Promise<boolean> {
+  confirm(message: string, destructive = true, confirmLabel?: string): Promise<boolean> {
     return new Promise<boolean>(resolve => {
-      this.pending.set({ message, resolve });
+      this.pending.set({ message, destructive, confirmLabel, resolve });
     });
   }
 

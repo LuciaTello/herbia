@@ -6,8 +6,13 @@
         <button class="confirm-btn cancel" (click)="confirm.cancel()">
           {{ i18n.t().confirm.cancel }}
         </button>
-        <button class="confirm-btn delete" (click)="confirm.accept()">
-          {{ i18n.t().confirm.confirm }}
+        <button
+          class="confirm-btn"
+          [class.destructive]="confirm.pending()!.destructive"
+          [class.positive]="!confirm.pending()!.destructive"
+          (click)="confirm.accept()"
+        >
+          {{ confirm.pending()!.confirmLabel || i18n.t().confirm.confirm }}
         </button>
       </div>
     </div>
