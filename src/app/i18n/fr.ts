@@ -177,12 +177,12 @@ export const FR: Translations = {
       'Tes trouvailles',
     ],
     texts: [
-      'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période. Toutes ne se laisseront pas trouver — ton défi : découvrir combien tu peux en dénicher.',
-      'Quand tu trouves une plante, prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points.',
+      'Les plantes que tu vois dans la mission sont choisies d\'après ce qui pousse dans cette zone à cette période. Toutes ne se laisseront pas trouver — ton défi : découvrir combien tu peux en dénicher.',
+      'Essaie de trouver les plantes proposées ou celles qui sont proches génétiquement. Prends-les en photo et si ça correspond à l\'espèce, au genre ou à la famille, tu gagneras des points.',
       'L\'espèce est le niveau le plus fin : les différences entre deux espèces du même genre sont subtiles. Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
       'Le genre regroupe des espèces comme des frères ou cousins proches : ils partagent un ancêtre récent et gardent beaucoup de traits visibles en commun. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
       'La famille, ce sont des cousins très éloignés : ils partagent un ancêtre vieux de millions d\'années. C\'est pour ça qu\'une fraise et un pommier (tous deux Rosacées) semblent si différents. Si tu ne trouves pas la plante exacte, clique sur « Famille » sous le nom scientifique pour voir d\'autres plantes que tu pourrais croiser.',
-      'Tu peux aussi ajouter des plantes qui ne sont pas dans la liste. Chaque espèce accepte 1 photo par mission, et jusqu\'à 20 photos par espèce et région dans ta collection.',
+      'Chaque espèce peut avoir jusqu\'à 4 photos, et la même espèce ne peut être capturée qu\'une fois par mission. Une fois ta promenade terminée, tu peux terminer la mission.',
     ],
     imageLabels: [
       'Lavandula angustifolia',

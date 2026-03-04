@@ -177,12 +177,12 @@ export const ES: Translations = {
       'Tus hallazgos',
     ],
     texts: [
-      'Las plantas que ves aquí se eligen según lo que crece en esta zona y época del año. No todas se dejarán encontrar — tu reto es descubrir cuántas puedes cazar.',
-      'Cuando encuentres una planta, sácale una foto. Herbia la identificará automáticamente y ganarás puntos.',
+      'Las plantas que ves en la misión se eligen según lo que crece en esta zona y época del año. No todas se dejarán encontrar — tu reto es descubrir cuántas puedes cazar.',
+      'Intenta encontrar las plantas propuestas o las que sean genéticamente cercanas. Hazles una foto y si coincide con la especie, el género o la familia, ganarás puntos.',
       'La especie es el nivel más fino: las diferencias entre dos especies del mismo género son sutiles. Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
       'El género agrupa especies como hermanos o primos cercanos: comparten un ancestro reciente y conservan muchos rasgos visibles en común. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
       'La familia son primos muy lejanos: comparten un ancestro de hace millones de años. Por eso una fresa y un manzano (ambos Rosáceas) parecen tan distintos. Si no encuentras la planta exacta, clica en «Familia» bajo el nombre científico para ver otras plantas que podrías cruzarte.',
-      'También puedes añadir plantas que no están en la lista. Cada especie admite 1 foto por misión, y hasta 20 fotos por especie y región en tu colección.',
+      'Cada especie puede tener hasta 4 fotos, y la misma especie solo se puede capturar una vez por misión. Cuando termines tu paseo, puedes terminar la misión.',
     ],
     imageLabels: [
       'Lavandula angustifolia',
