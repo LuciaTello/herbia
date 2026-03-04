@@ -142,7 +142,9 @@
         <img class="result-photo" [src]="r.photoUrl" alt="" />
       }
       @if (r.type === 'match') {
-        <span class="result-emoji">&#10003;</span>
+        @if (!r.photoUrl) {
+          <span class="result-emoji">&#10003;</span>
+        }
         <p class="result-name">{{ r.name }}</p>
         @if (r.identifiedAs) {
           <p class="result-scientific">{{ r.identifiedAs }}</p>
@@ -152,7 +154,9 @@
         }
         <p class="result-points">+{{ r.points }} pts</p>
       } @else {
-        <span class="result-emoji">&#128247;</span>
+        @if (!r.photoUrl) {
+          <span class="result-emoji">&#128247;</span>
+        }
         @if (r.identifiedAs) {
           <p class="result-identified">{{ r.identifiedAs }}</p>
         }
