@@ -217,7 +217,7 @@ export function missionRouter(prisma: PrismaClient): Router {
       };
 
       // Compare ALL PlantNet results against each mission plant
-      const matches: Array<{ plantId: number; commonName: string; scientificName: string; similarity: number }> = [];
+      const matches: Array<{ plantId: number; commonName: string; scientificName: string; similarity: number; alreadyCaptured: boolean }> = [];
 
       for (const plant of mission.plants) {
         const sim = await calculateSimilarity(
@@ -227,11 +227,22 @@ export function missionRouter(prisma: PrismaClient): Router {
           plant.family,
         );
         if (sim.similarity > 0) {
+          const hasUserPhoto = await prisma.plantPhoto.count({
+            where: {
+              source: 'user',
+              plant: {
+                scientificName: plant.scientificName,
+                missionId: missionId,
+                mission: { userId: req.userId! },
+              },
+            },
+          });
           matches.push({
             plantId: plant.id,
             commonName: plant.commonName,
             scientificName: plant.scientificName,
             similarity: sim.similarity,
+            alreadyCaptured: hasUserPhoto > 0,
           });
         }
       }
@@ -330,15 +341,19 @@ export function missionRouter(prisma: PrismaClient): Router {
         });
       }
 
-      // Count user photos GLOBALLY for this species (across all missions of this user)
-      const userPhotoCount = await prisma.plantPhoto.count({
+      // Limit: max 1 user photo per species per mission
+      const existingInMission = await prisma.plantPhoto.count({
         where: {
           source: 'user',
-          plant: { scientificName: plant.scientificName, mission: { userId: req.userId! } },
+          plant: {
+            scientificName: plant.scientificName,
+            missionId: plant.missionId,
+            mission: { userId: req.userId! },
+          },
         },
       });
-      if (userPhotoCount >= 4) {
-        res.status(409).json({ error: 'Maximum 4 photos per species' });
+      if (existingInMission >= 1) {
+        res.status(409).json({ error: 'already_captured_in_mission' });
         return;
       }
 
@@ -441,15 +456,18 @@ export function missionRouter(prisma: PrismaClient): Router {
           data: { found: true, foundAt: now, foundInMissionId: missionId },
         });
 
-        // Check global photo count for this species
-        const globalPhotoCount = await prisma.plantPhoto.count({
+        // Limit: max 20 user photos per species per region
+        const regionPhotoCount = await prisma.plantPhoto.count({
           where: {
             source: 'user',
-            plant: { scientificName: result.identifiedAs, mission: { userId: req.userId! } },
+            plant: {
+              scientificName: result.identifiedAs,
+              mission: { userId: req.userId!, regionCode: mission.regionCode },
+            },
           },
         });
-        if (globalPhotoCount >= 4) {
-          res.status(409).json({ error: 'Maximum 4 photos per species' });
+        if (regionPhotoCount >= 20) {
+          res.status(409).json({ error: 'region_limit_reached' });
           return;
         }
       } else {

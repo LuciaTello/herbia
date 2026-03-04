@@ -124,16 +124,20 @@ export class MissionDetailPage implements OnInit {
         const result = await this.missionService.identifyAll(this.missionId, file);
         this.identifying.set(false);
 
-        if (result.matches.length === 0) {
+        const available = result.matches.filter(m => !m.alreadyCaptured);
+        if (available.length === 0 && result.matches.length > 0) {
+          // All matches already captured in this mission
+          this.resultOverlay.set({ name: this.i18n.t().myMissions.alreadyCaptured, points: 0, type: 'noMatch' });
+          this.pendingFile.set(null);
+        } else if (available.length === 0) {
           // No match — add to collection directly
           await this.addToCollection(file, result);
-        } else if (result.matches.length === 1) {
-          // Single match — assign directly
-          const m = result.matches[0];
-          await this.confirmUpload(m.plantId, m.similarity, m.commonName);
+        } else if (available.length === 1) {
+          // Single available match — assign directly
+          await this.confirmUpload(available[0].plantId, available[0].similarity, available[0].commonName);
         } else {
-          // Multiple matches — show popup
-          this.identifyResult.set(result);
+          // Multiple available matches — show popup (only non-captured)
+          this.identifyResult.set({ ...result, matches: available });
         }
       } catch {
         this.identifying.set(false);
@@ -152,7 +156,12 @@ export class MissionDetailPage implements OnInit {
       await this.missionService.addUserPlant(this.missionId, file, prevResult);
       this.resultOverlay.set({ name: this.i18n.t().myMissions.noMatchInMission, points: 0, type: 'noMatch' });
     } catch (err: any) {
-      const msg = err?.status === 409 ? this.i18n.t().myMissions.maxPhotosReached : this.i18n.t().myMissions.uploadError;
+      let msg = this.i18n.t().myMissions.uploadError;
+      if (err?.status === 409) {
+        msg = err?.error?.error === 'region_limit_reached'
+          ? this.i18n.t().myMissions.regionLimitReached
+          : this.i18n.t().myMissions.maxPhotosReached;
+      }
       this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch' });
     } finally {
       this.pendingFile.set(null);
@@ -173,7 +182,12 @@ export class MissionDetailPage implements OnInit {
       this.resultOverlay.set({ name, points: similarity, type: 'match' });
       await this.checkAutoComplete();
     } catch (err: any) {
-      const msg = err?.status === 409 ? this.i18n.t().myMissions.maxPhotosReached : this.i18n.t().myMissions.uploadError;
+      let msg = this.i18n.t().myMissions.uploadError;
+      if (err?.status === 409) {
+        msg = err?.error?.error === 'already_captured_in_mission'
+          ? this.i18n.t().myMissions.alreadyCaptured
+          : this.i18n.t().myMissions.maxPhotosReached;
+      }
       this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch' });
     } finally {
       this.uploadingPhoto.set(false);
