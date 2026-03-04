@@ -38,7 +38,7 @@ export class MissionDetailPage implements OnInit {
   protected readonly identifying = signal(false);
   protected readonly identifyResult = signal<IdentifyAllResult | null>(null);
   protected readonly pendingFile = signal<File | null>(null);
-  protected readonly resultOverlay = signal<{ name: string; points: number; type: 'match' | 'noMatch'; photoUrl?: string; identifiedAs?: string } | null>(null);
+  protected readonly resultOverlay = signal<{ name: string; points: number; type: 'match' | 'noMatch'; photoUrl?: string; identifiedAs?: string; commonName?: string; genus?: string; family?: string } | null>(null);
   protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
   protected readonly uploadingPhoto = signal(false);
@@ -123,13 +123,13 @@ export class MissionDetailPage implements OnInit {
 
       try {
         const result = await this.missionService.identifyAll(this.missionId, file);
-        const identifiedAs = result.plantnetResult.identifiedAs;
+        const pn = result.plantnetResult;
 
         const available = result.matches.filter(m => !m.alreadyCaptured);
         if (available.length === 0) {
           await this.addToCollection(file, result, photoUrl);
         } else if (available.length === 1) {
-          await this.confirmUpload(available[0].plantId, available[0].similarity, available[0].commonName, photoUrl, identifiedAs);
+          await this.confirmUpload(available[0].plantId, available[0].similarity, available[0].commonName, photoUrl, pn);
         } else {
           this.identifyResult.set({ ...result, matches: available });
           URL.revokeObjectURL(photoUrl);
@@ -145,13 +145,13 @@ export class MissionDetailPage implements OnInit {
   }
 
   private async addToCollection(file: File, result: IdentifyAllResult, photoUrl?: string): Promise<void> {
-    const identifiedAs = result.plantnetResult.identifiedAs;
+    const pn = result.plantnetResult;
     try {
-      const prevResult = identifiedAs
-        ? { match: false, score: result.plantnetResult.score, identifiedAs, commonName: result.plantnetResult.commonName, similarity: 0, genus: result.plantnetResult.genus, family: result.plantnetResult.family }
+      const prevResult = pn.identifiedAs
+        ? { match: false, score: pn.score, identifiedAs: pn.identifiedAs, commonName: pn.commonName, similarity: 0, genus: pn.genus, family: pn.family }
         : undefined;
       await this.missionService.addUserPlant(this.missionId, file, prevResult);
-      this.resultOverlay.set({ name: this.i18n.t().myMissions.noMatchInMission, points: 0, type: 'noMatch', photoUrl, identifiedAs });
+      this.resultOverlay.set({ name: this.i18n.t().myMissions.noMatchInMission, points: 0, type: 'noMatch', photoUrl, identifiedAs: pn.identifiedAs, commonName: pn.commonName, genus: pn.genus, family: pn.family });
     } catch (err: any) {
       let msg = this.i18n.t().myMissions.uploadError;
       if (err?.status === 409) {
@@ -165,7 +165,7 @@ export class MissionDetailPage implements OnInit {
     }
   }
 
-  async confirmUpload(plantId: number, similarity: number, plantName?: string, photoUrl?: string, identifiedAs?: string): Promise<void> {
+  async confirmUpload(plantId: number, similarity: number, plantName?: string, photoUrl?: string, pn?: { identifiedAs: string; commonName: string; genus: string; family: string }): Promise<void> {
     const file = this.pendingFile();
     if (!file) return;
 
@@ -176,7 +176,7 @@ export class MissionDetailPage implements OnInit {
       if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
       this.missionService.markPlantFoundLocally(plantId);
       const name = plantName || this.missions().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
-      this.resultOverlay.set({ name, points: similarity, type: 'match', photoUrl, identifiedAs });
+      this.resultOverlay.set({ name, points: similarity, type: 'match', photoUrl, identifiedAs: pn?.identifiedAs, commonName: pn?.commonName, genus: pn?.genus, family: pn?.family });
       await this.checkAutoComplete();
     } catch (err: any) {
       let msg = this.i18n.t().myMissions.uploadError;

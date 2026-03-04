@@ -149,6 +149,12 @@
         @if (r.identifiedAs) {
           <p class="result-scientific">{{ r.identifiedAs }}</p>
         }
+        @if (r.commonName && r.commonName !== r.name) {
+          <p class="result-common">{{ r.commonName }}</p>
+        }
+        @if (r.family) {
+          <p class="result-family">{{ r.family }}</p>
+        }
         @if (matchReason(r.points)) {
           <p class="result-reason">{{ matchReason(r.points) }}</p>
         }
@@ -159,6 +165,12 @@
         }
         @if (r.identifiedAs) {
           <p class="result-identified">{{ r.identifiedAs }}</p>
+        }
+        @if (r.commonName) {
+          <p class="result-common">{{ r.commonName }}</p>
+        }
+        @if (r.family) {
+          <p class="result-family">{{ r.family }}</p>
         }
         <p class="result-name">{{ r.name }}</p>
       }
