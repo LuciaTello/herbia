@@ -1,58 +1,34 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
-import { PlantPhoto, IdentifyResult, SuggestedPlant } from '../../models/plant.model';
-import { environment } from '../../../environments/environment';
+import { Router, RouterLink } from '@angular/router';
+import { PlantPhoto, SuggestedPlant } from '../../models/plant.model';
 import { MissionService } from '../../services/mission.service';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
-import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { WorldMapComponent } from '../../components/world-map/world-map';
 import { getRarity } from '../../utils/rarity';
-import { resizeImage } from '../../utils/resize-image';
 import { getContinent, getContinentName, countryFlag } from '../../utils/continents';
 import { getCountryName } from '../../utils/country-names';
-import { CameraService } from '../../services/camera.service';
-import { CameraSource } from '@capacitor/camera';
 import { ConfirmService } from '../../components/confirm-popup/confirm.service';
 import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
-import { FamilyPopupComponent } from '../../components/family-popup/family-popup';
-import { RouteMapComponent } from '../../components/route-map/route-map';
 
 type MapView = 'map' | 'countries' | 'regions' | 'missions';
 
 @Component({
   selector: 'app-my-missions',
-  imports: [RouterLink, DatePipe, NgTemplateOutlet, PhotoGalleryComponent, WorldMapComponent, ConfirmPopupComponent, FamilyPopupComponent, RouteMapComponent],
+  imports: [RouterLink, DatePipe, NgTemplateOutlet, WorldMapComponent, ConfirmPopupComponent],
   templateUrl: './my-missions.html',
   styleUrl: './my-missions.css',
 })
 export class MyMissionsPage implements OnInit {
   private readonly missionService = inject(MissionService);
-  private readonly http = inject(HttpClient);
   protected readonly auth = inject(AuthService);
-  private readonly route = inject(ActivatedRoute);
-  protected readonly cameraService = inject(CameraService);
+  protected readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
   private readonly confirmService = inject(ConfirmService);
   protected readonly missions = this.missionService.getMissions();
   protected readonly loading = signal(true);
-  protected readonly expandedId = signal<number | null>(null);
-  protected readonly galleryImages = signal<string[]>([]);
-  protected readonly galleryPlantName = signal('');
-  protected readonly uploadingPhotoId = signal<number | null>(null);
-  protected readonly identifying = signal<number | null>(null);
-  protected readonly pendingFile = signal<File | null>(null);
-  protected readonly pendingPlantId = signal<number | null>(null);
-  protected readonly identifyResult = signal<IdentifyResult | null>(null);
-  protected readonly addingPlantForMission = signal<number | null>(null);
-  protected readonly showUnidentifiedFor = signal<number | null>(null);
-  protected readonly addPlantMessage = signal<string | null>(null);
-  protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
-  protected readonly selectedFamily = signal<string | null>(null);
 
   // Top-level toggle: active missions list vs completed missions map
   protected readonly showCompleted = signal(false);
@@ -185,24 +161,12 @@ export class MyMissionsPage implements OnInit {
 
   protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
 
-  protected userPhotos(photos: PlantPhoto[]): PlantPhoto[] {
-    return photos.filter(p => p.source === 'user');
-  }
-
-  protected refPhotos(photos: PlantPhoto[]): PlantPhoto[] {
-    return photos.filter(p => p.source !== 'user');
-  }
-
-  protected foundCount(plants: { found: boolean }[]): number {
-    return plants.filter(p => p.found).length;
-  }
-
   protected missionPoints(plants: SuggestedPlant[]): number {
     return plants.flatMap(p => p.photos).reduce((sum, ph) => sum + (ph.similarity || 0), 0);
   }
 
-  protected toggle(id: number): void {
-    this.expandedId.set(this.expandedId() === id ? null : id);
+  protected foundCount(plants: { found: boolean }[]): number {
+    return plants.filter(p => p.found).length;
   }
 
   async ngOnInit(): Promise<void> {
@@ -210,27 +174,6 @@ export class MyMissionsPage implements OnInit {
       await this.missionService.loadMissions();
     } finally {
       this.loading.set(false);
-    }
-    const openId = Number(this.route.snapshot.queryParamMap.get('open'));
-    if (openId) {
-      const mission = this.missions().find(m => m.id === openId);
-      if (mission?.status === 'completed') {
-        this.showCompleted.set(true);
-        if (mission.countryCode) {
-          const lang = this.i18n.currentLang();
-          const continent = getContinent(mission.countryCode);
-          if (continent) {
-            this.selectedContinent.set(continent);
-            this.selectedCountryCode.set(mission.countryCode);
-            this.selectedCountry.set(getCountryName(mission.countryCode, lang));
-            if (mission.region) this.selectedRegion.set(mission.region);
-            this.mapView.set('missions');
-          }
-        } else {
-          this.mapView.set('missions');
-        }
-      }
-      this.expandedId.set(openId);
     }
   }
 
@@ -302,248 +245,14 @@ export class MyMissionsPage implements OnInit {
     this.mapView.set(action);
   }
 
-  protected openGallery(photos: PlantPhoto[] | undefined, name: string): void {
-    if (photos?.length) {
-      this.galleryImages.set(photos.map(p => p.url));
-      this.galleryPlantName.set(name);
-    }
+  protected openMission(id: number): void {
+    this.router.navigate(['/my-missions', id]);
   }
 
-  protected closeGallery(): void {
-    this.galleryImages.set([]);
-    this.galleryPlantName.set('');
-  }
-
-  async onPhotoSelected(event: Event, plantId: number): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const raw = input.files?.[0];
-    if (!raw) return;
-    input.value = '';
-
-    const file = await resizeImage(raw);
-    this.pendingFile.set(file);
-    this.pendingPlantId.set(plantId);
-    this.identifyResult.set(null);
-    this.identifying.set(plantId);
-
-    try {
-      const result = await this.missionService.identifyPlant(plantId, file);
-      this.identifyResult.set(result);
-    } catch {
-      await this.confirmUpload();
-    } finally {
-      this.identifying.set(null);
-    }
-  }
-
-  async pickPhoto(plantId: number): Promise<void> {
-    let raw: File;
-    try {
-      raw = await this.cameraService.takePhoto();
-    } catch {
-      return; // User cancelled the camera/gallery prompt
-    }
-
-    try {
-      const file = await resizeImage(raw);
-      this.pendingFile.set(file);
-      this.pendingPlantId.set(plantId);
-      this.identifyResult.set(null);
-      this.identifying.set(plantId);
-
-      try {
-        const result = await this.missionService.identifyPlant(plantId, file);
-        this.identifyResult.set(result);
-      } catch {
-        await this.confirmUpload();
-      } finally {
-        this.identifying.set(null);
-      }
-    } catch {
-      this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
-    }
-  }
-
-  protected pickSource(type: 'camera' | 'gallery'): void {
-    this.cameraService.pick(type === 'camera' ? CameraSource.Camera : CameraSource.Photos);
-  }
-
-  async confirmUpload(): Promise<void> {
-    const file = this.pendingFile();
-    const plantId = this.pendingPlantId();
-    if (!file || !plantId) return;
-
-    this.identifyResult.set(null);
-    this.uploadingPhotoId.set(plantId);
-    try {
-      // Upload photo — backend awards points and auto-marks as found
-      const photo = await this.missionService.uploadPlantPhoto(plantId, file);
-      if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
-      // Optimistic update: mark found locally
-      this.missionService.markPlantFoundLocally(plantId);
-      await this.checkAutoComplete();
-    } catch {
-      this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
-    } finally {
-      this.uploadingPhotoId.set(null);
-      this.pendingFile.set(null);
-      this.pendingPlantId.set(null);
-    }
-  }
-
-  async addPendingAsUserPlant(): Promise<void> {
-    const file = this.pendingFile();
-    const plantId = this.pendingPlantId();
-    if (!file || !plantId) return;
-
-    // Find which mission this plant belongs to
-    const mission = this.missions().find(m => m.plants.some(p => p.id === plantId));
-    if (!mission) return;
-
-    const prevResult = this.identifyResult()!;
-    this.identifyResult.set(null);
-    this.pendingFile.set(null);
-    this.pendingPlantId.set(null);
-    this.addingPlantForMission.set(mission.id);
-    this.addPlantMessage.set(null);
-
-    try {
-      await this.missionService.addUserPlant(mission.id, file, prevResult);
-      this.addPlantMessage.set(this.i18n.t().myMissions.plantAdded);
-      setTimeout(() => this.addPlantMessage.set(null), 3000);
-      await this.checkAutoComplete();
-    } catch (err: any) {
-      if (err?.status === 409) {
-        this.addPlantMessage.set(this.i18n.t().myMissions.maxPhotosReached);
-      } else {
-        this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
-      }
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
-    } finally {
-      this.addingPlantForMission.set(null);
-    }
-  }
-
-  cancelUpload(): void {
-    this.pendingFile.set(null);
-    this.pendingPlantId.set(null);
-    this.identifyResult.set(null);
-  }
-
-  async deletePhoto(photoId: number): Promise<void> {
-    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deletePhoto);
-    if (!ok) return;
-    // Find the photo's similarity before deleting (to deduct points locally)
-    const photo = this.missions().flatMap(m => m.plants).flatMap(p => p.photos).find(p => p.id === photoId);
-    const similarity = photo?.similarity ?? 0;
-    await this.missionService.deletePlantPhoto(photoId);
-    if (similarity > 0) this.auth.points.update(p => Math.max(0, p - similarity));
-  }
-
-  async markFound(plantId: number): Promise<void> {
-    await this.missionService.markPlantFound(plantId);
-    await this.checkAutoComplete();
-  }
-
-  async completeMission(id: number): Promise<void> {
-    const ok = await this.confirmService.confirm(this.i18n.t().confirm.completeMission, false, this.i18n.t().myMissions.completeMission);
-    if (!ok) return;
-    this.completingId.set(id);
-    await this.missionService.completeMission(id);
-    await new Promise(resolve => setTimeout(resolve, 600));
-    this.completingId.set(null);
-  }
-
-  async deleteMission(id: number): Promise<void> {
+  async deleteMission(id: number, event: Event): Promise<void> {
+    event.stopPropagation();
     const ok = await this.confirmService.confirm(this.i18n.t().confirm.deleteMission);
     if (!ok) return;
     await this.missionService.deleteMission(id);
-  }
-
-  async deleteUserPlant(plantId: number): Promise<void> {
-    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deleteUserPlant);
-    if (!ok) return;
-    await this.missionService.deleteUserPlant(plantId);
-  }
-
-  protected aiPlants(plants: SuggestedPlant[]): SuggestedPlant[] {
-    return plants.filter(p => p.source !== 'user');
-  }
-
-  protected userPlants(plants: SuggestedPlant[]): SuggestedPlant[] {
-    return plants.filter(p => p.source === 'user' && p.scientificName !== '');
-  }
-
-  private async checkAutoComplete(): Promise<void> {
-    for (const mission of this.missions()) {
-      if (mission.status === 'completed') continue;
-      const aiPlants = mission.plants.filter(p => p.source !== 'user');
-      if (aiPlants.length > 0 && aiPlants.every(p => p.found)) {
-        await this.completeMission(mission.id);
-        this.completedPopup.set(true);
-        setTimeout(() => this.completedPopup.set(false), 3500);
-      }
-    }
-  }
-
-  protected openFamily(family: string): void {
-    this.selectedFamily.set(family);
-  }
-
-  protected closeFamily(): void {
-    this.selectedFamily.set(null);
-  }
-
-  protected async onRefPhotoError(photo: PlantPhoto): Promise<void> {
-    if (!photo.id) return;
-    try {
-      const result = await firstValueFrom(
-        this.http.post<{ url: string | null }>(`${environment.apiUrl}/plants/photos/${photo.id}/refresh`, {})
-      );
-      if (result.url) {
-        photo.url = result.url;
-      } else {
-        photo.url = '';
-      }
-    } catch {
-      photo.url = '';
-    }
-  }
-
-  protected unidentifiedPlants(plants: SuggestedPlant[]): SuggestedPlant[] {
-    return plants.filter(p => p.source === 'user' && p.scientificName === '');
-  }
-
-  protected toggleUnidentified(missionId: number): void {
-    this.showUnidentifiedFor.set(this.showUnidentifiedFor() === missionId ? null : missionId);
-  }
-
-  async onAddPlant(event: Event, missionId: number): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    const raw = input.files?.[0];
-    if (!raw) return;
-    input.value = '';
-
-    const file = await resizeImage(raw);
-    this.addingPlantForMission.set(missionId);
-    this.addPlantMessage.set(null);
-
-    try {
-      const result = await this.missionService.addUserPlant(missionId, file);
-      this.addPlantMessage.set(this.i18n.t().myMissions.plantAdded);
-      setTimeout(() => this.addPlantMessage.set(null), 3000);
-      await this.checkAutoComplete();
-    } catch (err: any) {
-      if (err?.status === 409) {
-        this.addPlantMessage.set(this.i18n.t().myMissions.maxPhotosReached);
-      } else {
-        this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
-      }
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
-    } finally {
-      this.addingPlantForMission.set(null);
-    }
   }
 }

@@ -1,0 +1,184 @@
+<a routerLink="/my-missions" class="back-link">{{ i18n.t().myMissions.back }}</a>
+
+@if (loading()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-message">{{ i18n.t().myMissions.loading }}</p>
+  </div>
+} @else if (!mission()) {
+  <div class="empty">
+    <p>{{ i18n.t().myMissions.emptyLine1 }}</p>
+  </div>
+} @else {
+  <h2>
+    @if (mission()!.origin === mission()!.destination) {
+      {{ mission()!.origin }}
+    } @else {
+      {{ mission()!.origin }} → {{ mission()!.destination }}
+    }
+  </h2>
+
+  @if (mission()!.description) {
+    <p class="mission-description">{{ mission()!.description }}</p>
+  }
+
+  <p class="mission-progress">
+    {{ i18n.t().myMissions.pointsEarned(missionPoints(mission()!.plants)) }}
+    · {{ i18n.t().myMissions.summary(foundCount(aiPlants())) }}
+  </p>
+
+  <div class="mission-plants">
+    @for (plant of aiPlants(); track plant.id) {
+      <article class="plant-card" [class.found]="plant.found"
+               [class.rarity-common]="plant.rarity === 'common' || !plant.rarity"
+               [class.rarity-rare]="plant.rarity === 'rare'"
+               [class.rarity-veryRare]="plant.rarity === 'veryRare'">
+        <div class="plant-thumbnail" (click)="openGallery(refPhotos(plant.photos), plant.commonName)">
+          @if (refPhotos(plant.photos).length) {
+            <img [src]="refPhotos(plant.photos)[0].url" [alt]="plant.commonName" />
+          } @else {
+            <div class="no-photo">?</div>
+          }
+        </div>
+        <div class="plant-info">
+          <h4>{{ plant.commonName }}</h4>
+          <p class="scientific">{{ plant.scientificName }}</p>
+          @if (plant.family) {
+            <span class="plant-family-link" (click)="openFamily(plant.family!); $event.stopPropagation()">{{ i18n.t().myMissions.viewFamily(plant.family!) }}</span>
+          }
+          <p class="chance" [style.color]="rarity(plant.rarity).color">
+            {{ rarity(plant.rarity).label }}
+          </p>
+          <p class="description">{{ plant.description }}</p>
+          @if (plant.hint) {
+            <p class="hint">{{ plant.hint }}</p>
+          }
+          @if (plant.found) {
+            @if (plant.foundInMission && plant.foundInMissionId !== mission()!.id) {
+              @if (plant.foundInMission.origin === plant.foundInMission.destination) {
+                <span class="found-in-mission">{{ i18n.t().myMissions.foundInMission(plant.foundInMission.origin, plant.foundInMission.origin) }}</span>
+              } @else {
+                <span class="found-in-mission">{{ i18n.t().myMissions.foundInMission(plant.foundInMission.origin, plant.foundInMission.destination) }}</span>
+              }
+            }
+            <!-- User photos with points -->
+            @if (userPhotos(plant.photos).length) {
+              <div class="user-photos-list">
+                @for (photo of userPhotos(plant.photos); track photo.id) {
+                  <div class="user-photo-row">
+                    <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
+                         (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
+                    <div class="photo-row-info">
+                      <span class="photo-row-name">{{ plant.commonName }}</span>
+                      <span class="photo-points">{{ i18n.t().myMissions.pointsEarned(photo.similarity || 0) }}</span>
+                    </div>
+                    @if (mission()!.status !== 'completed') {
+                      <button class="photo-row-delete" (click)="deletePhoto(photo.id!)">&times;</button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+      </article>
+    }
+  </div>
+
+  @if (addPlantMessage()) {
+    <p class="add-plant-message">{{ addPlantMessage() }}</p>
+  }
+
+  @if (mission()!.origin !== mission()!.destination) {
+    <app-route-map [origin]="mission()!.origin" [destination]="mission()!.destination" />
+  }
+
+  <!-- Action buttons -->
+  @if (mission()!.status !== 'completed') {
+    <div class="action-buttons">
+      <button class="complete-mission-button" (click)="completeMission()">
+        {{ i18n.t().myMissions.completeMission }}
+      </button>
+      <button class="delete-mission-button" (click)="deleteMission()">
+        &times;
+      </button>
+    </div>
+  }
+
+  <!-- FAB camera button -->
+  @if (mission()!.status !== 'completed') {
+    @if (identifying()) {
+      <div class="fab-camera identifying">
+        <div class="fab-spinner"></div>
+      </div>
+    } @else if (uploadingPhoto()) {
+      <div class="fab-camera identifying">
+        <div class="fab-spinner"></div>
+      </div>
+    } @else {
+      <button class="fab-camera" (click)="takePhoto()">&#x1F4F7;</button>
+    }
+  }
+
+  <!-- Match selection popup (multiple matches) -->
+  @if (identifyResult() && identifyResult()!.matches.length > 1) {
+    <div class="match-backdrop" (click)="cancelUpload()">
+      <div class="match-dialog" (click)="$event.stopPropagation()">
+        <p class="match-title">{{ i18n.t().myMissions.photoLooksLike }} <strong>{{ identifyResult()!.plantnetResult.identifiedAs }}</strong></p>
+        <p class="match-subtitle">{{ i18n.t().myMissions.selectPlant }}</p>
+        @for (match of identifyResult()!.matches; track match.plantId) {
+          <button class="match-option" (click)="selectMatch(match)">
+            {{ i18n.t().myMissions.pointsFor(match.commonName, match.similarity) }}
+          </button>
+        }
+        <button class="match-cancel" (click)="cancelUpload()">
+          {{ i18n.t().confirm.cancel }}
+        </button>
+      </div>
+    </div>
+  }
+}
+
+@if (completedPopup()) {
+  <div class="completed-popup" (click)="completedPopup.set(false)">
+    <p>{{ i18n.t().myMissions.allFound }}</p>
+  </div>
+}
+
+@if (galleryImages().length) {
+  <app-photo-gallery
+    [images]="galleryImages()"
+    [plantName]="galleryPlantName()"
+    (closeGallery)="closeGallery()"
+  />
+}
+
+<app-confirm-popup />
+
+@if (selectedFamily()) {
+  <app-family-popup
+    [family]="selectedFamily()!"
+    (close)="closeFamily()"
+  />
+}
+
+@if (cameraService.showPicker()) {
+  <div class="photo-picker-backdrop" (click)="cameraService.pick(null)">
+    <div class="photo-picker" (click)="$event.stopPropagation()">
+      <p class="photo-picker-title">{{ cameraService.labels().header }}</p>
+      <div class="photo-picker-options">
+        <button class="photo-picker-option" (click)="pickSource('camera')">
+          <span class="photo-picker-icon">&#x1F4F7;</span>
+          <span>{{ cameraService.labels().camera }}</span>
+        </button>
+        <button class="photo-picker-option" (click)="pickSource('gallery')">
+          <span class="photo-picker-icon">&#x1F5BC;</span>
+          <span>{{ cameraService.labels().gallery }}</span>
+        </button>
+      </div>
+      <button class="photo-picker-cancel" (click)="cameraService.pick(null)">
+        {{ cameraService.labels().cancel }}
+      </button>
+    </div>
+  </div>
+}

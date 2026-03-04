@@ -165,7 +165,7 @@ export class RoutePage {
         dLat,
         dLng,
       );
-      this.router.navigate(['/my-missions'], { queryParams: { open: mission.id } });
+      this.router.navigate(['/my-missions', mission.id]);
     } catch (e) {
       if (e instanceof HttpErrorResponse && e.status === 429) {
         this.error.set(this.i18n.t().route.dailyLimitReached);

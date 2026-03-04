@@ -33,7 +33,7 @@ export interface IdentifyResult {
  * Normalize a scientific name for comparison:
  * lowercase, trim, take only genus + species (first 2 words)
  */
-function normalize(name: string): string {
+export function normalize(name: string): string {
   return name.trim().toLowerCase().split(/\s+/).slice(0, 2).join(' ');
 }
 
@@ -60,7 +60,7 @@ async function lookupFamily(scientificName: string): Promise<string> {
  * Lookup synonyms for a scientific name via iNaturalist taxa API.
  * Returns a Set of normalized synonyms (including the canonical name).
  */
-async function lookupSynonyms(scientificName: string): Promise<Set<string>> {
+export async function lookupSynonyms(scientificName: string): Promise<Set<string>> {
   const synonyms = new Set<string>([normalize(scientificName)]);
   try {
     const url = `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(scientificName)}&rank=species&per_page=1&all_names=true`;
@@ -81,6 +81,59 @@ async function lookupSynonyms(scientificName: string): Promise<Set<string>> {
     // ignore — return what we have
   }
   return synonyms;
+}
+
+/**
+ * Calculate taxonomic similarity between an identified species and an expected one.
+ * Reusable logic extracted from identifyPlant for multi-plant comparison.
+ */
+export async function calculateSimilarity(
+  identifiedSpecies: PlantNetResult,
+  expectedScientificName: string,
+  expectedGenus: string,
+  expectedFamily: string,
+): Promise<{ similarity: number; genus: string; family: string }> {
+  const expected = normalize(expectedScientificName);
+  const candidate = normalize(identifiedSpecies.species.scientificNameWithoutAuthor);
+  const bestGenus = identifiedSpecies.species.genus?.scientificNameWithoutAuthor || '';
+  const bestFamily = identifiedSpecies.species.family?.scientificNameWithoutAuthor || '';
+
+  // Derive genus from scientific name if missing
+  if (!expectedGenus && expectedScientificName) {
+    expectedGenus = expectedScientificName.trim().split(/\s+/)[0];
+  }
+
+  // Exact species match
+  if (candidate === expected) {
+    return { similarity: 100, genus: bestGenus, family: bestFamily };
+  }
+
+  // Check ALL results for synonym match
+  const synonyms = await lookupSynonyms(expectedScientificName);
+  if (synonyms.has(candidate)) {
+    return { similarity: 100, genus: bestGenus, family: bestFamily };
+  }
+
+  // Genus match (including synonym genera)
+  const expectedGenera = new Set([expectedGenus.toLowerCase()]);
+  for (const syn of synonyms) {
+    const g = syn.split(' ')[0];
+    if (g) expectedGenera.add(g);
+  }
+
+  if (bestGenus && expectedGenera.has(bestGenus.toLowerCase())) {
+    return { similarity: 75, genus: bestGenus, family: bestFamily };
+  }
+
+  // Family match
+  if (!expectedFamily && expectedScientificName) {
+    expectedFamily = await lookupFamily(expectedScientificName);
+  }
+  if (expectedFamily && bestFamily && bestFamily.toLowerCase() === expectedFamily.toLowerCase()) {
+    return { similarity: 40, genus: bestGenus, family: bestFamily };
+  }
+
+  return { similarity: 0, genus: bestGenus, family: bestFamily };
 }
 
 export async function identifyPlant(

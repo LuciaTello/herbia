@@ -86,6 +86,11 @@ export interface Translations {
     missionsCount: (n: number) => string;
     noLocationMissions: (n: number) => string;
     allFound: string;
+    photoLooksLike: string;
+    selectPlant: string;
+    noMatchInMission: string;
+    pointsFor: (name: string, pts: number) => string;
+    takingPhoto: string;
   };
   collection: {
     back: string;

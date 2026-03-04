@@ -56,6 +56,23 @@ export interface IdentifyResult {
   family: string;
 }
 
+// IdentifyAllResult: what POST /api/missions/:missionId/identify-all returns
+export interface IdentifyAllResult {
+  plantnetResult: {
+    identifiedAs: string;
+    commonName: string;
+    score: number;
+    genus: string;
+    family: string;
+  };
+  matches: Array<{
+    plantId: number;
+    commonName: string;
+    scientificName: string;
+    similarity: number;
+  }>;
+}
+
 // PlaceSelection: emitted by PlaceAutocomplete when a place is selected
 export interface PlaceSelection {
   name: string;

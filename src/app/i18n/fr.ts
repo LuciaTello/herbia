@@ -100,6 +100,11 @@ export const FR: Translations = {
     missionsCount: (n) => `${n} mission${n !== 1 ? 's' : ''}`,
     noLocationMissions: (n) => `${n} mission${n !== 1 ? 's' : ''} sans localisation`,
     allFound: 'Tu as trouvé toutes les plantes ! Mission accomplie.',
+    photoLooksLike: 'Ta photo ressemble à :',
+    selectPlant: 'Choisis où l\'assigner',
+    noMatchInMission: 'Pas de correspondance dans la mission. Ajoutée à ta collection.',
+    pointsFor: (name, pts) => `${name} — ${pts} pts`,
+    takingPhoto: 'Analyse de la photo...',
   },
   collection: {
     back: "Retour à l'accueil",

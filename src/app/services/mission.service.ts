@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Mission, SuggestedPlant, Plant, PlantPhoto, IdentifyResult } from '../models/plant.model';
+import { Mission, SuggestedPlant, Plant, PlantPhoto, IdentifyResult, IdentifyAllResult } from '../models/plant.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -93,9 +93,20 @@ export class MissionService {
     );
   }
 
-  async uploadPlantPhoto(plantId: number, file: File): Promise<PlantPhoto> {
+  async identifyAll(missionId: number, file: File): Promise<IdentifyAllResult> {
     const formData = new FormData();
     formData.append('photo', file);
+    return firstValueFrom(
+      this.http.post<IdentifyAllResult>(`${this.apiUrl}/${missionId}/identify-all`, formData)
+    );
+  }
+
+  async uploadPlantPhoto(plantId: number, file: File, similarity?: number): Promise<PlantPhoto> {
+    const formData = new FormData();
+    formData.append('photo', file);
+    if (similarity !== undefined) {
+      formData.append('similarity', String(similarity));
+    }
     const photo = await firstValueFrom(
       this.http.post<PlantPhoto>(`${this.apiUrl}/plants/${plantId}/photo`, formData)
     );

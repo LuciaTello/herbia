@@ -5,7 +5,7 @@ import { Router } from 'express';
 import multer, { memoryStorage } from 'multer';
 import type { PrismaClient } from '../generated/prisma/client';
 import { uploadPhoto, deletePhoto } from '../services/cloudinary.service';
-import { identifyPlant } from '../services/plantnet.service';
+import { identifyPlant, calculateSimilarity } from '../services/plantnet.service';
 
 const upload = multer({
   storage: memoryStorage(),
@@ -171,6 +171,86 @@ export function missionRouter(prisma: PrismaClient): Router {
     }
   });
 
+  // POST /api/missions/:missionId/identify-all - Identify a photo against ALL plants in a mission
+  router.post('/:missionId/identify-all', upload.single('photo'), async (req, res) => {
+    try {
+      const missionId = parseInt(req.params['missionId'] as string);
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).json({ error: 'No photo provided' });
+        return;
+      }
+      if (!ALLOWED_MIMES.includes(file.mimetype)) {
+        res.status(400).json({ error: 'Invalid file type. Use JPEG or PNG' });
+        return;
+      }
+
+      // Verify mission ownership
+      const mission = await prisma.mission.findUnique({
+        where: { id: missionId },
+        include: { plants: { where: { source: 'ai' } } },
+      });
+      if (!mission || mission.userId !== req.userId!) {
+        res.status(404).json({ error: 'Mission not found' });
+        return;
+      }
+
+      // Single PlantNet call
+      const result = await identifyPlant(file.buffer, file.mimetype, '');
+
+      if (!result.identifiedAs) {
+        res.json({
+          plantnetResult: { identifiedAs: '', commonName: '', score: 0, genus: '', family: '' },
+          matches: [],
+        });
+        return;
+      }
+
+      // Compare against all AI plants in the mission
+      const matches: Array<{ plantId: number; commonName: string; scientificName: string; similarity: number }> = [];
+
+      for (const plant of mission.plants) {
+        const sim = await calculateSimilarity(
+          { score: result.score / 100, species: {
+            scientificNameWithoutAuthor: result.identifiedAs,
+            genus: { scientificNameWithoutAuthor: result.genus },
+            family: { scientificNameWithoutAuthor: result.family },
+            commonNames: result.commonName ? [result.commonName] : [],
+          }},
+          plant.scientificName,
+          plant.genus,
+          plant.family,
+        );
+        if (sim.similarity > 0) {
+          matches.push({
+            plantId: plant.id,
+            commonName: plant.commonName,
+            scientificName: plant.scientificName,
+            similarity: sim.similarity,
+          });
+        }
+      }
+
+      // Sort by similarity descending
+      matches.sort((a, b) => b.similarity - a.similarity);
+
+      res.json({
+        plantnetResult: {
+          identifiedAs: result.identifiedAs,
+          commonName: result.commonName,
+          score: result.score,
+          genus: result.genus,
+          family: result.family,
+        },
+        matches,
+      });
+    } catch (error) {
+      console.error('Error in identify-all:', error);
+      res.status(500).json({ error: 'Identification failed' });
+    }
+  });
+
   // POST /api/missions/plants/:plantId/identify - Identify a plant photo via PlantNet
   router.post('/plants/:plantId/identify', upload.single('photo'), async (req, res) => {
     try {
@@ -269,8 +349,9 @@ export function missionRouter(prisma: PrismaClient): Router {
 
       const url = await uploadPhoto(file.buffer, plantId);
 
-      // Award pending similarity points and store on photo (for deduction on delete)
-      const similarity = plant.pendingSimilarity || 0;
+      // Award similarity points: use body param if provided (from identify-all), else pendingSimilarity
+      const bodySimilarity = parseInt(req.body.similarity);
+      const similarity = bodySimilarity > 0 ? bodySimilarity : (plant.pendingSimilarity || 0);
       const photo = await prisma.plantPhoto.create({
         data: { url, source: 'user', plantId, similarity },
       });
