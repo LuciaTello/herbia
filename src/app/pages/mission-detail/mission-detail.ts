@@ -38,7 +38,7 @@ export class MissionDetailPage implements OnInit {
   protected readonly identifying = signal(false);
   protected readonly identifyResult = signal<IdentifyAllResult | null>(null);
   protected readonly pendingFile = signal<File | null>(null);
-  protected readonly addPlantMessage = signal<string | null>(null);
+  protected readonly resultOverlay = signal<{ name: string; points: number; type: 'match' | 'noMatch' } | null>(null);
   protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
   protected readonly uploadingPhoto = signal(false);
@@ -137,12 +137,10 @@ export class MissionDetailPage implements OnInit {
         }
       } catch {
         this.identifying.set(false);
-        this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
-        setTimeout(() => this.addPlantMessage.set(null), 4000);
+        this.resultOverlay.set({ name: this.i18n.t().myMissions.uploadError, points: 0, type: 'noMatch' });
       }
     } catch {
-      this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
+      this.resultOverlay.set({ name: this.i18n.t().myMissions.uploadError, points: 0, type: 'noMatch' });
     }
   }
 
@@ -152,15 +150,10 @@ export class MissionDetailPage implements OnInit {
         ? { match: false, score: result.plantnetResult.score, identifiedAs: result.plantnetResult.identifiedAs, commonName: result.plantnetResult.commonName, similarity: 0, genus: result.plantnetResult.genus, family: result.plantnetResult.family }
         : undefined;
       await this.missionService.addUserPlant(this.missionId, file, prevResult);
-      this.addPlantMessage.set(this.i18n.t().myMissions.noMatchInMission);
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
+      this.resultOverlay.set({ name: this.i18n.t().myMissions.noMatchInMission, points: 0, type: 'noMatch' });
     } catch (err: any) {
-      if (err?.status === 409) {
-        this.addPlantMessage.set(this.i18n.t().myMissions.maxPhotosReached);
-      } else {
-        this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
-      }
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
+      const msg = err?.status === 409 ? this.i18n.t().myMissions.maxPhotosReached : this.i18n.t().myMissions.uploadError;
+      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch' });
     } finally {
       this.pendingFile.set(null);
     }
@@ -176,18 +169,12 @@ export class MissionDetailPage implements OnInit {
       const photo = await this.missionService.uploadPlantPhoto(plantId, file, similarity);
       if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
       this.missionService.markPlantFoundLocally(plantId);
-      // Show success toast
       const name = plantName || this.missions().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
-      this.addPlantMessage.set(this.i18n.t().myMissions.pointsFor(name, similarity));
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
+      this.resultOverlay.set({ name, points: similarity, type: 'match' });
       await this.checkAutoComplete();
     } catch (err: any) {
-      if (err?.status === 409) {
-        this.addPlantMessage.set(this.i18n.t().myMissions.maxPhotosReached);
-      } else {
-        this.addPlantMessage.set(this.i18n.t().myMissions.uploadError);
-      }
-      setTimeout(() => this.addPlantMessage.set(null), 4000);
+      const msg = err?.status === 409 ? this.i18n.t().myMissions.maxPhotosReached : this.i18n.t().myMissions.uploadError;
+      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch' });
     } finally {
       this.uploadingPhoto.set(false);
       this.pendingFile.set(null);

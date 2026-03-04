@@ -256,25 +256,57 @@ h2 {
   color: #d63031;
 }
 
-.toast {
+/* Result overlay — full-screen tap-to-dismiss */
+.result-overlay {
   position: fixed;
-  bottom: 5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #2d3436;
-  color: white;
-  padding: 0.625rem 1.25rem;
-  border-radius: 10px;
-  font-size: 0.85rem;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  animation: popup-in 0.3s ease-out;
-  max-width: 90%;
-  text-align: center;
+  animation: fadeIn 0.2s ease-out;
 }
 
-.toast p {
+.result-card {
+  text-align: center;
+  padding: 2rem 2.5rem;
+  border-radius: 20px;
+  min-width: 220px;
+  animation: scaleIn 0.3s ease-out;
+}
+
+.result-card.match {
+  background: #e8f5e9;
+}
+
+.result-card.no-match {
+  background: #fff;
+}
+
+.result-emoji {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+.result-card.match .result-emoji {
+  color: #2d7d46;
+}
+
+.result-name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin: 0 0 0.5rem;
+  line-height: 1.3;
+}
+
+.result-points {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2d7d46;
   margin: 0;
 }
 
