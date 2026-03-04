@@ -125,11 +125,7 @@ export class MissionDetailPage implements OnInit {
         this.identifying.set(false);
 
         const available = result.matches.filter(m => !m.alreadyCaptured);
-        if (available.length === 0 && result.matches.length > 0) {
-          // All matches already captured in this mission
-          this.resultOverlay.set({ name: this.i18n.t().myMissions.alreadyCaptured, points: 0, type: 'noMatch' });
-          this.pendingFile.set(null);
-        } else if (available.length === 0) {
+        if (available.length === 0) {
           // No match — add to collection directly
           await this.addToCollection(file, result);
         } else if (available.length === 1) {
