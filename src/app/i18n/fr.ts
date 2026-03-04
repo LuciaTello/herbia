@@ -185,7 +185,7 @@ export const FR: Translations = {
       'L\'espèce est le niveau le plus fin : les différences entre deux espèces du même genre sont subtiles. Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
       'Le genre regroupe des espèces comme des frères ou cousins proches : ils partagent un ancêtre récent et gardent beaucoup de traits visibles en commun. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
       'La famille, ce sont des cousins très éloignés : ils partagent un ancêtre vieux de millions d\'années. C\'est pour ça qu\'une fraise et un pommier (tous deux Rosacées) semblent si différents. Si tu ne trouves pas la plante exacte, clique sur « Famille » sous le nom scientifique pour voir d\'autres plantes que tu pourrais croiser.',
-      'Chaque espèce peut avoir jusqu\'à 4 photos, et la même espèce ne peut être capturée qu\'une fois par mission. Une fois ta promenade terminée, tu peux terminer la mission pour l\'archiver.',
+      'Chaque plante d\'une mission accepte jusqu\'à 4 photos, et chacune te rapporte des points. Il ne peut y avoir qu\'une seule plante de la même espèce par mission. Une fois ta promenade terminée, tu peux archiver la mission.',
     ],
     imageLabels: [
       'Lavandula angustifolia',

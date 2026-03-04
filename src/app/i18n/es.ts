@@ -185,7 +185,7 @@ export const ES: Translations = {
       'La especie es el nivel más fino: las diferencias entre dos especies del mismo género son sutiles. Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
       'El género agrupa especies como hermanos o primos cercanos: comparten un ancestro reciente y conservan muchos rasgos visibles en común. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
       'La familia son primos muy lejanos: comparten un ancestro de hace millones de años. Por eso una fresa y un manzano (ambos Rosáceas) parecen tan distintos. Si no encuentras la planta exacta, clica en «Familia» bajo el nombre científico para ver otras plantas que podrías cruzarte.',
-      'Cada especie puede tener hasta 4 fotos, y la misma especie solo se puede capturar una vez por misión. Cuando termines tu paseo, puedes terminar la misión para archivarla.',
+      'Cada planta de una misión acepta hasta 4 fotos, y cada una te da puntos. Solo puede haber una planta de la misma especie por misión. Cuando termines tu paseo, puedes archivar la misión.',
     ],
     imageLabels: [
       'Lavandula angustifolia',
