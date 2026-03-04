@@ -51,10 +51,10 @@
 }
 
 @if (auth.isLoggedIn()) {
-  <nav class="quick-nav">
-    <a routerLink="/profile" class="nav-chip">{{ i18n.t().nav.profile }}</a>
-    <a routerLink="/my-level" class="nav-chip">{{ i18n.t().nav.level }}</a>
-    <a routerLink="/friends" class="nav-chip">{{ i18n.t().nav.friends }}</a>
-    <a routerLink="/tutorials" class="nav-chip">{{ i18n.t().nav.tutorial }}</a>
+  <nav class="bottom-nav">
+    <a routerLink="/profile">{{ i18n.t().nav.profile }}</a>
+    <a routerLink="/my-level">{{ i18n.t().nav.level }}</a>
+    <a routerLink="/friends">{{ i18n.t().nav.friends }}</a>
+    <a routerLink="/tutorials">{{ i18n.t().nav.tutorial }}</a>
   </nav>
 }
