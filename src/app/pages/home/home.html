@@ -52,9 +52,29 @@
 
 @if (auth.isLoggedIn()) {
   <nav class="bottom-nav">
-    <a routerLink="/profile">{{ i18n.t().nav.profile }}</a>
-    <a routerLink="/my-level">{{ i18n.t().nav.level }}</a>
-    <a routerLink="/friends">{{ i18n.t().nav.friends }}</a>
-    <a routerLink="/tutorials">{{ i18n.t().nav.tutorial }}</a>
+    <a routerLink="/profile">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/>
+      </svg>
+      <span>{{ i18n.t().nav.profile }}</span>
+    </a>
+    <a routerLink="/my-level">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+      <span>{{ i18n.t().nav.level }}</span>
+    </a>
+    <a routerLink="/friends">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="8" r="3"/><path d="M2 21v-1a5 5 0 0 1 10 0v1"/><path d="M14 21v-1a4.5 4.5 0 0 1 7 0v1"/>
+      </svg>
+      <span>{{ i18n.t().nav.friends }}</span>
+    </a>
+    <a routerLink="/tutorials">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+      <span>{{ i18n.t().nav.tutorial }}</span>
+    </a>
   </nav>
 }
