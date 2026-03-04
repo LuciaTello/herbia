@@ -2,20 +2,17 @@ import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Plant, PlantPhoto, PlaceSelection } from '../../models/plant.model';
+import { Plant, PlaceSelection } from '../../models/plant.model';
 import { PlantService } from '../../services/plant.service';
 import { MissionService } from '../../services/mission.service';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
-import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
 import { PlaceAutocompleteDirective } from '../../directives/place-autocomplete.directive';
-import { RouteMapComponent } from '../../components/route-map/route-map';
 import { MissionTutorialComponent } from '../../components/mission-tutorial/mission-tutorial';
-import { getRarity } from '../../utils/rarity';
 
 @Component({
   selector: 'app-route',
-  imports: [FormsModule, RouterLink, PhotoGalleryComponent, PlaceAutocompleteDirective, RouteMapComponent, MissionTutorialComponent],
+  imports: [FormsModule, RouterLink, PlaceAutocompleteDirective, MissionTutorialComponent],
   templateUrl: './route.html',
   styleUrl: './route.css',
 })
@@ -45,8 +42,6 @@ export class RoutePage {
   protected readonly saving = signal(false);
   protected readonly error = signal('');
   protected readonly loadingMessage = signal('');
-  protected readonly galleryImages = signal<string[]>([]);
-  protected readonly galleryPlantName = signal('');
   protected readonly showMissionTip = signal(false);
 
   // setInterval returns a handle we need to clear later (like ScheduledFuture in Java)
@@ -72,20 +67,6 @@ export class RoutePage {
     const index = Math.floor(Math.random() * messages.length);
     return messages[index];
   }
-
-  protected openGallery(photos: PlantPhoto[] | undefined, name: string): void {
-    if (photos?.length) {
-      this.galleryImages.set(photos.map(p => p.url));
-      this.galleryPlantName.set(name);
-    }
-  }
-
-  protected closeGallery(): void {
-    this.galleryImages.set([]);
-    this.galleryPlantName.set('');
-  }
-
-  protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
 
   protected setMode(m: 'route' | 'zone'): void {
     this.mode.set(m);
@@ -135,6 +116,10 @@ export class RoutePage {
       if (!result.tooFar) {
         const sorted = [...result.plants].sort((a, b) => (a.rarity || 'common').localeCompare(b.rarity || 'common'));
         this.plants.set(sorted);
+        this.loading.set(false);
+        this.stopLoadingMessages();
+        this.onStartMissionClick();
+        return;
       } else {
         this.plants.set([]);
       }

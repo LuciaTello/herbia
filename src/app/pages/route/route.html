@@ -83,62 +83,11 @@
   </section>
 }
 
-@if (plants().length > 0) {
-  <section class="results">
-    <h3>{{ mode() === 'zone' ? i18n.t().route.zoneResultsTitle : i18n.t().route.resultsTitle }}</h3>
-
-    @if (description()) {
-      <p class="mission-description">{{ description() }}</p>
-    }
-
-    @for (plant of plants(); track plant.scientificName) {
-      <article class="plant-card">
-        <div class="plant-thumbnail" (click)="openGallery(plant.photos, plant.commonName)">
-          @if (plant.photos.length) {
-            <img [src]="plant.photos[0].url" [alt]="plant.commonName"
-                 (error)="$event.target.style.display='none'" />
-          } @else {
-            <div class="no-photo">{{ plant.commonName }}</div>
-          }
-        </div>
-        <div class="plant-info">
-          <h4>{{ plant.commonName }}</h4>
-          <p class="scientific">{{ plant.scientificName }}</p>
-          <p class="chance" [style.color]="rarity(plant.rarity).color">
-            {{ rarity(plant.rarity).label }}
-          </p>
-          <p>{{ plant.description }}</p>
-          @if (plant.hint) {
-            <p class="hint">{{ plant.hint }}</p>
-          }
-        </div>
-      </article>
-    }
-
-    @if (mode() === 'route') {
-      <app-route-map [origin]="origin()" [destination]="destination()" />
-    }
-
-    <button
-      class="primary-button start-mission-button"
-      (click)="onStartMissionClick()"
-      [disabled]="saving()"
-    >
-      @if (saving()) {
-        {{ i18n.t().route.saving }}
-      } @else {
-        {{ i18n.t().route.startMission }}
-      }
-    </button>
-  </section>
-}
-
-@if (galleryImages().length) {
-  <app-photo-gallery
-    [images]="galleryImages()"
-    [plantName]="galleryPlantName()"
-    (closeGallery)="closeGallery()"
-  />
+@if (saving()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-message">{{ i18n.t().route.saving }}</p>
+  </div>
 }
 
 @if (showMissionTip()) {

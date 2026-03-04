@@ -19,12 +19,13 @@ import { CameraSource } from '@capacitor/camera';
 import { ConfirmService } from '../../components/confirm-popup/confirm.service';
 import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
 import { FamilyPopupComponent } from '../../components/family-popup/family-popup';
+import { RouteMapComponent } from '../../components/route-map/route-map';
 
 type MapView = 'map' | 'countries' | 'regions' | 'missions';
 
 @Component({
   selector: 'app-my-missions',
-  imports: [RouterLink, DatePipe, NgTemplateOutlet, PhotoGalleryComponent, WorldMapComponent, ConfirmPopupComponent, FamilyPopupComponent],
+  imports: [RouterLink, DatePipe, NgTemplateOutlet, PhotoGalleryComponent, WorldMapComponent, ConfirmPopupComponent, FamilyPopupComponent, RouteMapComponent],
   templateUrl: './my-missions.html',
   styleUrl: './my-missions.css',
 })

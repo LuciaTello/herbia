@@ -333,6 +333,10 @@
         </div>
       }
 
+      @if (mission.origin !== mission.destination) {
+        <app-route-map [origin]="mission.origin" [destination]="mission.destination" />
+      }
+
       <!-- Complete mission button -->
       @if (mission.status !== 'completed') {
         <button class="complete-mission-button" (click)="completeMission(mission.id)">
