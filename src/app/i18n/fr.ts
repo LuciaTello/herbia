@@ -90,7 +90,7 @@ export const FR: Translations = {
     addingPlant: 'Identification...',
     myPlantsTitle: 'Mes plantes',
     unidentifiedCount: (count) => `${count} plante${count !== 1 ? 's' : ''} non identifiée${count !== 1 ? 's' : ''}`,
-    maxPhotosReached: 'Max 4 photos par espèce. Supprimez-en une d\'abord.',
+    maxPhotosReached: 'Limite de photos atteinte pour cette espèce. Efface des photos pour continuer à ajouter.',
     alreadyCaptured: 'Tu as déjà capturé cette espèce dans cette mission.',
     regionLimitReached: 'Limite de photos atteinte pour cette espèce dans cette région. Efface dans ta collection pour continuer à ajouter.',
     uploadError: 'Erreur lors du téléchargement. Réessayez.',
@@ -164,7 +164,7 @@ export const FR: Translations = {
   },
   missionTip: {
     title: 'Avant de commencer',
-    text: 'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu trouves une plante, appuie sur « Ajouter photo » et prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points :\n\n🎯 Espèce exacte → 100 pts\n🌿 Même genre → 75 pts\n🌳 Même famille → 40 pts\n\nTu peux aussi ajouter des plantes qui ne sont pas dans la liste avec le bouton « Ajouter d\'autres plantes ». Chaque espèce peut avoir jusqu\'à 4 photos.\n\nBonne chance, voyageuse !',
+    text: 'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu trouves une plante, appuie sur « Ajouter photo » et prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points :\n\n🎯 Espèce exacte → 100 pts\n🌿 Même genre → 75 pts\n🌳 Même famille → 40 pts\n\nChaque espèce accepte 1 photo par mission. Si la plante ne correspond à aucune de la mission, elle est ajoutée à ta collection (jusqu\'à 20 photos par espèce et région).\n\nBonne chance, voyageuse !',
     dismiss: 'Compris !',
   },
   missionTutorial: {
@@ -182,7 +182,7 @@ export const FR: Translations = {
       'L\'espèce est le niveau le plus fin : les différences entre deux espèces du même genre sont subtiles. Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
       'Le genre regroupe des espèces comme des frères ou cousins proches : ils partagent un ancêtre récent et gardent beaucoup de traits visibles en commun. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
       'La famille, ce sont des cousins très éloignés : ils partagent un ancêtre vieux de millions d\'années. C\'est pour ça qu\'une fraise et un pommier (tous deux Rosacées) semblent si différents. Si tu ne trouves pas la plante exacte, clique sur « Famille » sous le nom scientifique pour voir d\'autres plantes que tu pourrais croiser.',
-      'Tu peux aussi ajouter des plantes qui ne sont pas dans la liste. Chaque espèce peut avoir jusqu\'à 4 photos — qu\'elle soit suggérée, même genre, même famille ou trouvaille libre.',
+      'Tu peux aussi ajouter des plantes qui ne sont pas dans la liste. Chaque espèce accepte 1 photo par mission, et jusqu\'à 20 photos par espèce et région dans ta collection.',
     ],
     imageLabels: [
       'Lavandula angustifolia',

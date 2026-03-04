@@ -90,7 +90,7 @@ export const ES: Translations = {
     addingPlant: 'Identificando...',
     myPlantsTitle: 'Mis plantas',
     unidentifiedCount: (count) => `${count} planta${count !== 1 ? 's' : ''} sin identificar`,
-    maxPhotosReached: 'Máx 4 fotos por especie. Borra una primero.',
+    maxPhotosReached: 'Límite de fotos alcanzado para esta especie. Borra fotos para seguir añadiendo.',
     alreadyCaptured: 'Ya has capturado esta especie en esta misión.',
     regionLimitReached: 'Límite de fotos alcanzado para esta especie en esta región. Borra fotos en tu colección para seguir añadiendo.',
     uploadError: 'Error al subir la foto. Inténtalo de nuevo.',
@@ -164,7 +164,7 @@ export const ES: Translations = {
   },
   missionTip: {
     title: 'Antes de empezar',
-    text: 'Las plantas que ves aquí se eligen según lo que crece en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando encuentres una planta, toca «Añadir foto» y sácale una foto. Herbia la identificará automáticamente y ganarás puntos:\n\n🎯 Especie exacta → 100 pts\n🌿 Mismo género → 75 pts\n🌳 Misma familia → 40 pts\n\nTambién puedes añadir plantas que no están en la lista con el botón «Añadir otras plantas». Cada especie admite hasta 4 fotos.\n\n¡Buena suerte, viajera!',
+    text: 'Las plantas que ves aquí se eligen según lo que crece en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando encuentres una planta, toca «Añadir foto» y sácale una foto. Herbia la identificará automáticamente y ganarás puntos:\n\n🎯 Especie exacta → 100 pts\n🌿 Mismo género → 75 pts\n🌳 Misma familia → 40 pts\n\nCada especie admite 1 foto por misión. Si la planta no coincide con ninguna de la misión, se añade a tu colección (hasta 20 fotos por especie y región).\n\n¡Buena suerte, viajera!',
     dismiss: '¡Entendido!',
   },
   missionTutorial: {
@@ -182,7 +182,7 @@ export const ES: Translations = {
       'La especie es el nivel más fino: las diferencias entre dos especies del mismo género son sutiles. Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
       'El género agrupa especies como hermanos o primos cercanos: comparten un ancestro reciente y conservan muchos rasgos visibles en común. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
       'La familia son primos muy lejanos: comparten un ancestro de hace millones de años. Por eso una fresa y un manzano (ambos Rosáceas) parecen tan distintos. Si no encuentras la planta exacta, clica en «Familia» bajo el nombre científico para ver otras plantas que podrías cruzarte.',
-      'También puedes añadir plantas que no están en la lista. Cada especie admite hasta 4 fotos — ya sea sugerida, mismo género, misma familia o hallazgo libre.',
+      'También puedes añadir plantas que no están en la lista. Cada especie admite 1 foto por misión, y hasta 20 fotos por especie y región en tu colección.',
     ],
     imageLabels: [
       'Lavandula angustifolia',
