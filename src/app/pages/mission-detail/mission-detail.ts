@@ -122,22 +122,19 @@ export class MissionDetailPage implements OnInit {
 
       try {
         const result = await this.missionService.identifyAll(this.missionId, file);
-        this.identifying.set(false);
 
         const available = result.matches.filter(m => !m.alreadyCaptured);
         if (available.length === 0) {
-          // No match — add to collection directly
           await this.addToCollection(file, result);
         } else if (available.length === 1) {
-          // Single available match — assign directly
           await this.confirmUpload(available[0].plantId, available[0].similarity, available[0].commonName);
         } else {
-          // Multiple available matches — show popup (only non-captured)
           this.identifyResult.set({ ...result, matches: available });
         }
       } catch {
-        this.identifying.set(false);
         this.resultOverlay.set({ name: this.i18n.t().myMissions.uploadError, points: 0, type: 'noMatch' });
+      } finally {
+        this.identifying.set(false);
       }
     } catch {
       this.resultOverlay.set({ name: this.i18n.t().myMissions.uploadError, points: 0, type: 'noMatch' });
