@@ -136,7 +136,7 @@
 }
 
 @if (resultOverlay(); as r) {
-  <div class="result-overlay" (click)="dismissOverlay()">
+  <div class="result-overlay">
     <div class="result-card" [class.match]="r.type === 'match'" [class.no-match]="r.type === 'noMatch'">
       @if (r.photoUrl) {
         <img class="result-photo" [src]="r.photoUrl" alt="" />
@@ -174,6 +174,7 @@
         }
         <p class="result-name">{{ r.name }}</p>
       }
+      <button class="result-dismiss" (click)="dismissOverlay()">OK</button>
     </div>
   </div>
 }

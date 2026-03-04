@@ -265,7 +265,6 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -358,6 +357,24 @@ h2 {
   font-weight: 800;
   color: #2d7d46;
   margin: 0;
+}
+
+.result-dismiss {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.5rem 2rem;
+  background: #2d7d46;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.result-dismiss:hover {
+  background: #246b3a;
 }
 
 /* Action buttons */
