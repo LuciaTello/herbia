@@ -5,7 +5,7 @@ import { Router } from 'express';
 import multer, { memoryStorage } from 'multer';
 import type { PrismaClient } from '../generated/prisma/client';
 import { uploadPhoto, deletePhoto } from '../services/cloudinary.service';
-import { identifyPlant, calculateSimilarity } from '../services/plantnet.service';
+import { identifyPlant, callPlantNet, calculateSimilarity, normalize } from '../services/plantnet.service';
 
 const upload = multer({
   storage: memoryStorage(),
@@ -196,10 +196,10 @@ export function missionRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Single PlantNet call
-      const result = await identifyPlant(file.buffer, file.mimetype, '');
+      // Single PlantNet call — get ALL raw results
+      const allResults = await callPlantNet(file.buffer, file.mimetype);
 
-      if (!result.identifiedAs) {
+      if (!allResults.length) {
         res.json({
           plantnetResult: { identifiedAs: '', commonName: '', score: 0, genus: '', family: '' },
           matches: [],
@@ -207,17 +207,21 @@ export function missionRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Compare against all AI plants in the mission
+      const best = allResults[0];
+      const plantnetResult = {
+        identifiedAs: best.species.scientificNameWithoutAuthor,
+        commonName: best.species.commonNames?.[0] || '',
+        score: Math.round(best.score * 100),
+        genus: best.species.genus?.scientificNameWithoutAuthor || '',
+        family: best.species.family?.scientificNameWithoutAuthor || '',
+      };
+
+      // Compare ALL PlantNet results against each mission plant
       const matches: Array<{ plantId: number; commonName: string; scientificName: string; similarity: number }> = [];
 
       for (const plant of mission.plants) {
         const sim = await calculateSimilarity(
-          { score: result.score / 100, species: {
-            scientificNameWithoutAuthor: result.identifiedAs,
-            genus: { scientificNameWithoutAuthor: result.genus },
-            family: { scientificNameWithoutAuthor: result.family },
-            commonNames: result.commonName ? [result.commonName] : [],
-          }},
+          allResults,
           plant.scientificName,
           plant.genus,
           plant.family,
@@ -235,16 +239,7 @@ export function missionRouter(prisma: PrismaClient): Router {
       // Sort by similarity descending
       matches.sort((a, b) => b.similarity - a.similarity);
 
-      res.json({
-        plantnetResult: {
-          identifiedAs: result.identifiedAs,
-          commonName: result.commonName,
-          score: result.score,
-          genus: result.genus,
-          family: result.family,
-        },
-        matches,
-      });
+      res.json({ plantnetResult, matches });
     } catch (error) {
       console.error('Error in identify-all:', error);
       res.status(500).json({ error: 'Identification failed' });

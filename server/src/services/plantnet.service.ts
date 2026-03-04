@@ -84,37 +84,85 @@ export async function lookupSynonyms(scientificName: string): Promise<Set<string
 }
 
 /**
- * Calculate taxonomic similarity between an identified species and an expected one.
- * Reusable logic extracted from identifyPlant for multi-plant comparison.
+ * Call PlantNet API and return raw results (for reuse by identify-all).
+ */
+export async function callPlantNet(
+  buffer: Buffer,
+  mimetype: string,
+): Promise<PlantNetResult[]> {
+  const apiKey = process.env['PLANTNET_API_KEY'];
+  if (!apiKey) {
+    throw new Error('PLANTNET_API_KEY not configured');
+  }
+
+  const ext = mimetype === 'image/png' ? 'png' : 'jpg';
+  const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer;
+  const file = new File([arrayBuffer], `photo.${ext}`, { type: mimetype });
+  const formData = new FormData();
+  formData.append('images', file);
+  formData.append('organs', 'auto');
+
+  const response = await fetch(`${PLANTNET_URL}?api-key=${apiKey}`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) return []; // not a plant
+    const text = await response.text();
+    throw new Error(`PlantNet API error ${response.status}: ${text}`);
+  }
+
+  const data = (await response.json()) as PlantNetResponse;
+  return data.results || [];
+}
+
+/**
+ * Calculate taxonomic similarity between ALL PlantNet results and an expected species.
+ * Iterates all results for exact/synonym matches (like identifyPlant does),
+ * then falls back to genus/family from the best result.
  */
 export async function calculateSimilarity(
-  identifiedSpecies: PlantNetResult,
+  allResults: PlantNetResult[],
   expectedScientificName: string,
   expectedGenus: string,
   expectedFamily: string,
 ): Promise<{ similarity: number; genus: string; family: string }> {
+  if (!allResults.length) return { similarity: 0, genus: '', family: '' };
+
   const expected = normalize(expectedScientificName);
-  const candidate = normalize(identifiedSpecies.species.scientificNameWithoutAuthor);
-  const bestGenus = identifiedSpecies.species.genus?.scientificNameWithoutAuthor || '';
-  const bestFamily = identifiedSpecies.species.family?.scientificNameWithoutAuthor || '';
+  const best = allResults[0];
+  const bestGenus = best.species.genus?.scientificNameWithoutAuthor || '';
+  const bestFamily = best.species.family?.scientificNameWithoutAuthor || '';
 
   // Derive genus from scientific name if missing
   if (!expectedGenus && expectedScientificName) {
     expectedGenus = expectedScientificName.trim().split(/\s+/)[0];
   }
 
-  // Exact species match
-  if (candidate === expected) {
-    return { similarity: 100, genus: bestGenus, family: bestFamily };
+  // Check ALL results for exact species match
+  for (const result of allResults) {
+    if (normalize(result.species.scientificNameWithoutAuthor) === expected) {
+      const g = result.species.genus?.scientificNameWithoutAuthor || '';
+      const f = result.species.family?.scientificNameWithoutAuthor || '';
+      return { similarity: 100, genus: g, family: f };
+    }
   }
 
   // Check ALL results for synonym match
   const synonyms = await lookupSynonyms(expectedScientificName);
-  if (synonyms.has(candidate)) {
-    return { similarity: 100, genus: bestGenus, family: bestFamily };
+  if (synonyms.size > 1) {
+    for (const result of allResults) {
+      const candidate = normalize(result.species.scientificNameWithoutAuthor);
+      if (synonyms.has(candidate)) {
+        const g = result.species.genus?.scientificNameWithoutAuthor || '';
+        const f = result.species.family?.scientificNameWithoutAuthor || '';
+        return { similarity: 100, genus: g, family: f };
+      }
+    }
   }
 
-  // Genus match (including synonym genera)
+  // Genus match (from best result, including synonym genera)
   const expectedGenera = new Set([expectedGenus.toLowerCase()]);
   for (const syn of synonyms) {
     const g = syn.split(' ')[0];

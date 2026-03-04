@@ -85,10 +85,6 @@
     }
   </div>
 
-  @if (addPlantMessage()) {
-    <p class="add-plant-message">{{ addPlantMessage() }}</p>
-  }
-
   @if (mission()!.origin !== mission()!.destination) {
     <app-route-map [origin]="mission()!.origin" [destination]="mission()!.destination" />
   }
@@ -137,6 +133,12 @@
       </div>
     </div>
   }
+}
+
+@if (addPlantMessage()) {
+  <div class="toast" (click)="addPlantMessage.set(null)">
+    <p>{{ addPlantMessage() }}</p>
+  </div>
 }
 
 @if (completedPopup()) {
