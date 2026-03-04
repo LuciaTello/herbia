@@ -245,6 +245,7 @@ export const FR: Translations = {
     deletePhoto: 'Tu veux vraiment supprimer cette photo ? Les points associés seront déduits.',
     deleteMission: 'Tu veux vraiment supprimer cette mission ? Les plantes et photos associées seront perdues.',
     deleteUserPlant: 'Tu veux vraiment supprimer cette plante et ses photos ?',
+    completeMission: 'Tu veux vraiment terminer la mission ? Tu ne pourras plus ajouter de photos et elle sera archivée.',
     removePlant: 'Tu veux vraiment retirer cette plante de ta collection ?',
     removeFriend: 'Tu veux vraiment supprimer cette amie ?',
   },

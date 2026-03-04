@@ -195,6 +195,7 @@ export interface Translations {
     deleteMission: string;
     deleteUserPlant: string;
     removePlant: string;
+    completeMission: string;
     removeFriend: string;
   };
   tutorials: {

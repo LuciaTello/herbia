@@ -448,6 +448,8 @@ export class MyMissionsPage implements OnInit {
   }
 
   async completeMission(id: number): Promise<void> {
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.completeMission);
+    if (!ok) return;
     this.completingId.set(id);
     await this.missionService.completeMission(id);
     await new Promise(resolve => setTimeout(resolve, 600));
