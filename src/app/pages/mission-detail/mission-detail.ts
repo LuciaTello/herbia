@@ -129,7 +129,8 @@ export class MissionDetailPage implements OnInit {
           await this.addToCollection(file, result);
         } else if (result.matches.length === 1) {
           // Single match — assign directly
-          await this.confirmUpload(result.matches[0].plantId, result.matches[0].similarity);
+          const m = result.matches[0];
+          await this.confirmUpload(m.plantId, m.similarity, m.commonName);
         } else {
           // Multiple matches — show popup
           this.identifyResult.set(result);
@@ -165,7 +166,7 @@ export class MissionDetailPage implements OnInit {
     }
   }
 
-  async confirmUpload(plantId: number, similarity: number): Promise<void> {
+  async confirmUpload(plantId: number, similarity: number, plantName?: string): Promise<void> {
     const file = this.pendingFile();
     if (!file) return;
 
@@ -175,6 +176,10 @@ export class MissionDetailPage implements OnInit {
       const photo = await this.missionService.uploadPlantPhoto(plantId, file, similarity);
       if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
       this.missionService.markPlantFoundLocally(plantId);
+      // Show success toast
+      const name = plantName || this.missions().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
+      this.addPlantMessage.set(this.i18n.t().myMissions.pointsFor(name, similarity));
+      setTimeout(() => this.addPlantMessage.set(null), 4000);
       await this.checkAutoComplete();
     } catch (err: any) {
       if (err?.status === 409) {
@@ -189,8 +194,8 @@ export class MissionDetailPage implements OnInit {
     }
   }
 
-  protected selectMatch(match: { plantId: number; similarity: number }): void {
-    this.confirmUpload(match.plantId, match.similarity);
+  protected selectMatch(match: { plantId: number; similarity: number; commonName: string }): void {
+    this.confirmUpload(match.plantId, match.similarity, match.commonName);
   }
 
   protected cancelUpload(): void {
