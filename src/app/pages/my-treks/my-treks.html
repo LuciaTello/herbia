@@ -1,41 +1,41 @@
-<a routerLink="/" class="back-link">{{ i18n.t().myMissions.back }}</a>
+<a routerLink="/" class="back-link">{{ i18n.t().myTreks.back }}</a>
 
-<h2>{{ i18n.t().myMissions.title }}</h2>
+<h2>{{ i18n.t().myTreks.title }}</h2>
 
 @if (loading()) {
   <div class="loading-container">
     <div class="loading-spinner"></div>
-    <p class="loading-message">{{ i18n.t().myMissions.loading }}</p>
+    <p class="loading-message">{{ i18n.t().myTreks.loading }}</p>
   </div>
-} @else if (missions().length === 0) {
+} @else if (treks().length === 0) {
   <div class="empty">
-    <p>{{ i18n.t().myMissions.emptyLine1 }}</p>
-    <p>{{ i18n.t().myMissions.emptyLine2 }}</p>
+    <p>{{ i18n.t().myTreks.emptyLine1 }}</p>
+    <p>{{ i18n.t().myTreks.emptyLine2 }}</p>
   </div>
 } @else {
   <!-- Top-level toggle -->
-  <div class="missions-toggle">
+  <div class="treks-toggle">
     <button class="toggle-btn" [class.active]="!showCompleted()" (click)="switchToActive()">
-      {{ i18n.t().myMissions.activeMissions }}
+      {{ i18n.t().myTreks.activeTreks }}
     </button>
     <button class="toggle-btn" [class.active]="showCompleted()" (click)="switchToCompleted()">
-      {{ i18n.t().myMissions.completedMissions }}
+      {{ i18n.t().myTreks.completedTreks }}
     </button>
   </div>
 
   @if (!showCompleted()) {
-    <!-- ACTIVE MISSIONS: flat list -->
-    <div class="missions-list">
-      @for (mission of activeMissions(); track mission.id) {
-        <ng-container *ngTemplateOutlet="missionTpl; context: { $implicit: mission }" />
+    <!-- ACTIVE TREKS: flat list -->
+    <div class="treks-list">
+      @for (trek of activeTreks(); track trek.id) {
+        <ng-container *ngTemplateOutlet="trekTpl; context: { $implicit: trek }" />
       } @empty {
         <div class="empty">
-          <p>{{ i18n.t().myMissions.emptyLine1 }}</p>
+          <p>{{ i18n.t().myTreks.emptyLine1 }}</p>
         </div>
       }
     </div>
   } @else {
-    <!-- COMPLETED MISSIONS: map drill-down -->
+    <!-- COMPLETED TREKS: map drill-down -->
 
     @if (mapView() !== 'map') {
       <nav class="breadcrumb">
@@ -60,7 +60,7 @@
 
         @if (noLocationCompleted().length) {
           <button class="no-location-link" (click)="onShowNoLocation()">
-            {{ i18n.t().myMissions.noLocationMissions(noLocationCompleted().length) }}
+            {{ i18n.t().myTreks.noLocationTreks(noLocationCompleted().length) }}
           </button>
         }
       }
@@ -71,7 +71,7 @@
             <button class="country-card" (click)="onCountrySelected(country.code, country.name)">
               <span class="country-flag">{{ country.flag }}</span>
               <span class="country-name">{{ country.name }}</span>
-              <span class="country-count">{{ i18n.t().myMissions.missionsCount(country.count) }}</span>
+              <span class="country-count">{{ i18n.t().myTreks.treksCount(country.count) }}</span>
             </button>
           }
         </div>
@@ -81,24 +81,24 @@
         <div class="country-grid">
           <button class="country-card all-region-card" (click)="onShowAllFromCountry()">
             <span class="country-name">{{ i18n.t().collection.allRegions }}</span>
-            <span class="country-count">{{ i18n.t().myMissions.missionsCount(completedInCountry().length) }}</span>
+            <span class="country-count">{{ i18n.t().myTreks.treksCount(completedInCountry().length) }}</span>
           </button>
           @for (region of regionsInCountry(); track region.name) {
             <button class="country-card" (click)="onRegionSelected(region.name)">
               <span class="country-name">{{ region.name }}</span>
-              <span class="country-count">{{ i18n.t().myMissions.missionsCount(region.count) }}</span>
+              <span class="country-count">{{ i18n.t().myTreks.treksCount(region.count) }}</span>
             </button>
           }
         </div>
       }
 
-      @case ('missions') {
-        <div class="missions-list">
-          @for (mission of completedInView(); track mission.id) {
-            <ng-container *ngTemplateOutlet="missionTpl; context: { $implicit: mission }" />
+      @case ('treks') {
+        <div class="treks-list">
+          @for (trek of completedInView(); track trek.id) {
+            <ng-container *ngTemplateOutlet="trekTpl; context: { $implicit: trek }" />
           } @empty {
             <div class="empty">
-              <p>{{ i18n.t().myMissions.emptyLine1 }}</p>
+              <p>{{ i18n.t().myTreks.emptyLine1 }}</p>
             </div>
           }
         </div>
@@ -107,34 +107,34 @@
   }
 }
 
-<!-- Mission card template -->
-<ng-template #missionTpl let-mission>
-  <section class="mission-card" [class.completing]="completingId() === mission.id"
-           (click)="openMission(mission.id)">
-    <div class="mission-header">
-      <div class="mission-route">
+<!-- Trek card template -->
+<ng-template #trekTpl let-trek>
+  <section class="trek-card" [class.completing]="completingId() === trek.id"
+           (click)="openTrek(trek.id)">
+    <div class="trek-header">
+      <div class="trek-route">
         <div>
           <h3>
-            @if (mission.origin === mission.destination) {
-              {{ mission.origin }}
+            @if (trek.origin === trek.destination) {
+              {{ trek.origin }}
             } @else {
-              {{ mission.origin }} → {{ mission.destination }}
+              {{ trek.origin }} → {{ trek.destination }}
             }
           </h3>
-          <p class="mission-date">
-            {{ mission.createdAt | date }}
-            @if (mission.status === 'completed') {
-              <span class="completed-badge">{{ i18n.t().myMissions.completed }}</span>
+          <p class="trek-date">
+            {{ trek.createdAt | date }}
+            @if (trek.status === 'completed') {
+              <span class="completed-badge">{{ i18n.t().myTreks.completed }}</span>
             }
           </p>
         </div>
       </div>
-      <button class="delete-button" (click)="deleteMission(mission.id, $event)">&times;</button>
+      <button class="delete-button" (click)="deleteTrek(trek.id, $event)">&times;</button>
     </div>
 
-    <div class="mission-progress">
+    <div class="trek-progress">
       <p class="progress-text">
-        {{ i18n.t().myMissions.pointsEarned(missionPoints(mission.plants)) }}
+        {{ i18n.t().myTreks.pointsEarned(trekPoints(trek.plants)) }}
       </p>
     </div>
   </section>

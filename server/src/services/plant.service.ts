@@ -25,8 +25,8 @@ interface PlantPhoto {
 
 // Hardcoded tooFar messages per language (same text as i18n strings)
 const TOO_FAR: Record<string, string> = {
-  es: 'Esa ruta cruza múltiples climas — prueba con un mission más corto para que las sugerencias de plantas sean más precisas.',
-  fr: 'Cet itinéraire traverse plusieurs climats — essayez un mission plus court pour que les suggestions de plantes soient plus précises.',
+  es: 'Esa ruta cruza múltiples climas — prueba con una excursión más corta para que las sugerencias de plantas sean más precisas.',
+  fr: 'Cet itinéraire traverse plusieurs climats — essayez une balade plus courte pour que les suggestions de plantes soient plus précises.',
 };
 
 // --- iNaturalist species discovery ---
@@ -202,7 +202,7 @@ function buildPlantPrompt(origin: string, destination: string, lang: string, mon
   const monthName = MONTH_NAMES[month];
 
   const exclusionBlock = exclude.length > 0
-    ? `\n\nIMPORTANT: The traveler has already found these species on previous missions. Do NOT suggest any of them:\n${exclude.join(', ')}\n`
+    ? `\n\nIMPORTANT: The traveler has already found these species on previous treks. Do NOT suggest any of them:\n${exclude.join(', ')}\n`
     : '';
 
   const isZone = origin === destination;
@@ -211,7 +211,7 @@ function buildPlantPrompt(origin: string, destination: string, lang: string, mon
     : `A person is walking from ${origin} to ${destination}.`;
   const tooFarBlock = isZone
     ? ''
-    : `\nIMPORTANT: If the origin and destination are very far apart (different countries, different climate zones, or more than ~100 km), set "tooFar" to true in your response and leave plants as an empty array. The description should explain in ${langName} that the mission crosses multiple climates and suggest picking a shorter route.`;
+    : `\nIMPORTANT: If the origin and destination are very far apart (different countries, different climate zones, or more than ~100 km), set "tooFar" to true in your response and leave plants as an empty array. The description should explain in ${langName} that the trek crosses multiple climates and suggest picking a shorter route.`;
 
   return `You are a botanist expert on the flora in Europe, with a sharp sense of humor and a love for bad plant puns.
 ${routeContext}

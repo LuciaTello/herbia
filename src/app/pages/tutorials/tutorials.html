@@ -3,11 +3,11 @@
 <h2 class="page-title">{{ i18n.t().tutorials.title }}</h2>
 
 <div class="tutorial-cards">
-  <button class="tutorial-card" (click)="open('missions')">
+  <button class="tutorial-card" (click)="open('treks')">
     <span class="card-emoji">🎯</span>
     <div class="card-text">
-      <strong>{{ i18n.t().tutorials.missions.title }}</strong>
-      <span>{{ i18n.t().tutorials.missions.description }}</span>
+      <strong>{{ i18n.t().tutorials.treks.title }}</strong>
+      <span>{{ i18n.t().tutorials.treks.description }}</span>
     </div>
   </button>
 
@@ -20,8 +20,8 @@
   </button>
 </div>
 
-@if (activeTutorial() === 'missions') {
-  <app-mission-tutorial (done)="close()" />
+@if (activeTutorial() === 'treks') {
+  <app-trek-tutorial (done)="close()" />
 }
 
 @if (activeTutorial() === 'taxonomy') {

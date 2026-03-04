@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PlantPhoto, SuggestedPlant, IdentifyAllResult } from '../../models/plant.model';
-import { MissionService } from '../../services/mission.service';
+import { TrekService } from '../../services/trek.service';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery';
@@ -15,20 +15,20 @@ import { FamilyPopupComponent } from '../../components/family-popup/family-popup
 import { RouteMapComponent } from '../../components/route-map/route-map';
 
 @Component({
-  selector: 'app-mission-detail',
+  selector: 'app-trek-detail',
   imports: [RouterLink, PhotoGalleryComponent, ConfirmPopupComponent, FamilyPopupComponent, RouteMapComponent],
-  templateUrl: './mission-detail.html',
-  styleUrl: './mission-detail.css',
+  templateUrl: './trek-detail.html',
+  styleUrl: './trek-detail.css',
 })
-export class MissionDetailPage implements OnInit {
-  private readonly missionService = inject(MissionService);
+export class TrekDetailPage implements OnInit {
+  private readonly trekService = inject(TrekService);
   protected readonly auth = inject(AuthService);
   private readonly activatedRoute = inject(ActivatedRoute);
   protected readonly router = inject(Router);
   protected readonly cameraService = inject(CameraService);
   protected readonly i18n = inject(I18nService);
   private readonly confirmService = inject(ConfirmService);
-  protected readonly missions = this.missionService.getMissions();
+  protected readonly treks = this.trekService.getTreks();
   protected readonly loading = signal(true);
   protected readonly galleryImages = signal<string[]>([]);
   protected readonly galleryPlantName = signal('');
@@ -43,21 +43,21 @@ export class MissionDetailPage implements OnInit {
   protected readonly completingId = signal<number | null>(null);
   protected readonly uploadingPhoto = signal(false);
 
-  private missionId = 0;
+  private trekId = 0;
 
-  protected readonly mission = computed(() =>
-    this.missions().find(m => m.id === this.missionId)
+  protected readonly trek = computed(() =>
+    this.treks().find(m => m.id === this.trekId)
   );
 
   protected readonly aiPlants = computed(() =>
-    (this.mission()?.plants || []).filter(p => p.source !== 'user')
+    (this.trek()?.plants || []).filter(p => p.source !== 'user')
   );
 
   async ngOnInit(): Promise<void> {
-    this.missionId = parseInt(this.activatedRoute.snapshot.paramMap.get('id')!);
+    this.trekId = parseInt(this.activatedRoute.snapshot.paramMap.get('id')!);
     try {
-      if (!this.missions().length) {
-        await this.missionService.loadMissions();
+      if (!this.treks().length) {
+        await this.trekService.loadTreks();
       }
     } finally {
       this.loading.set(false);
@@ -74,7 +74,7 @@ export class MissionDetailPage implements OnInit {
     return photos.filter(p => p.source !== 'user');
   }
 
-  protected missionPoints(plants: SuggestedPlant[]): number {
+  protected trekPoints(plants: SuggestedPlant[]): number {
     return plants.flatMap(p => p.photos).reduce((sum, ph) => sum + (ph.similarity || 0), 0);
   }
 
@@ -122,7 +122,7 @@ export class MissionDetailPage implements OnInit {
       this.identifying.set(true);
 
       try {
-        const result = await this.missionService.identifyAll(this.missionId, file);
+        const result = await this.trekService.identifyAll(this.trekId, file);
         const pn = result.plantnetResult;
 
         const available = result.matches.filter(m => !m.alreadyCaptured);
@@ -135,12 +135,12 @@ export class MissionDetailPage implements OnInit {
           URL.revokeObjectURL(photoUrl);
         }
       } catch {
-        this.resultOverlay.set({ name: this.i18n.t().myMissions.uploadError, points: 0, type: 'noMatch', photoUrl });
+        this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch', photoUrl });
       } finally {
         this.identifying.set(false);
       }
     } catch {
-      this.resultOverlay.set({ name: this.i18n.t().myMissions.uploadError, points: 0, type: 'noMatch' });
+      this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch' });
     }
   }
 
@@ -150,14 +150,14 @@ export class MissionDetailPage implements OnInit {
       const prevResult = pn.identifiedAs
         ? { match: false, score: pn.score, identifiedAs: pn.identifiedAs, commonName: pn.commonName, similarity: 0, genus: pn.genus, family: pn.family }
         : undefined;
-      await this.missionService.addUserPlant(this.missionId, file, prevResult);
-      this.resultOverlay.set({ name: this.i18n.t().myMissions.noMatchInMission, points: 0, type: 'noMatch', photoUrl, identifiedAs: pn.identifiedAs, commonName: pn.commonName, genus: pn.genus, family: pn.family });
+      await this.trekService.addUserPlant(this.trekId, file, prevResult);
+      this.resultOverlay.set({ name: this.i18n.t().myTreks.noMatchInTrek, points: 0, type: 'noMatch', photoUrl, identifiedAs: pn.identifiedAs, commonName: pn.commonName, genus: pn.genus, family: pn.family });
     } catch (err: any) {
-      let msg = this.i18n.t().myMissions.uploadError;
+      let msg = this.i18n.t().myTreks.uploadError;
       if (err?.status === 409) {
         msg = err?.error?.error === 'region_limit_reached'
-          ? this.i18n.t().myMissions.regionLimitReached
-          : this.i18n.t().myMissions.maxPhotosReached;
+          ? this.i18n.t().myTreks.regionLimitReached
+          : this.i18n.t().myTreks.maxPhotosReached;
       }
       this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl });
     } finally {
@@ -172,18 +172,18 @@ export class MissionDetailPage implements OnInit {
     this.identifyResult.set(null);
     this.uploadingPhoto.set(true);
     try {
-      const photo = await this.missionService.uploadPlantPhoto(plantId, file, similarity);
+      const photo = await this.trekService.uploadPlantPhoto(plantId, file, similarity);
       if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
-      this.missionService.markPlantFoundLocally(plantId);
-      const name = plantName || this.missions().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
+      this.trekService.markPlantFoundLocally(plantId);
+      const name = plantName || this.treks().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
       this.resultOverlay.set({ name, points: similarity, type: 'match', photoUrl, identifiedAs: pn?.identifiedAs, commonName: pn?.commonName, genus: pn?.genus, family: pn?.family });
       await this.checkAutoComplete();
     } catch (err: any) {
-      let msg = this.i18n.t().myMissions.uploadError;
+      let msg = this.i18n.t().myTreks.uploadError;
       if (err?.status === 409) {
-        msg = err?.error?.error === 'already_captured_in_mission'
-          ? this.i18n.t().myMissions.alreadyCaptured
-          : this.i18n.t().myMissions.maxPhotosReached;
+        msg = err?.error?.error === 'already_captured_in_trek'
+          ? this.i18n.t().myTreks.alreadyCaptured
+          : this.i18n.t().myTreks.maxPhotosReached;
       }
       this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl });
     } finally {
@@ -203,9 +203,9 @@ export class MissionDetailPage implements OnInit {
   }
 
   protected matchReason(points: number): string {
-    if (points >= 100) return this.i18n.t().myMissions.matchSpecies;
-    if (points >= 75) return this.i18n.t().myMissions.matchGenus;
-    if (points >= 40) return this.i18n.t().myMissions.matchFamily;
+    if (points >= 100) return this.i18n.t().myTreks.matchSpecies;
+    if (points >= 75) return this.i18n.t().myTreks.matchGenus;
+    if (points >= 40) return this.i18n.t().myTreks.matchFamily;
     return '';
   }
 
@@ -217,38 +217,38 @@ export class MissionDetailPage implements OnInit {
   async deletePhoto(photoId: number): Promise<void> {
     const ok = await this.confirmService.confirm(this.i18n.t().confirm.deletePhoto);
     if (!ok) return;
-    const photo = this.missions().flatMap(m => m.plants).flatMap(p => p.photos).find(p => p.id === photoId);
+    const photo = this.treks().flatMap(m => m.plants).flatMap(p => p.photos).find(p => p.id === photoId);
     const similarity = photo?.similarity ?? 0;
-    await this.missionService.deletePlantPhoto(photoId);
+    await this.trekService.deletePlantPhoto(photoId);
     if (similarity > 0) this.auth.points.update(p => Math.max(0, p - similarity));
   }
 
-  async completeMission(): Promise<void> {
-    const mission = this.mission();
-    if (!mission) return;
-    const ok = await this.confirmService.confirm(this.i18n.t().confirm.completeMission, false, this.i18n.t().myMissions.completeMission);
+  async completeTrek(): Promise<void> {
+    const trek = this.trek();
+    if (!trek) return;
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.completeTrek, false, this.i18n.t().myTreks.completeTrek);
     if (!ok) return;
-    this.completingId.set(mission.id);
-    await this.missionService.completeMission(mission.id);
+    this.completingId.set(trek.id);
+    await this.trekService.completeTrek(trek.id);
     await new Promise(resolve => setTimeout(resolve, 600));
     this.completingId.set(null);
   }
 
-  async deleteMission(): Promise<void> {
-    const mission = this.mission();
-    if (!mission) return;
-    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deleteMission);
+  async deleteTrek(): Promise<void> {
+    const trek = this.trek();
+    if (!trek) return;
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deleteTrek);
     if (!ok) return;
-    await this.missionService.deleteMission(mission.id);
-    this.router.navigate(['/my-missions']);
+    await this.trekService.deleteTrek(trek.id);
+    this.router.navigate(['/my-treks']);
   }
 
   private async checkAutoComplete(): Promise<void> {
-    const mission = this.mission();
-    if (!mission || mission.status === 'completed') return;
-    const aiPlants = mission.plants.filter(p => p.source !== 'user');
+    const trek = this.trek();
+    if (!trek || trek.status === 'completed') return;
+    const aiPlants = trek.plants.filter(p => p.source !== 'user');
     if (aiPlants.length > 0 && aiPlants.every(p => p.found)) {
-      await this.completeMission();
+      await this.completeTrek();
       this.completedPopup.set(true);
       setTimeout(() => this.completedPopup.set(false), 3500);
     }

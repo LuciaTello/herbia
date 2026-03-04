@@ -18,7 +18,7 @@ export function userRouter(prisma: PrismaClient): Router {
     try {
       const user = await prisma.user.findUnique({
         where: { id: req.userId! },
-        select: { id: true, email: true, lang: true, username: true, points: true, missionTipCount: true, photoUrl: true, bio: true },
+        select: { id: true, email: true, lang: true, username: true, points: true, trekTipCount: true, photoUrl: true, bio: true },
       });
       if (!user) {
         res.status(404).json({ error: 'User not found' });
@@ -34,10 +34,10 @@ export function userRouter(prisma: PrismaClient): Router {
   // PATCH /api/users/me - Update user preferences
   router.patch('/me', async (req, res) => {
     try {
-      const { incrementMissionTip, username, email, bio } = req.body;
+      const { incrementTrekTip, username, email, bio } = req.body;
 
       const data: Record<string, unknown> = {};
-      if (incrementMissionTip) data.missionTipCount = { increment: 1 };
+      if (incrementTrekTip) data.trekTipCount = { increment: 1 };
 
       if (username !== undefined) {
         if (username) {

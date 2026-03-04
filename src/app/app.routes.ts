@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import { HomePage } from './pages/home/home';
 import { RoutePage } from './pages/route/route';
 import { CollectionPage } from './pages/collection/collection';
-import { MissionDetailPage } from './pages/mission-detail/mission-detail';
-import { MyMissionsPage } from './pages/my-missions/my-missions';
+import { TrekDetailPage } from './pages/trek-detail/trek-detail';
+import { MyTreksPage } from './pages/my-treks/my-treks';
 import { LevelPage } from './pages/level/level';
 import { FriendsPage } from './pages/friends/friends';
 import { ProfilePage } from './pages/profile/profile';
@@ -16,8 +16,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginPage },
   { path: 'route', component: RoutePage, canActivate: [authGuard] },
   { path: 'collection', component: CollectionPage, canActivate: [authGuard] },
-  { path: 'my-missions/:id', component: MissionDetailPage, canActivate: [authGuard] },
-  { path: 'my-missions', component: MyMissionsPage, canActivate: [authGuard] },
+  { path: 'my-treks/:id', component: TrekDetailPage, canActivate: [authGuard] },
+  { path: 'my-treks', component: MyTreksPage, canActivate: [authGuard] },
   { path: 'my-level', component: LevelPage, canActivate: [authGuard] },
   { path: 'friends', component: FriendsPage, canActivate: [authGuard] },
   { path: 'profile', component: ProfilePage, canActivate: [authGuard] },

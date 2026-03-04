@@ -8,7 +8,7 @@ import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { plantRouter } from './routes/plant.routes';
 import { collectionRouter } from './routes/collection.routes';
-import { missionRouter } from './routes/mission.routes';
+import { trekRouter } from './routes/trek.routes';
 import { authRouter } from './routes/auth.routes';
 import { userRouter } from './routes/user.routes';
 import { friendRouter } from './routes/friend.routes';
@@ -68,7 +68,7 @@ app.use('/api/config', configRouter(prisma));
 app.use('/api/users', authMiddleware, userRouter(prisma));
 app.use('/api/plants', authMiddleware, plantRouter(prisma));
 app.use('/api/collection', authMiddleware, collectionRouter(prisma));
-app.use('/api/missions', authMiddleware, missionRouter(prisma));
+app.use('/api/treks', authMiddleware, trekRouter(prisma));
 app.use('/api/friends', authMiddleware, friendRouter(prisma));
 
 // --- Health endpoint (public, no auth) ---

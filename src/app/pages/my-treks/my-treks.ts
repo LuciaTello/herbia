@@ -2,7 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { PlantPhoto, SuggestedPlant } from '../../models/plant.model';
-import { MissionService } from '../../services/mission.service';
+import { TrekService } from '../../services/trek.service';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
 import { WorldMapComponent } from '../../components/world-map/world-map';
@@ -12,25 +12,25 @@ import { getCountryName } from '../../utils/country-names';
 import { ConfirmService } from '../../components/confirm-popup/confirm.service';
 import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
 
-type MapView = 'map' | 'countries' | 'regions' | 'missions';
+type MapView = 'map' | 'countries' | 'regions' | 'treks';
 
 @Component({
-  selector: 'app-my-missions',
+  selector: 'app-my-treks',
   imports: [RouterLink, DatePipe, NgTemplateOutlet, WorldMapComponent, ConfirmPopupComponent],
-  templateUrl: './my-missions.html',
-  styleUrl: './my-missions.css',
+  templateUrl: './my-treks.html',
+  styleUrl: './my-treks.css',
 })
-export class MyMissionsPage implements OnInit {
-  private readonly missionService = inject(MissionService);
+export class MyTreksPage implements OnInit {
+  private readonly trekService = inject(TrekService);
   protected readonly auth = inject(AuthService);
   protected readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
   private readonly confirmService = inject(ConfirmService);
-  protected readonly missions = this.missionService.getMissions();
+  protected readonly treks = this.trekService.getTreks();
   protected readonly loading = signal(true);
   protected readonly completingId = signal<number | null>(null);
 
-  // Top-level toggle: active missions list vs completed missions map
+  // Top-level toggle: active treks list vs completed treks map
   protected readonly showCompleted = signal(false);
 
   // Drill-down state (only used in completed tab)
@@ -40,24 +40,24 @@ export class MyMissionsPage implements OnInit {
   protected readonly selectedCountryCode = signal<string | null>(null);
   protected readonly selectedRegion = signal<string | null>(null);
 
-  // --- Active missions (flat list, newest first) ---
-  protected readonly activeMissions = computed(() =>
-    this.missions()
+  // --- Active treks (flat list, newest first) ---
+  protected readonly activeTreks = computed(() =>
+    this.treks()
       .filter(m => m.status !== 'completed' || m.id === this.completingId())
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   );
 
-  // --- Completed missions drill-down ---
-  private readonly completedMissions = computed(() =>
-    this.missions().filter(m => m.status === 'completed')
+  // --- Completed treks drill-down ---
+  private readonly completedTreks = computed(() =>
+    this.treks().filter(m => m.status === 'completed')
   );
 
   private readonly locatedCompleted = computed(() =>
-    this.completedMissions().filter(m => m.countryCode)
+    this.completedTreks().filter(m => m.countryCode)
   );
 
   protected readonly noLocationCompleted = computed(() =>
-    this.completedMissions().filter(m => !m.countryCode)
+    this.completedTreks().filter(m => !m.countryCode)
   );
 
   protected readonly continentCounts = computed(() => {
@@ -117,7 +117,7 @@ export class MyMissionsPage implements OnInit {
   protected readonly completedInView = computed(() => {
     const code = this.selectedCountryCode();
     const region = this.selectedRegion();
-    if (this.mapView() === 'missions' && !code) {
+    if (this.mapView() === 'treks' && !code) {
       return this.noLocationCompleted();
     }
     if (!code) return [];
@@ -138,7 +138,7 @@ export class MyMissionsPage implements OnInit {
     const v = this.mapView();
     if (v === 'map') return parts;
 
-    if (v === 'missions' && !this.selectedCountryCode()) {
+    if (v === 'treks' && !this.selectedCountryCode()) {
       parts.push({ label: this.i18n.t().collection.noLocation, action: null });
       return parts;
     }
@@ -161,7 +161,7 @@ export class MyMissionsPage implements OnInit {
 
   protected rarity(rarity: string) { return getRarity(rarity, this.i18n.t()); }
 
-  protected missionPoints(plants: SuggestedPlant[]): number {
+  protected trekPoints(plants: SuggestedPlant[]): number {
     return plants.flatMap(p => p.photos).reduce((sum, ph) => sum + (ph.similarity || 0), 0);
   }
 
@@ -171,7 +171,7 @@ export class MyMissionsPage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      await this.missionService.loadMissions();
+      await this.trekService.loadTreks();
     } finally {
       this.loading.set(false);
     }
@@ -212,12 +212,12 @@ export class MyMissionsPage implements OnInit {
 
   protected onRegionSelected(region: string): void {
     this.selectedRegion.set(region);
-    this.mapView.set('missions');
+    this.mapView.set('treks');
   }
 
   protected onShowAllFromCountry(): void {
     this.selectedRegion.set(null);
-    this.mapView.set('missions');
+    this.mapView.set('treks');
   }
 
   protected onShowNoLocation(): void {
@@ -225,7 +225,7 @@ export class MyMissionsPage implements OnInit {
     this.selectedCountry.set(null);
     this.selectedCountryCode.set(null);
     this.selectedRegion.set(null);
-    this.mapView.set('missions');
+    this.mapView.set('treks');
   }
 
   protected navigateTo(action: MapView | null): void {
@@ -245,14 +245,14 @@ export class MyMissionsPage implements OnInit {
     this.mapView.set(action);
   }
 
-  protected openMission(id: number): void {
-    this.router.navigate(['/my-missions', id]);
+  protected openTrek(id: number): void {
+    this.router.navigate(['/my-treks', id]);
   }
 
-  async deleteMission(id: number, event: Event): Promise<void> {
+  async deleteTrek(id: number, event: Event): Promise<void> {
     event.stopPropagation();
-    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deleteMission);
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.deleteTrek);
     if (!ok) return;
-    await this.missionService.deleteMission(id);
+    await this.trekService.deleteTrek(id);
   }
 }

@@ -7,11 +7,11 @@ interface Slide {
 }
 
 @Component({
-  selector: 'app-mission-tutorial',
-  templateUrl: './mission-tutorial.html',
-  styleUrl: './mission-tutorial.css',
+  selector: 'app-trek-tutorial',
+  templateUrl: './trek-tutorial.html',
+  styleUrl: './trek-tutorial.css',
 })
-export class MissionTutorialComponent {
+export class TrekTutorialComponent {
   @Output() done = new EventEmitter<void>();
 
   protected readonly i18n = inject(I18nService);

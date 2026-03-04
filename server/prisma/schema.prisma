@@ -21,12 +21,11 @@ model User {
   points       Int      @default(0)
   photoUrl     String?  @map("photo_url")
   bio          String?
-  missionTipCount Int @default(0) @map("mission_tip_count")
+  trekTipCount Int @default(0) @map("mission_tip_count")
   createdAt    DateTime @default(now())
 
-  // One-to-many: a user has many missions
-  // Like @OneToMany(mappedBy = "user") List<Mission> missions;
-  missions     Mission[]
+  // One-to-many: a user has many treks
+  treks        Trek[]
 
   sentFriendships     Friendship[] @relation("sentFriendships")
   receivedFriendships Friendship[] @relation("receivedFriendships")
@@ -34,13 +33,12 @@ model User {
   @@map("users")
 }
 
-// A mission represents a search (origin → destination) with its suggested plants
-// Like @Entity Mission in JPA
-model Mission {
+// A trek represents a search (origin → destination) with its suggested plants
+model Trek {
   id          Int              @id @default(autoincrement())
   origin      String
   destination String
-  description String           @default("")  // General vegetation overview for this route/month
+  description String           @default("")
   month       Int              // 1-12, for seasonal plant suggestions
   year        Int              // e.g. 2026
   createdAt   DateTime         @default(now())
@@ -58,17 +56,16 @@ model Mission {
   userId      Int              @map("user_id")
   user        User             @relation(fields: [userId], references: [id])
 
-  // One-to-many: a mission has many suggested plants
-  // cascade delete handled by Prisma (onDelete: Cascade)
-  plants      SuggestedPlant[] @relation("missionPlants")
+  // One-to-many: a trek has many suggested plants
+  plants      SuggestedPlant[] @relation("trekPlants")
 
-  // Plants that were originally found in this mission (reverse of foundInMission)
-  plantsFoundHere SuggestedPlant[] @relation("foundInMission")
+  // Plants that were originally found in this trek (reverse of foundInTrek)
+  plantsFoundHere SuggestedPlant[] @relation("foundInTrek")
 
   @@map("treks")
 }
 
-// Canonical plant species (one row per species, shared across all missions)
+// Canonical plant species (one row per species, shared across all treks)
 model Plant {
   id             Int      @id @default(autoincrement())
   scientificName String   @unique @map("scientific_name")
@@ -86,8 +83,7 @@ model Plant {
   @@map("plants")
 }
 
-// A plant suggested by the AI for a specific mission
-// Like @Entity SuggestedPlant in JPA
+// A plant suggested by the AI for a specific trek
 model SuggestedPlant {
   id             Int       @id @default(autoincrement())
   commonName     String
@@ -98,7 +94,7 @@ model SuggestedPlant {
   genus          String    @default("")
   family         String    @default("")
   source         String    @default("ai")   // "ai" | "user"
-  pendingSimilarity Int    @default(0)      @map("pending_similarity")  // temp: similarity from last identify, consumed on upload
+  pendingSimilarity Int    @default(0)      @map("pending_similarity")
   found          Boolean   @default(false)
   foundAt        DateTime?
 
@@ -106,16 +102,16 @@ model SuggestedPlant {
   plantId        Int?      @map("plant_id")
   plant          Plant?    @relation(fields: [plantId], references: [id], onDelete: SetNull)
 
-  // Mission where this plant was originally found (null if not found yet)
-  foundInMissionId  Int?      @map("found_in_trek_id")
-  foundInMission    Mission?  @relation("foundInMission", fields: [foundInMissionId], references: [id], onDelete: SetNull)
+  // Trek where this plant was originally found (null if not found yet)
+  foundInTrekId  Int?      @map("found_in_trek_id")
+  foundInTrek    Trek?     @relation("foundInTrek", fields: [foundInTrekId], references: [id], onDelete: SetNull)
 
-  // One-to-many: a plant has many photos (normalized from old imageUrls column)
+  // One-to-many: a plant has many photos
   photos         PlantPhoto[]
 
-  // Foreign key to Mission (like @ManyToOne @JoinColumn(name = "trek_id") Mission mission;)
-  missionId      Int       @map("trek_id")
-  mission        Mission   @relation("missionPlants", fields: [missionId], references: [id], onDelete: Cascade)
+  // Foreign key to Trek
+  trekId         Int       @map("trek_id")
+  trek           Trek      @relation("trekPlants", fields: [trekId], references: [id], onDelete: Cascade)
 
   @@map("suggested_plants")
 }
@@ -125,7 +121,7 @@ model PlantPhoto {
   id         Int    @id @default(autoincrement())
   url        String
   source     String   // "wikipedia" | "inaturalist" | "user"
-  similarity Int    @default(0)  // points earned for this photo (deducted on delete)
+  similarity Int    @default(0)
   plantId    Int    @map("plant_id")
   plant      SuggestedPlant @relation(fields: [plantId], references: [id], onDelete: Cascade)
 

@@ -12,9 +12,9 @@ export interface Translations {
   home: {
     greeting: (name: string) => string;
     startRoute: string;
-    missionSubtitle: string;
-    myMissions: string;
-    missionsSubtitle: string;
+    trekSubtitle: string;
+    myTreks: string;
+    treksSubtitle: string;
     myCollection: string;
     collectionSubtitle: string;
   };
@@ -35,7 +35,7 @@ export interface Translations {
     searchZone: string;
     zoneResultsTitle: string;
     resultsTitle: string;
-    startMission: string;
+    startTrek: string;
     saving: string;
     tooFar: string;
     error: string;
@@ -45,14 +45,14 @@ export interface Translations {
     plantCount10: string;
     loadingMessages: string[];
   };
-  myMissions: {
+  myTreks: {
     back: string;
     title: string;
     loading: string;
     emptyLine1: string;
     emptyLine2: string;
     found: string;
-    foundInMission: (origin: string, destination: string) => string;
+    foundInTrek: (origin: string, destination: string) => string;
     markFound: string;
     addPhoto: string;
     uploading: string;
@@ -71,7 +71,7 @@ export interface Translations {
     sameFamily: (name: string) => string;
     viewFamily: (name: string) => string;
     summary: (found: number) => string;
-    missionComplete: string;
+    trekComplete: string;
     addPlant: string;
     addingPlant: string;
     myPlantsTitle: string;
@@ -81,16 +81,16 @@ export interface Translations {
     regionLimitReached: string;
     uploadError: string;
     plantAdded: string;
-    completeMission: string;
+    completeTrek: string;
     completed: string;
-    activeMissions: string;
-    completedMissions: string;
-    missionsCount: (n: number) => string;
-    noLocationMissions: (n: number) => string;
+    activeTreks: string;
+    completedTreks: string;
+    treksCount: (n: number) => string;
+    noLocationTreks: (n: number) => string;
     allFound: string;
     photoLooksLike: string;
     selectPlant: string;
-    noMatchInMission: string;
+    noMatchInTrek: string;
     matchSpecies: string;
     matchGenus: string;
     matchFamily: string;
@@ -139,12 +139,12 @@ export interface Translations {
     start: string;
     accept: string;
   };
-  missionTip: {
+  trekTip: {
     title: string;
     text: string;
     dismiss: string;
   };
-  missionTutorial: {
+  trekTutorial: {
     titles: string[];
     texts: string[];
     imageLabels: string[];
@@ -175,7 +175,7 @@ export interface Translations {
     save: string;
     alreadyFriends: string;
     remove: string;
-    missions: string;
+    treks: string;
     plants: string;
     noBio: string;
   };
@@ -202,16 +202,16 @@ export interface Translations {
     cancel: string;
     confirm: string;
     deletePhoto: string;
-    deleteMission: string;
+    deleteTrek: string;
     deleteUserPlant: string;
     removePlant: string;
-    completeMission: string;
+    completeTrek: string;
     removeFriend: string;
   };
   tutorials: {
     back: string;
     title: string;
-    missions: {
+    treks: {
       title: string;
       description: string;
     };

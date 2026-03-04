@@ -33,8 +33,8 @@ export class AuthService {
   // In-memory only: true right after register, false otherwise
   readonly justRegistered = signal(false);
 
-  // How many times the user has seen the mission tip (show until 4)
-  readonly missionTipCount = signal(4); // default 4 = don't show
+  // How many times the user has seen the trek tip (show until 4)
+  readonly trekTipCount = signal(4); // default 4 = don't show
 
   readonly username = signal<string | null>(null);
   readonly points = signal(0);
@@ -59,7 +59,7 @@ export class AuthService {
     );
     this.i18n.setLang(lang as 'es' | 'fr');
     this.justRegistered.set(true);
-    this.missionTipCount.set(result.user.missionTipCount);
+    this.trekTipCount.set(result.user.trekTipCount);
     this.username.set(result.user.username);
     this.points.set(result.user.points);
     this.photoUrl.set(result.user.photoUrl);
@@ -73,7 +73,7 @@ export class AuthService {
       this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
     );
     this.i18n.setLang(result.user.lang as 'es' | 'fr');
-    this.missionTipCount.set(result.user.missionTipCount);
+    this.trekTipCount.set(result.user.trekTipCount);
     this.username.set(result.user.username);
     this.points.set(result.user.points);
     this.photoUrl.set(result.user.photoUrl);
@@ -82,10 +82,10 @@ export class AuthService {
     this.setToken(result.token);
   }
 
-  async dismissMissionTip(): Promise<void> {
-    this.missionTipCount.update(c => c + 1);
+  async dismissTrekTip(): Promise<void> {
+    this.trekTipCount.update(c => c + 1);
     await firstValueFrom(
-      this.http.patch(`${environment.apiUrl}/users/me`, { incrementMissionTip: true })
+      this.http.patch(`${environment.apiUrl}/users/me`, { incrementTrekTip: true })
     );
   }
 

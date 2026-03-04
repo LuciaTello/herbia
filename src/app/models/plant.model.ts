@@ -18,7 +18,7 @@ export interface Plant {
   photos: PlantPhoto[];
 }
 
-// SuggestedPlant: a plant tied to a mission in PostgreSQL (with found state)
+// SuggestedPlant: a plant tied to a trek in PostgreSQL (with found state)
 export interface SuggestedPlant {
   id: number;
   commonName: string;
@@ -32,10 +32,10 @@ export interface SuggestedPlant {
   photos: PlantPhoto[];
   found: boolean;
   foundAt: string | null;
-  foundInMissionId?: number | null;
-  foundInMission?: { origin: string; destination: string } | null;
-  missionId: number;
-  mission?: { origin: string; destination: string; country?: string | null; countryCode?: string | null; region?: string | null; regionCode?: string | null };
+  foundInTrekId?: number | null;
+  foundInTrek?: { origin: string; destination: string } | null;
+  trekId: number;
+  trek?: { origin: string; destination: string; country?: string | null; countryCode?: string | null; region?: string | null; regionCode?: string | null };
 }
 
 // SuggestResult: what POST /api/plants/suggest returns (description + plants)
@@ -45,7 +45,7 @@ export interface SuggestResult {
   plants: Plant[];
 }
 
-// IdentifyResult: what POST /api/missions/plants/:plantId/identify returns
+// IdentifyResult: what POST /api/treks/plants/:plantId/identify returns
 export interface IdentifyResult {
   match: boolean;
   score: number;
@@ -56,7 +56,7 @@ export interface IdentifyResult {
   family: string;
 }
 
-// IdentifyAllResult: what POST /api/missions/:missionId/identify-all returns
+// IdentifyAllResult: what POST /api/treks/:trekId/identify-all returns
 export interface IdentifyAllResult {
   plantnetResult: {
     identifiedAs: string;
@@ -85,8 +85,8 @@ export interface PlaceSelection {
   lng?: number;
 }
 
-// Mission: a search (origin → destination) for a specific month
-export interface Mission {
+// Trek: a search (origin → destination) for a specific month
+export interface Trek {
   id: number;
   origin: string;
   destination: string;

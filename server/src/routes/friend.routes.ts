@@ -189,17 +189,17 @@ export function friendRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      const [missionCount, plantCount] = await Promise.all([
-        prisma.mission.count({ where: { userId } }),
+      const [trekCount, plantCount] = await Promise.all([
+        prisma.trek.count({ where: { userId } }),
         prisma.suggestedPlant.count({
           where: {
-            mission: { userId },
+            trek: { userId },
             OR: [{ found: true }, { source: 'user' }],
           },
         }),
       ]);
 
-      res.json({ ...user, missionCount, plantCount });
+      res.json({ ...user, trekCount, plantCount });
     } catch (error) {
       console.error('Error fetching friend profile:', error);
       res.status(500).json({ error: 'Failed to fetch profile' });

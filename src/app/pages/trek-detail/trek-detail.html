@@ -1,33 +1,33 @@
-<a routerLink="/my-missions" class="back-link">{{ i18n.t().myMissions.back }}</a>
+<a routerLink="/my-treks" class="back-link">{{ i18n.t().myTreks.back }}</a>
 
 @if (loading()) {
   <div class="loading-container">
     <div class="loading-spinner"></div>
-    <p class="loading-message">{{ i18n.t().myMissions.loading }}</p>
+    <p class="loading-message">{{ i18n.t().myTreks.loading }}</p>
   </div>
-} @else if (!mission()) {
+} @else if (!trek()) {
   <div class="empty">
-    <p>{{ i18n.t().myMissions.emptyLine1 }}</p>
+    <p>{{ i18n.t().myTreks.emptyLine1 }}</p>
   </div>
 } @else {
   <h2>
-    @if (mission()!.origin === mission()!.destination) {
-      {{ mission()!.origin }}
+    @if (trek()!.origin === trek()!.destination) {
+      {{ trek()!.origin }}
     } @else {
-      {{ mission()!.origin }} → {{ mission()!.destination }}
+      {{ trek()!.origin }} → {{ trek()!.destination }}
     }
   </h2>
 
-  @if (mission()!.description) {
-    <p class="mission-description">{{ mission()!.description }}</p>
+  @if (trek()!.description) {
+    <p class="trek-description">{{ trek()!.description }}</p>
   }
 
-  <p class="mission-progress">
-    {{ i18n.t().myMissions.pointsEarned(missionPoints(mission()!.plants)) }}
-    · {{ i18n.t().myMissions.summary(foundCount(aiPlants())) }}
+  <p class="trek-progress">
+    {{ i18n.t().myTreks.pointsEarned(trekPoints(trek()!.plants)) }}
+    · {{ i18n.t().myTreks.summary(foundCount(aiPlants())) }}
   </p>
 
-  <div class="mission-plants">
+  <div class="trek-plants">
     @for (plant of aiPlants(); track plant.id) {
       <article class="plant-card" [class.found]="plant.found"
                [class.rarity-common]="plant.rarity === 'common' || !plant.rarity"
@@ -44,7 +44,7 @@
           <h4>{{ plant.commonName }}</h4>
           <p class="scientific">{{ plant.scientificName }}</p>
           @if (plant.family) {
-            <span class="plant-family-link" (click)="openFamily(plant.family!); $event.stopPropagation()">{{ i18n.t().myMissions.viewFamily(plant.family!) }}</span>
+            <span class="plant-family-link" (click)="openFamily(plant.family!); $event.stopPropagation()">{{ i18n.t().myTreks.viewFamily(plant.family!) }}</span>
           }
           <p class="chance" [style.color]="rarity(plant.rarity).color">
             {{ rarity(plant.rarity).label }}
@@ -54,11 +54,11 @@
             <p class="hint">{{ plant.hint }}</p>
           }
           @if (plant.found) {
-            @if (plant.foundInMission && plant.foundInMissionId !== mission()!.id) {
-              @if (plant.foundInMission.origin === plant.foundInMission.destination) {
-                <span class="found-in-mission">{{ i18n.t().myMissions.foundInMission(plant.foundInMission.origin, plant.foundInMission.origin) }}</span>
+            @if (plant.foundInTrek && plant.foundInTrekId !== trek()!.id) {
+              @if (plant.foundInTrek.origin === plant.foundInTrek.destination) {
+                <span class="found-in-trek">{{ i18n.t().myTreks.foundInTrek(plant.foundInTrek.origin, plant.foundInTrek.origin) }}</span>
               } @else {
-                <span class="found-in-mission">{{ i18n.t().myMissions.foundInMission(plant.foundInMission.origin, plant.foundInMission.destination) }}</span>
+                <span class="found-in-trek">{{ i18n.t().myTreks.foundInTrek(plant.foundInTrek.origin, plant.foundInTrek.destination) }}</span>
               }
             }
             <!-- User photos with points -->
@@ -70,9 +70,9 @@
                          (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
                     <div class="photo-row-info">
                       <span class="photo-row-name">{{ plant.commonName }}</span>
-                      <span class="photo-points">{{ i18n.t().myMissions.pointsEarned(photo.similarity || 0) }}</span>
+                      <span class="photo-points">{{ i18n.t().myTreks.pointsEarned(photo.similarity || 0) }}</span>
                     </div>
-                    @if (mission()!.status !== 'completed') {
+                    @if (trek()!.status !== 'completed') {
                       <button class="photo-row-delete" (click)="deletePhoto(photo.id!)">&times;</button>
                     }
                   </div>
@@ -85,24 +85,24 @@
     }
   </div>
 
-  @if (mission()!.origin !== mission()!.destination) {
-    <app-route-map [origin]="mission()!.origin" [destination]="mission()!.destination" />
+  @if (trek()!.origin !== trek()!.destination) {
+    <app-route-map [origin]="trek()!.origin" [destination]="trek()!.destination" />
   }
 
   <!-- Action buttons -->
-  @if (mission()!.status !== 'completed') {
+  @if (trek()!.status !== 'completed') {
     <div class="action-buttons">
-      <button class="complete-mission-button" (click)="completeMission()">
-        {{ i18n.t().myMissions.completeMission }}
+      <button class="complete-trek-button" (click)="completeTrek()">
+        {{ i18n.t().myTreks.completeTrek }}
       </button>
-      <button class="delete-mission-button" (click)="deleteMission()">
+      <button class="delete-trek-button" (click)="deleteTrek()">
         &times;
       </button>
     </div>
   }
 
   <!-- FAB camera button -->
-  @if (mission()!.status !== 'completed') {
+  @if (trek()!.status !== 'completed') {
     @if (identifying()) {
       <div class="fab-camera identifying">
         <div class="fab-spinner"></div>
@@ -112,7 +112,7 @@
         <div class="fab-spinner"></div>
       </div>
     } @else {
-      <button class="fab-camera" (click)="takePhoto()">&#x1F4F7; {{ i18n.t().myMissions.addPhoto }}</button>
+      <button class="fab-camera" (click)="takePhoto()">&#x1F4F7; {{ i18n.t().myTreks.addPhoto }}</button>
     }
   }
 
@@ -120,11 +120,11 @@
   @if (identifyResult() && identifyResult()!.matches.length > 1) {
     <div class="match-backdrop" (click)="cancelUpload()">
       <div class="match-dialog" (click)="$event.stopPropagation()">
-        <p class="match-title">{{ i18n.t().myMissions.photoLooksLike }} <strong>{{ identifyResult()!.plantnetResult.identifiedAs }}</strong></p>
-        <p class="match-subtitle">{{ i18n.t().myMissions.selectPlant }}</p>
+        <p class="match-title">{{ i18n.t().myTreks.photoLooksLike }} <strong>{{ identifyResult()!.plantnetResult.identifiedAs }}</strong></p>
+        <p class="match-subtitle">{{ i18n.t().myTreks.selectPlant }}</p>
         @for (match of identifyResult()!.matches; track match.plantId) {
           <button class="match-option" (click)="selectMatch(match)">
-            {{ i18n.t().myMissions.pointsFor(match.commonName, match.similarity) }}
+            {{ i18n.t().myTreks.pointsFor(match.commonName, match.similarity) }}
           </button>
         }
         <button class="match-cancel" (click)="cancelUpload()">
@@ -181,7 +181,7 @@
 
 @if (completedPopup()) {
   <div class="completed-popup" (click)="completedPopup.set(false)">
-    <p>{{ i18n.t().myMissions.allFound }}</p>
+    <p>{{ i18n.t().myTreks.allFound }}</p>
   </div>
 }
 

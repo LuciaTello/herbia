@@ -4,21 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Plant, PlaceSelection } from '../../models/plant.model';
 import { PlantService } from '../../services/plant.service';
-import { MissionService } from '../../services/mission.service';
+import { TrekService } from '../../services/trek.service';
 import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../i18n';
 import { PlaceAutocompleteDirective } from '../../directives/place-autocomplete.directive';
-import { MissionTutorialComponent } from '../../components/mission-tutorial/mission-tutorial';
+import { TrekTutorialComponent } from '../../components/trek-tutorial/trek-tutorial';
 
 @Component({
   selector: 'app-route',
-  imports: [FormsModule, RouterLink, PlaceAutocompleteDirective, MissionTutorialComponent],
+  imports: [FormsModule, RouterLink, PlaceAutocompleteDirective, TrekTutorialComponent],
   templateUrl: './route.html',
   styleUrl: './route.css',
 })
 export class RoutePage {
   private readonly plantService = inject(PlantService);
-  private readonly missionService = inject(MissionService);
+  private readonly trekService = inject(TrekService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
@@ -42,7 +42,7 @@ export class RoutePage {
   protected readonly saving = signal(false);
   protected readonly error = signal('');
   protected readonly loadingMessage = signal('');
-  protected readonly showMissionTip = signal(false);
+  protected readonly showTrekTip = signal(false);
 
   // setInterval returns a handle we need to clear later (like ScheduledFuture in Java)
   private messageInterval: ReturnType<typeof setInterval> | null = null;
@@ -118,7 +118,7 @@ export class RoutePage {
         this.plants.set(sorted);
         this.loading.set(false);
         this.stopLoadingMessages();
-        this.onStartMissionClick();
+        this.onStartTrekClick();
         return;
       } else {
         this.plants.set([]);
@@ -131,27 +131,27 @@ export class RoutePage {
     }
   }
 
-  protected onStartMissionClick(): void {
-    if (this.auth.missionTipCount() < 1) {
-      this.showMissionTip.set(true);
+  protected onStartTrekClick(): void {
+    if (this.auth.trekTipCount() < 1) {
+      this.showTrekTip.set(true);
       return;
     }
-    this.onStartMission();
+    this.onStartTrek();
   }
 
-  protected async dismissMissionTip(): Promise<void> {
-    this.showMissionTip.set(false);
-    this.auth.dismissMissionTip();
-    this.onStartMission();
+  protected async dismissTrekTip(): Promise<void> {
+    this.showTrekTip.set(false);
+    this.auth.dismissTrekTip();
+    this.onStartTrek();
   }
 
-  async onStartMission(): Promise<void> {
+  async onStartTrek(): Promise<void> {
     this.saving.set(true);
     try {
       const dest = this.mode() === 'zone' ? this.origin() : this.destination();
       const dLat = this.mode() === 'zone' ? this.originLat : this.destLat;
       const dLng = this.mode() === 'zone' ? this.originLng : this.destLng;
-      const mission = await this.missionService.createMission(
+      const trek = await this.trekService.createTrek(
         this.origin(),
         dest,
         this.description(),
@@ -165,7 +165,7 @@ export class RoutePage {
         dLat,
         dLng,
       );
-      this.router.navigate(['/my-missions', mission.id]);
+      this.router.navigate(['/my-treks', trek.id]);
     } catch (e) {
       if (e instanceof HttpErrorResponse && e.status === 429) {
         this.error.set(this.i18n.t().route.dailyLimitReached);

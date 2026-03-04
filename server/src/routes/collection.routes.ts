@@ -8,17 +8,17 @@ import type { PrismaClient } from '../generated/prisma/client';
 export function collectionRouter(prisma: PrismaClient): Router {
   const router = Router();
 
-  // GET /api/collection - all found plants across all missions for this user
+  // GET /api/collection - all found plants across all treks for this user
   router.get('/', async (req, res) => {
     try {
       const plants = await prisma.suggestedPlant.findMany({
         where: {
           found: true,
-          mission: { userId: req.userId! },
+          trek: { userId: req.userId! },
         },
         include: {
           photos: true,
-          mission: { select: { origin: true, destination: true, country: true, countryCode: true, region: true, regionCode: true } },
+          trek: { select: { origin: true, destination: true, country: true, countryCode: true, region: true, regionCode: true } },
         },
         orderBy: { foundAt: 'desc' },
       });
@@ -35,13 +35,13 @@ export function collectionRouter(prisma: PrismaClient): Router {
     try {
       const id = parseInt(req.params['id']);
 
-      // Verify ownership via mission.userId
+      // Verify ownership via trek.userId
       const plant = await prisma.suggestedPlant.findUnique({
         where: { id },
-        include: { mission: { select: { userId: true } } },
+        include: { trek: { select: { userId: true } } },
       });
 
-      if (!plant || plant.mission.userId !== req.userId!) {
+      if (!plant || plant.trek.userId !== req.userId!) {
         res.status(404).json({ error: 'Plant not found' });
         return;
       }

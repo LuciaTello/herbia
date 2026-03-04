@@ -117,7 +117,7 @@ h2 {
   border-color: #2d7d46;
 }
 
-.missions-toggle {
+.treks-toggle {
   display: flex;
   gap: 0.5rem;
   justify-content: center;
@@ -173,12 +173,12 @@ h2 {
   padding: 2rem 1rem;
 }
 
-.missions-list {
+.treks-list {
   max-width: 400px;
   margin: 0 auto;
 }
 
-.mission-card {
+.trek-card {
   background: #f0f9f0;
   border-radius: 12px;
   overflow: hidden;
@@ -188,22 +188,22 @@ h2 {
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.mission-card:hover {
+.trek-card:hover {
   background: #e8f5e9;
 }
 
-.mission-card.completing {
+.trek-card.completing {
   opacity: 0;
   transform: scale(0.95);
 }
 
-.mission-header {
+.trek-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-.mission-route {
+.trek-route {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
@@ -211,19 +211,19 @@ h2 {
   min-width: 0;
 }
 
-.mission-route h3 {
+.trek-route h3 {
   margin: 0;
   color: #2d7d46;
   font-size: 1.1rem;
 }
 
-.mission-date {
+.trek-date {
   color: #636e72;
   font-size: 0.75rem;
   margin: 0.25rem 0 0;
 }
 
-.mission-progress {
+.trek-progress {
   margin: 0.5rem 0 0;
 }
 

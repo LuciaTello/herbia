@@ -27,7 +27,7 @@ export interface FriendProfile {
   points: number;
   photoUrl: string | null;
   bio: string | null;
-  missionCount: number;
+  trekCount: number;
   plantCount: number;
 }
 

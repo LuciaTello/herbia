@@ -6,7 +6,7 @@ import type { PrismaClient } from '../generated/prisma/client';
 import { getSuggestedPlants, ensurePlantPhoto, fetchFromWikipedia, fetchFromINaturalist } from '../services/plant.service';
 import { incrementQuota } from '../services/quota.service';
 
-// Factory function (same pattern as missionRouter/collectionRouter)
+// Factory function (same pattern as trekRouter/collectionRouter)
 export function plantRouter(prisma: PrismaClient): Router {
   const router = Router();
 
@@ -35,18 +35,18 @@ export function plantRouter(prisma: PrismaClient): Router {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const missionFilter = region
+      const trekFilter = region
         ? { userId: req.userId!, region }
         : { userId: req.userId! };
 
       const [found, recentlySuggested] = await Promise.all([
         prisma.suggestedPlant.findMany({
-          where: { mission: missionFilter, found: true, foundAt: { gte: thirtyDaysAgo } },
+          where: { trek: trekFilter, found: true, foundAt: { gte: thirtyDaysAgo } },
           select: { scientificName: true },
           distinct: ['scientificName'],
         }),
         prisma.suggestedPlant.findMany({
-          where: { mission: { ...missionFilter, createdAt: { gte: sevenDaysAgo } }, found: false },
+          where: { trek: { ...trekFilter, createdAt: { gte: sevenDaysAgo } }, found: false },
           select: { scientificName: true },
           distinct: ['scientificName'],
         }),
@@ -120,7 +120,7 @@ export function plantRouter(prisma: PrismaClient): Router {
     }
   });
 
-  // POST /api/plants/photos/:photoId/refresh — re-fetch a broken mission photo
+  // POST /api/plants/photos/:photoId/refresh — re-fetch a broken trek photo
   router.post('/photos/:photoId/refresh', async (req, res) => {
     try {
       const photoId = Number(req.params['photoId']);
@@ -129,13 +129,13 @@ export function plantRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Find the photo and verify ownership (photo → plant (SuggestedPlant) → mission → user)
+      // Find the photo and verify ownership (photo → plant (SuggestedPlant) → trek → user)
       const photo = await prisma.plantPhoto.findUnique({
         where: { id: photoId },
-        include: { plant: { include: { mission: { select: { userId: true } } } } },
+        include: { plant: { include: { trek: { select: { userId: true } } } } },
       });
 
-      if (!photo || photo.plant?.mission?.userId !== req.userId) {
+      if (!photo || photo.plant?.trek?.userId !== req.userId) {
         res.status(404).json({ error: 'Photo not found' });
         return;
       }
