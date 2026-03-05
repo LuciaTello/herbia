@@ -157,12 +157,14 @@ h2 {
   border-radius: 20px;
   padding: 0.25rem 0.55rem;
   cursor: pointer;
-  margin: 0.25rem 0;
-  transition: background 0.15s;
+  margin-bottom: 0.35rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
 .plant-family-chip:active {
   background: #e8f5e9;
+  box-shadow: none;
 }
 
 .chip-arrow {
