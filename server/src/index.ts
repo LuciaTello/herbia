@@ -12,6 +12,7 @@ import { trekRouter } from './routes/trek.routes';
 import { authRouter } from './routes/auth.routes';
 import { userRouter } from './routes/user.routes';
 import { friendRouter } from './routes/friend.routes';
+import { challengeRouter } from './routes/challenge.routes';
 import { configRouter } from './routes/config.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { initPlantService } from './services/plant.service';
@@ -70,6 +71,7 @@ app.use('/api/plants', authMiddleware, plantRouter(prisma));
 app.use('/api/collection', authMiddleware, collectionRouter(prisma));
 app.use('/api/treks', authMiddleware, trekRouter(prisma));
 app.use('/api/friends', authMiddleware, friendRouter(prisma));
+app.use('/api/challenges', authMiddleware, challengeRouter(prisma));
 
 // --- Health endpoint (public, no auth) ---
 app.get('/api/health', (_req, res) => res.json({ ok: true }));

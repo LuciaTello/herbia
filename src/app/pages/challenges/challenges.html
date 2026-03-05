@@ -1,0 +1,32 @@
+@if (!playing()) {
+  <a routerLink="/" class="back-link">&larr; {{ i18n.t().challenges.back }}</a>
+
+  <h2 class="page-title">{{ i18n.t().challenges.title }}</h2>
+
+  @if (loading()) {
+    <div class="loading-spinner"></div>
+  } @else {
+    <div class="challenge-cards">
+      <div class="challenge-card" [class.locked]="!isUnlocked()">
+        <div class="card-header">
+          <span class="card-emoji">{{ isUnlocked() ? '🧠' : '🔒' }}</span>
+          <strong>{{ i18n.t().challenges.quizTitle }}</strong>
+        </div>
+        <p class="card-description">
+          @if (isUnlocked()) {
+            {{ i18n.t().challenges.quizDescription }}
+          } @else {
+            {{ i18n.t().challenges.lockedDescription(plantsNeeded()) }}
+          }
+        </p>
+        @if (isUnlocked()) {
+          <button class="start-btn" (click)="startQuiz()">{{ i18n.t().challenges.start }}</button>
+        } @else {
+          <span class="locked-badge">{{ i18n.t().challenges.locked }}</span>
+        }
+      </div>
+    </div>
+  }
+} @else {
+  <app-quiz-game (done)="onQuizDone()" />
+}

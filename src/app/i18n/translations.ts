@@ -17,6 +17,8 @@ export interface Translations {
     treksSubtitle: string;
     myCollection: string;
     collectionSubtitle: string;
+    challenges: string;
+    challengesSubtitle: string;
   };
   route: {
     back: string;
@@ -225,6 +227,30 @@ export interface Translations {
     texts: string[];
     next: string;
     done: string;
+  };
+  challenges: {
+    back: string;
+    title: string;
+    quizTitle: string;
+    quizDescription: string;
+    lockedDescription: (n: number) => string;
+    start: string;
+    locked: string;
+    questionOf: (current: number, total: number) => string;
+    nameQuestion: string;
+    familyQuestion: string;
+    correct: string;
+    incorrect: (answer: string) => string;
+    next: string;
+    resultsTitle: string;
+    resultsScore: (score: number, total: number) => string;
+    resultsPerfect: string;
+    resultsGreat: string;
+    resultsGood: string;
+    resultsTryAgain: string;
+    pointsAdded: (pts: number) => string;
+    playAgain: string;
+    backToHub: string;
   };
 }
 

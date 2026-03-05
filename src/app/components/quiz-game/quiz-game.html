@@ -1,0 +1,71 @@
+@if (!quiz.finished()) {
+  <div class="quiz-container">
+    <!-- Progress -->
+    <div class="progress-header">
+      <span class="progress-label">{{ i18n.t().challenges.questionOf(quiz.currentIndex() + 1, quiz.questions().length) }}</span>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress()"></div>
+      </div>
+    </div>
+
+    <!-- Question -->
+    @if (currentQuestion(); as q) {
+      <div class="question-card">
+        <img [src]="q.photo" [alt]="q.plantName" class="plant-photo" />
+
+        <p class="question-text">
+          @if (q.type === 'name') {
+            {{ i18n.t().challenges.nameQuestion }}
+          } @else {
+            {{ i18n.t().challenges.familyQuestion }}
+          }
+        </p>
+
+        <div class="options">
+          @for (option of q.options; track option; let i = $index) {
+            <button
+              class="option-btn"
+              [class.correct]="quiz.answered() !== null && i === q.correctIndex"
+              [class.incorrect]="quiz.answered() === i && i !== q.correctIndex"
+              [disabled]="quiz.answered() !== null"
+              (click)="selectOption(i)"
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+
+        @if (quiz.answered() !== null) {
+          <div class="feedback" [class.is-correct]="quiz.answered() === q.correctIndex">
+            @if (quiz.answered() === q.correctIndex) {
+              <span>{{ i18n.t().challenges.correct }}</span>
+            } @else {
+              <span>{{ i18n.t().challenges.incorrect(q.options[q.correctIndex]) }}</span>
+            }
+          </div>
+
+          <button class="next-btn" (click)="next()">
+            {{ i18n.t().challenges.next }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+} @else {
+  <!-- Results screen -->
+  <div class="results">
+    <span class="results-emoji">{{ resultEmoji() }}</span>
+    <h2>{{ i18n.t().challenges.resultsTitle }}</h2>
+    <p class="results-score">{{ i18n.t().challenges.resultsScore(quiz.score(), quiz.questions().length) }}</p>
+    <p class="results-message">{{ resultMessage() }}</p>
+
+    @if (quiz.score() > 0) {
+      <p class="points-added">{{ i18n.t().challenges.pointsAdded(quiz.score()) }}</p>
+    }
+
+    <div class="results-actions">
+      <button class="action-primary" (click)="playAgain()">{{ i18n.t().challenges.playAgain }}</button>
+      <button class="action-secondary" (click)="backToHub()">{{ i18n.t().challenges.backToHub }}</button>
+    </div>
+  </div>
+}

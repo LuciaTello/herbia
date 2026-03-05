@@ -9,6 +9,7 @@ import { FriendsPage } from './pages/friends/friends';
 import { ProfilePage } from './pages/profile/profile';
 import { LoginPage } from './pages/login/login';
 import { TutorialsPage } from './pages/tutorials/tutorials';
+import { ChallengesPage } from './pages/challenges/challenges';
 import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
@@ -22,4 +23,5 @@ export const routes: Routes = [
   { path: 'friends', component: FriendsPage, canActivate: [authGuard] },
   { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
   { path: 'tutorials', component: TutorialsPage, canActivate: [authGuard] },
+  { path: 'challenges', component: ChallengesPage, canActivate: [authGuard] },
 ];
