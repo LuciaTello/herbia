@@ -116,19 +116,6 @@
   color: #d63031;
 }
 
-/* Feedback */
-.feedback {
-  text-align: center;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #d63031;
-  padding: 0.5rem;
-}
-
-.feedback.is-correct {
-  color: #2d7d46;
-}
-
 /* Next button */
 .next-btn {
   width: 100%;

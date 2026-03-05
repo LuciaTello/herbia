@@ -38,15 +38,8 @@
         </div>
 
         @if (quiz.answered() !== null) {
-          <div class="feedback" [class.is-correct]="quiz.answered() === q.correctIndex">
-            @if (quiz.answered() === q.correctIndex) {
-              <span>{{ i18n.t().challenges.correct }}</span>
-            } @else {
-              <span>{{ i18n.t().challenges.incorrect(q.options[q.correctIndex]) }}</span>
-            }
-          </div>
-
           <button class="next-btn" (click)="next()">
+            {{ quiz.answered() === q.correctIndex ? '✓' : '✗' }}
             {{ i18n.t().challenges.next }}
           </button>
         }
