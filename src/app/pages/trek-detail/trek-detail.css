@@ -145,21 +145,30 @@ h2 {
   margin: 0.125rem 0;
 }
 
-.plant-family-link {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #e65100;
-  background: #fff3e0;
-  border-radius: 4px;
-  padding: 0.1rem 0.4rem;
+.plant-family-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2d7d46;
+  background: #e8f5e9;
+  border: 1.5px solid #c8e6c9;
+  border-radius: 20px;
+  padding: 0.3rem 0.7rem;
   cursor: pointer;
-  text-decoration: underline;
-  margin-bottom: 0.25rem;
+  margin: 0.25rem 0;
+  transition: background 0.2s, border-color 0.2s;
 }
 
-.plant-family-link:hover {
-  background: #ffe0b2;
+.plant-family-chip:active {
+  background: #c8e6c9;
+  border-color: #2d7d46;
+}
+
+.chip-icon {
+  font-size: 0.75rem;
+  line-height: 1;
 }
 
 .plant-info .chance {

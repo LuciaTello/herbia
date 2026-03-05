@@ -44,7 +44,9 @@
           <h4>{{ plant.commonName }}</h4>
           <p class="scientific">{{ plant.scientificName }}</p>
           @if (plant.family) {
-            <span class="plant-family-link" (click)="openFamily(plant.family!); $event.stopPropagation()">{{ i18n.t().myTreks.viewFamily(plant.family!) }}</span>
+            <button class="plant-family-chip" (click)="openFamily(plant.family!); $event.stopPropagation()">
+              <span class="chip-icon">🌳</span> {{ plant.family! }}
+            </button>
           }
           <p class="chance" [style.color]="rarity(plant.rarity).color">
             {{ rarity(plant.rarity).label }}
