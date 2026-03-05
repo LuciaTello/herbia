@@ -132,10 +132,19 @@ h2 {
   padding: 0.75rem;
 }
 
+.plant-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .plant-info h4 {
   margin: 0;
   color: #2d3436;
   font-size: 0.95rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .plant-info .scientific {
@@ -149,16 +158,16 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #2d7d46;
   background: white;
   border: 1.5px solid #2d7d46;
   border-radius: 20px;
-  padding: 0.25rem 0.55rem;
+  padding: 0.2rem 0.5rem;
   cursor: pointer;
-  margin-bottom: 0.35rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: background 0.15s, box-shadow 0.15s;
 }
 

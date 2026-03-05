@@ -41,12 +41,14 @@
           }
         </div>
         <div class="plant-info">
-          @if (plant.family) {
-            <button class="plant-family-chip" (click)="openFamily(plant.family!); $event.stopPropagation()">
-              {{ plant.family! }} <span class="chip-arrow">›</span>
-            </button>
-          }
-          <h4>{{ plant.commonName }}</h4>
+          <div class="plant-name-row">
+            <h4>{{ plant.commonName }}</h4>
+            @if (plant.family) {
+              <button class="plant-family-chip" (click)="openFamily(plant.family!); $event.stopPropagation()">
+                {{ plant.family! }} <span class="chip-arrow">›</span>
+              </button>
+            }
+          </div>
           <p class="scientific">{{ plant.scientificName }}</p>
           <p class="chance" [style.color]="rarity(plant.rarity).color">
             {{ rarity(plant.rarity).label }}
