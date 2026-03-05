@@ -6,6 +6,7 @@ import multer, { memoryStorage } from 'multer';
 import type { PrismaClient } from '../generated/prisma/client';
 import { uploadPhoto, deletePhoto } from '../services/cloudinary.service';
 import { identifyPlant, callPlantNet, calculateSimilarity, normalize } from '../services/plantnet.service';
+import { translatePlantNames } from '../services/plant.service';
 
 const upload = multer({
   storage: memoryStorage(),
@@ -196,6 +197,10 @@ export function trekRouter(prisma: PrismaClient): Router {
         return;
       }
 
+      // Get user language for translation
+      const user = await prisma.user.findUnique({ where: { id: req.userId! }, select: { lang: true } });
+      const lang = user?.lang || 'es';
+
       // Single PlantNet call — get ALL raw results
       const allResults = await callPlantNet(file.buffer, file.mimetype);
 
@@ -208,9 +213,39 @@ export function trekRouter(prisma: PrismaClient): Router {
       }
 
       const best = allResults[0];
+      const englishName = best.species.commonNames?.[0] || '';
+      const sciName = best.species.scientificNameWithoutAuthor;
+
+      // Try cached translation from canonical Plant table, else translate via Groq
+      let localizedName = englishName;
+      if (englishName && sciName) {
+        const nameField = lang === 'fr' ? 'commonNameFr' : 'commonNameEs';
+        const canonical = await prisma.plant.findUnique({ where: { scientificName: sciName }, select: { commonNameEs: true, commonNameFr: true } });
+        const cachedName = lang === 'fr' ? canonical?.commonNameFr : canonical?.commonNameEs;
+        if (cachedName) {
+          localizedName = cachedName;
+        } else {
+          const translations = await translatePlantNames([{ scientificName: sciName, commonName: englishName }], lang);
+          localizedName = translations.get(sciName) || englishName;
+          // Cache for next time
+          try {
+            await prisma.plant.upsert({
+              where: { scientificName: sciName },
+              update: { [nameField]: localizedName },
+              create: {
+                scientificName: sciName,
+                [nameField]: localizedName,
+                genus: best.species.genus?.scientificNameWithoutAuthor || '',
+                family: best.species.family?.scientificNameWithoutAuthor || '',
+              },
+            });
+          } catch { /* ignore */ }
+        }
+      }
+
       const plantnetResult = {
-        identifiedAs: best.species.scientificNameWithoutAuthor,
-        commonName: best.species.commonNames?.[0] || '',
+        identifiedAs: sciName,
+        commonName: localizedName,
         score: Math.round(best.score * 100),
         genus: best.species.genus?.scientificNameWithoutAuthor || '',
         family: best.species.family?.scientificNameWithoutAuthor || '',
@@ -406,14 +441,30 @@ export function trekRouter(prisma: PrismaClient): Router {
         return;
       }
 
+      // Get user language for translation
+      const addPlantUser = await prisma.user.findUnique({ where: { id: req.userId! }, select: { lang: true } });
+      const addPlantLang = addPlantUser?.lang || 'es';
+
       // Use pre-identified result if provided (avoids double PlantNet call)
       const preIdentifiedAs = req.body.identifiedAs;
       const preCommonName = req.body.commonName;
       let result;
       if (preIdentifiedAs !== undefined) {
+        // commonName from identify-all is already translated
         result = { match: false, score: 0, identifiedAs: preIdentifiedAs, commonName: preCommonName || '', similarity: 0 };
       } else {
         result = await identifyPlant(file.buffer, file.mimetype, '');
+        // Translate PlantNet English name
+        if (result.identifiedAs && result.commonName) {
+          const canonical = await prisma.plant.findUnique({ where: { scientificName: result.identifiedAs }, select: { commonNameEs: true, commonNameFr: true } });
+          const cachedName = addPlantLang === 'fr' ? canonical?.commonNameFr : canonical?.commonNameEs;
+          if (cachedName) {
+            result.commonName = cachedName;
+          } else {
+            const translations = await translatePlantNames([{ scientificName: result.identifiedAs, commonName: result.commonName }], addPlantLang);
+            result.commonName = translations.get(result.identifiedAs) || result.commonName;
+          }
+        }
       }
       const identified = result.identifiedAs !== '';
       const now = new Date();
