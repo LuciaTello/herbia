@@ -45,7 +45,7 @@
             <h4>{{ plant.commonName }}</h4>
             @if (plant.family) {
               <button class="plant-family-chip" (click)="openFamily(plant.family!); $event.stopPropagation()">
-                {{ plant.family! }} <span class="chip-arrow">›</span>
+                {{ i18n.t().myTreks.viewFamily(plant.family!) }} <span class="chip-arrow">›</span>
               </button>
             }
           </div>

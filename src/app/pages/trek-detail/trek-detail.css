@@ -134,7 +134,7 @@ h2 {
 
 .plant-name-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
 }
@@ -167,6 +167,7 @@ h2 {
   padding: 0.2rem 0.5rem;
   cursor: pointer;
   flex-shrink: 0;
+  margin-top: 3px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: background 0.15s, box-shadow 0.15s;
 }
