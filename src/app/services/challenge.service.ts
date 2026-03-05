@@ -25,10 +25,9 @@ export class ChallengeService {
 
   /** Generate 10 quiz questions from the user's collection */
   generateQuiz(collection: SuggestedPlant[]): boolean {
-    // Only AI-suggested plants (localized names) with user-taken photos
+    // Plants with a name and at least one user-taken photo
     const eligible = collection.filter(p =>
       p.commonName &&
-      p.source !== 'user' &&
       p.photos.some(ph => ph.source === 'user')
     );
 
