@@ -84,10 +84,15 @@ export class ChallengeService {
     return result.points;
   }
 
+  private formatName(plant: SuggestedPlant): string {
+    return `${plant.commonName} (${plant.scientificName})`;
+  }
+
   private buildNameQuestion(plant: SuggestedPlant, pool: SuggestedPlant[]): QuizQuestion {
-    const correctAnswer = plant.commonName;
+    const correctAnswer = this.formatName(plant);
     const distractors = this.pickDistractors(
-      pool.filter(p => p.id !== plant.id).map(p => p.commonName),
+      correctAnswer,
+      pool.filter(p => p.id !== plant.id).map(p => this.formatName(p)),
       3
     );
     const { options, correctIndex } = this.shuffleOptions(correctAnswer, distractors);
@@ -104,6 +109,7 @@ export class ChallengeService {
   private buildFamilyQuestion(plant: SuggestedPlant, pool: SuggestedPlant[]): QuizQuestion {
     const correctAnswer = plant.family!;
     const distractors = this.pickDistractors(
+      correctAnswer,
       [...new Set(pool.filter(p => p.family && p.family !== correctAnswer).map(p => p.family!))],
       3
     );
@@ -111,7 +117,7 @@ export class ChallengeService {
 
     return {
       photo: this.pickPhoto(plant),
-      plantName: plant.commonName,
+      plantName: this.formatName(plant),
       type: 'family',
       options,
       correctIndex,
@@ -125,8 +131,8 @@ export class ChallengeService {
     return pool[Math.floor(Math.random() * pool.length)].url;
   }
 
-  private pickDistractors(candidates: string[], count: number): string[] {
-    const unique = [...new Set(candidates)];
+  private pickDistractors(correct: string, candidates: string[], count: number): string[] {
+    const unique = [...new Set(candidates)].filter(c => c !== correct);
     const shuffled = unique.sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
   }
