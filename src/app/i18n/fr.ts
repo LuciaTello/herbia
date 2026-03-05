@@ -86,6 +86,7 @@ export const FR: Translations = {
     sameGenus: (name) => `Même genre ! (${name})`,
     sameFamily: (name) => `Même famille (${name})`,
     viewFamily: (name) => `Famille ${name}`,
+    familyLabel: 'Famille',
     summary: (found) => `${found} capturée${found !== 1 ? 's' : ''}`,
     trekComplete: 'Balade accomplie !',
     addPlant: 'Ajouter d\'autres plantes',

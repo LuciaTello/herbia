@@ -72,6 +72,7 @@ export interface Translations {
     sameGenus: (name: string) => string;
     sameFamily: (name: string) => string;
     viewFamily: (name: string) => string;
+    familyLabel: string;
     summary: (found: number) => string;
     trekComplete: string;
     addPlant: string;
