@@ -409,6 +409,45 @@ export function initPlantService(apiKey: string): void {
   groq = new Groq({ apiKey });
 }
 
+/**
+ * Translate plant common names from English to the target language using Groq.
+ * Returns a map of scientificName → translated common name.
+ */
+export async function translatePlantNames(
+  plants: { scientificName: string; commonName: string }[],
+  lang: string,
+): Promise<Map<string, string>> {
+  if (plants.length === 0) return new Map();
+
+  const langName = LANG_NAMES[lang] || 'Spanish';
+  const list = plants.map(p => `- ${p.scientificName}: ${p.commonName}`).join('\n');
+
+  const prompt = `Translate these plant common names from English to ${langName}. Return ONLY a JSON array of objects with "scientificName" and "commonName" (translated). Keep scientific names unchanged.\n\n${list}`;
+
+  try {
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3,
+    });
+
+    const text = (completion.choices[0]?.message?.content || '')
+      .replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+    const result: { scientificName: string; commonName: string }[] = JSON.parse(text);
+
+    const map = new Map<string, string>();
+    for (const r of result) {
+      if (r.scientificName && r.commonName) {
+        map.set(r.scientificName, r.commonName);
+      }
+    }
+    return map;
+  } catch (e) {
+    console.error('Error translating plant names:', e);
+    return new Map();
+  }
+}
+
 export interface SuggestedPlantsResult {
   tooFar: boolean;
   description: string;

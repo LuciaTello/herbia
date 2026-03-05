@@ -282,6 +282,7 @@ export const FR: Translations = {
     start: 'C\'est parti !',
     locked: 'Bloqué',
     notEnoughPhotos: 'Il te faut au moins 10 plantes avec photo dans ta collection pour jouer.',
+    quit: 'Quitter',
     questionOf: (current, total) => `Question ${current} sur ${total}`,
     nameQuestion: 'Comment s\'appelle cette plante ?',
     familyQuestion: 'À quelle famille appartient cette plante ?',

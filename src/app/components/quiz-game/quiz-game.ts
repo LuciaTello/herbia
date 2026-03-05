@@ -42,6 +42,10 @@ export class QuizGameComponent {
     return t.resultsTryAgain;
   });
 
+  protected quit(): void {
+    this.done.emit();
+  }
+
   protected selectOption(index: number): void {
     this.quiz.answer(index);
   }

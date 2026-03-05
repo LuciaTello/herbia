@@ -1,5 +1,7 @@
 @if (!quiz.finished()) {
   <div class="quiz-container">
+    <button class="quit-btn" (click)="quit()">← {{ i18n.t().challenges.quit }}</button>
+
     <!-- Progress -->
     <div class="progress-header">
       <span class="progress-label">{{ i18n.t().challenges.questionOf(quiz.currentIndex() + 1, quiz.questions().length) }}</span>

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
+import { translatePlantNames } from '../services/plant.service';
 
 export function challengeRouter(prisma: PrismaClient): Router {
   const router = Router();
@@ -21,16 +22,49 @@ export function challengeRouter(prisma: PrismaClient): Router {
         },
         include: {
           photos: true,
-          plant: { select: { commonNameEs: true, commonNameFr: true } },
+          plant: { select: { id: true, commonNameEs: true, commonNameFr: true } },
         },
       });
 
-      // Replace commonName with localized version from canonical Plant table
+      // Split: plants with localized name vs those needing translation
+      const nameField = lang === 'fr' ? 'commonNameFr' : 'commonNameEs';
+      const needsTranslation = plants.filter(p => !p.plant?.[nameField]);
+      const hasTranslation = plants.filter(p => p.plant?.[nameField]);
+
+      // Translate missing names via Groq (batch)
+      let translations = new Map<string, string>();
+      if (needsTranslation.length > 0) {
+        // Deduplicate by scientificName
+        const unique = [...new Map(needsTranslation.map(p => [p.scientificName, p])).values()];
+        translations = await translatePlantNames(
+          unique.map(p => ({ scientificName: p.scientificName, commonName: p.commonName })),
+          lang,
+        );
+
+        // Cache translations in canonical Plant table
+        for (const [sciName, translatedName] of translations) {
+          try {
+            await prisma.plant.upsert({
+              where: { scientificName: sciName },
+              update: { [nameField]: translatedName },
+              create: {
+                scientificName: sciName,
+                [nameField]: translatedName,
+                genus: needsTranslation.find(p => p.scientificName === sciName)?.genus || '',
+                family: needsTranslation.find(p => p.scientificName === sciName)?.family || '',
+              },
+            });
+          } catch { /* ignore cache errors */ }
+        }
+      }
+
+      // Build response with localized names
       const result = plants.map(p => {
-        const localized = lang === 'fr' ? p.plant?.commonNameFr : p.plant?.commonNameEs;
+        const cached = p.plant?.[nameField];
+        const translated = translations.get(p.scientificName);
         return {
           id: p.id,
-          commonName: localized || p.commonName,
+          commonName: cached || translated || p.commonName,
           scientificName: p.scientificName,
           genus: p.genus,
           family: p.family,
