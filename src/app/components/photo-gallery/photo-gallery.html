@@ -1,14 +1,14 @@
 <div class="gallery-overlay" (click)="close()">
-  <div class="gallery-content" (click)="$event.stopPropagation()">
-    <button class="close-button" (click)="close()">&times;</button>
+  <div class="gallery-content">
+    <button class="close-button" (click)="close(); $event.stopPropagation()">&times;</button>
 
     <div class="gallery-image-container"
          (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
       @if (images.length > 1) {
-        <button class="nav-button prev" (click)="prev()">&#8249;</button>
+        <button class="nav-button prev" (click)="prev(); $event.stopPropagation()">&#8249;</button>
       }
 
-      <div class="image-wrapper">
+      <div class="image-wrapper" (click)="$event.stopPropagation()">
         @if (imageLoading()) {
           <div class="gallery-spinner"></div>
         }
@@ -17,11 +17,11 @@
       </div>
 
       @if (images.length > 1) {
-        <button class="nav-button next" (click)="next()">&#8250;</button>
+        <button class="nav-button next" (click)="next(); $event.stopPropagation()">&#8250;</button>
       }
     </div>
 
-    <div class="gallery-footer">
+    <div class="gallery-footer" (click)="$event.stopPropagation()">
       <p class="plant-name">{{ plantName }}</p>
       @if (images.length > 1) {
         <p class="counter">{{ currentIndex() + 1 }} / {{ images.length }}</p>
