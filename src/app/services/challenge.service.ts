@@ -17,19 +17,24 @@ export class ChallengeService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/challenges`;
 
+  readonly quizPlants = signal<SuggestedPlant[]>([]);
   readonly questions = signal<QuizQuestion[]>([]);
   readonly currentIndex = signal(0);
   readonly score = signal(0);
   readonly answered = signal<number | null>(null); // index chosen, null = not yet answered
   readonly finished = signal(false);
 
-  /** Generate 10 quiz questions from the user's collection */
-  generateQuiz(collection: SuggestedPlant[]): boolean {
-    // Plants with a name and at least one user-taken photo
-    const eligible = collection.filter(p =>
-      p.commonName &&
-      p.photos.some(ph => ph.source === 'user')
+  /** Fetch quiz-eligible plants with localized names from backend */
+  async loadQuizPlants(): Promise<void> {
+    const plants = await firstValueFrom(
+      this.http.get<SuggestedPlant[]>(`${this.apiUrl}/quiz-plants`)
     );
+    this.quizPlants.set(plants);
+  }
+
+  /** Generate 10 quiz questions from pre-loaded quiz plants */
+  generateQuiz(): boolean {
+    const eligible = this.quizPlants().filter(p => p.commonName);
 
     if (eligible.length < 10) return false;
 

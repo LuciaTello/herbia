@@ -16,7 +16,7 @@ const MIN_PLANTS = 20;
 export class ChallengesPage implements OnInit {
   protected readonly i18n = inject(I18nService);
   private readonly collection = inject(CollectionService);
-  private readonly challenge = inject(ChallengeService);
+  protected readonly challenge = inject(ChallengeService);
 
   protected readonly playing = signal(false);
   protected readonly loading = signal(true);
@@ -25,15 +25,19 @@ export class ChallengesPage implements OnInit {
   protected readonly plantCount = computed(() => this.collection.getCollection()().length);
   protected readonly isUnlocked = computed(() => this.plantCount() >= MIN_PLANTS);
   protected readonly plantsNeeded = computed(() => Math.max(0, MIN_PLANTS - this.plantCount()));
+  protected readonly quizReady = computed(() => this.challenge.quizPlants().length >= 10);
 
   async ngOnInit(): Promise<void> {
-    await this.collection.loadCollection();
+    await Promise.all([
+      this.collection.loadCollection(),
+      this.challenge.loadQuizPlants(),
+    ]);
     this.loading.set(false);
   }
 
   protected startQuiz(): void {
     this.error.set(null);
-    const ok = this.challenge.generateQuiz(this.collection.getCollection()());
+    const ok = this.challenge.generateQuiz();
     if (ok) {
       this.playing.set(true);
     } else {
