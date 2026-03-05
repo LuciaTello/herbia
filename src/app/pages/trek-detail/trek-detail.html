@@ -45,7 +45,7 @@
           <p class="scientific">{{ plant.scientificName }}</p>
           @if (plant.family) {
             <button class="plant-family-chip" (click)="openFamily(plant.family!); $event.stopPropagation()">
-              <span class="chip-icon">🌳</span> {{ plant.family! }}
+              {{ plant.family! }} <span class="chip-arrow">›</span>
             </button>
           }
           <p class="chance" [style.color]="rarity(plant.rarity).color">

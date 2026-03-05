@@ -148,27 +148,27 @@ h2 {
 .plant-family-chip {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.8rem;
-  font-weight: 500;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 600;
   color: #2d7d46;
-  background: #e8f5e9;
-  border: 1.5px solid #c8e6c9;
+  background: white;
+  border: 1.5px solid #2d7d46;
   border-radius: 20px;
-  padding: 0.3rem 0.7rem;
+  padding: 0.25rem 0.55rem;
   cursor: pointer;
   margin: 0.25rem 0;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.15s;
 }
 
 .plant-family-chip:active {
-  background: #c8e6c9;
-  border-color: #2d7d46;
+  background: #e8f5e9;
 }
 
-.chip-icon {
-  font-size: 0.75rem;
+.chip-arrow {
+  font-size: 1rem;
   line-height: 1;
+  font-weight: 700;
 }
 
 .plant-info .chance {
