@@ -222,8 +222,18 @@ export interface Translations {
       title: string;
       description: string;
     };
+    families: {
+      title: string;
+      description: string;
+    };
   };
   taxonomyTutorial: {
+    titles: string[];
+    texts: string[];
+    next: string;
+    done: string;
+  };
+  familiesTutorial: {
     titles: string[];
     texts: string[];
     next: string;

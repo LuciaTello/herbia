@@ -273,6 +273,10 @@ export const FR: Translations = {
       title: 'Taxonomie des plantes',
       description: 'Découvre comment les plantes sont classifiées et pourquoi certaines ont plusieurs noms.',
     },
+    families: {
+      title: 'Les familles de plantes en France',
+      description: 'Découvre combien de familles existent en France et apprends à reconnaître les plus courantes.',
+    },
   },
   challenges: {
     back: 'Retour à l\'accueil',
@@ -299,6 +303,26 @@ export const FR: Translations = {
     pointsAdded: (pts) => `+${pts} points ajoutés`,
     playAgain: 'Rejouer',
     backToHub: 'Retour aux défis',
+  },
+  familiesTutorial: {
+    titles: [
+      'Combien de familles en France ?',
+      'Asteraceae — La reine des familles',
+      'Poaceae & Fabaceae',
+      'Rosaceae — Des fraises aux roses',
+      'Lamiaceae — Les aromatiques',
+      'Et les autres ?',
+    ],
+    texts: [
+      'La France métropolitaine abrite environ 160 familles de plantes vasculaires, rassemblant plus de 6 000 espèces. Mais rassure-toi : une dizaine de familles dominent les paysages. Les connaître, c\'est reconnaître la majorité des plantes que tu croiseras en balade.',
+      'Avec plus de 750 espèces en France, les Asteraceae sont la famille la plus nombreuse. Tu les reconnais à leurs « fleurs » qui sont en réalité des dizaines de petites fleurs regroupées en capitule. Marguerites, pissenlits, tournesols, chardons — elles sont partout.',
+      'Les Poaceae (graminées) forment la 2e famille : herbes, blé, avoine, bambous. Elles tapissent prairies et pelouses. Les Fabaceae (légumineuses) sont la 3e : trèfles, genêts, glycines. Elles enrichissent le sol en azote grâce à leurs racines — de vraies alliées de la nature.',
+      'Fraisiers, pommiers, cerisiers, aubépines, rosiers... Les Rosaceae rassemblent des plantes qu\'on croirait sans lien. Leur point commun ? Des fleurs à 5 pétales et de nombreuses étamines. C\'est la famille star des vergers et des haies.',
+      'Lavande, thym, romarin, menthe, sauge, basilic... Les Lamiaceae dominent la flore méditerranéenne et tes placards de cuisine. Tu les reconnais à leur tige carrée et leurs feuilles opposées. Beaucoup sont très parfumées — ton nez est leur meilleur indice.',
+      'Brassicaceae (choux, moutarde — 4 pétales en croix), Apiaceae (carotte, persil — fleurs en ombelle), Orchidaceae (plus de 160 espèces d\'orchidées sauvages en France !), Ranunculaceae (boutons d\'or, anémones)... Chaque famille a ses astuces visuelles. Dans herbia, clique sur « Famille » pour explorer les cousines d\'une plante.',
+    ],
+    next: 'Suivant',
+    done: 'Compris !',
   },
   taxonomyTutorial: {
     titles: [

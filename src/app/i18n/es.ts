@@ -273,6 +273,10 @@ export const ES: Translations = {
       title: 'Taxonomía de las plantas',
       description: 'Descubre cómo se clasifican las plantas y por qué algunas tienen varios nombres.',
     },
+    families: {
+      title: 'Las familias de plantas en Francia',
+      description: 'Descubre cuántas familias existen en Francia y aprende a reconocer las más comunes.',
+    },
   },
   challenges: {
     back: 'Volver al inicio',
@@ -299,6 +303,26 @@ export const ES: Translations = {
     pointsAdded: (pts) => `+${pts} puntos añadidos`,
     playAgain: 'Jugar otra vez',
     backToHub: 'Volver a desafíos',
+  },
+  familiesTutorial: {
+    titles: [
+      '¿Cuántas familias hay en Francia?',
+      'Asteraceae — La reina de las familias',
+      'Poaceae y Fabaceae',
+      'Rosaceae — De las fresas a las rosas',
+      'Lamiaceae — Las aromáticas',
+      '¿Y las demás?',
+    ],
+    texts: [
+      'Francia metropolitana alberga unas 160 familias de plantas vasculares, con más de 6 000 especies. Pero tranquila: una decena de familias dominan los paisajes. Conocerlas es reconocer la mayoría de las plantas que encontrarás en tus paseos.',
+      'Con más de 750 especies en Francia, las Asteraceae son la familia más numerosa. Las reconoces por sus «flores» que en realidad son decenas de pequeñas flores agrupadas en capítulo. Margaritas, dientes de león, girasoles, cardos — están por todas partes.',
+      'Las Poaceae (gramíneas) son la 2ª familia: hierbas, trigo, avena, bambú. Cubren praderas y céspedes. Las Fabaceae (leguminosas) son la 3ª: tréboles, retamas, glicinias. Enriquecen el suelo con nitrógeno gracias a sus raíces — auténticas aliadas de la naturaleza.',
+      'Fresas, manzanos, cerezos, espinos, rosales... Las Rosaceae agrupan plantas que parecen no tener relación. ¿Su punto en común? Flores con 5 pétalos y numerosos estambres. Es la familia estrella de los huertos y los setos.',
+      'Lavanda, tomillo, romero, menta, salvia, albahaca... Las Lamiaceae dominan la flora mediterránea y tus armarios de cocina. Las reconoces por su tallo cuadrado y sus hojas opuestas. Muchas son muy aromáticas — tu nariz es su mejor pista.',
+      'Brassicaceae (coles, mostaza — 4 pétalos en cruz), Apiaceae (zanahoria, perejil — flores en umbela), Orchidaceae (¡más de 160 especies de orquídeas silvestres en Francia!), Ranunculaceae (ranúnculos, anémonas)... Cada familia tiene sus trucos visuales. En herbia, pulsa «Familia» para explorar las primas de una planta.',
+    ],
+    next: 'Siguiente',
+    done: '¡Entendido!',
   },
   taxonomyTutorial: {
     titles: [
