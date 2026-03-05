@@ -25,9 +25,11 @@ export class ChallengeService {
 
   /** Generate 10 quiz questions from the user's collection */
   generateQuiz(collection: SuggestedPlant[]): boolean {
-    // Filter: need a name and at least one photo
+    // Only AI-suggested plants (localized names) with user-taken photos
     const eligible = collection.filter(p =>
-      p.commonName && p.photos.length > 0
+      p.commonName &&
+      p.source !== 'user' &&
+      p.photos.some(ph => ph.source === 'user')
     );
 
     if (eligible.length < 10) return false;
@@ -125,9 +127,9 @@ export class ChallengeService {
   }
 
   private pickPhoto(plant: SuggestedPlant): string {
-    // Prefer non-user photos (less recognizable), fall back to any
-    const preferred = plant.photos.filter(ph => ph.source !== 'user');
-    const pool = preferred.length > 0 ? preferred : plant.photos;
+    // Use only user-taken photos
+    const userPhotos = plant.photos.filter(ph => ph.source === 'user');
+    const pool = userPhotos.length > 0 ? userPhotos : plant.photos;
     return pool[Math.floor(Math.random() * pool.length)].url;
   }
 
