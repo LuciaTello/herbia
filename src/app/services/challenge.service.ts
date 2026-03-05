@@ -25,10 +25,9 @@ export class ChallengeService {
 
   /** Generate 10 quiz questions from the user's collection */
   generateQuiz(collection: SuggestedPlant[]): boolean {
-    // Filter: only plants with non-user photos, with a name and at least one photo
+    // Filter: need a name and at least one photo
     const eligible = collection.filter(p =>
-      p.commonName &&
-      p.photos.some(ph => ph.source !== 'user')
+      p.commonName && p.photos.length > 0
     );
 
     if (eligible.length < 10) return false;
@@ -120,8 +119,10 @@ export class ChallengeService {
   }
 
   private pickPhoto(plant: SuggestedPlant): string {
-    const nonUser = plant.photos.filter(ph => ph.source !== 'user');
-    return nonUser[Math.floor(Math.random() * nonUser.length)].url;
+    // Prefer non-user photos (less recognizable), fall back to any
+    const preferred = plant.photos.filter(ph => ph.source !== 'user');
+    const pool = preferred.length > 0 ? preferred : plant.photos;
+    return pool[Math.floor(Math.random() * pool.length)].url;
   }
 
   private pickDistractors(candidates: string[], count: number): string[] {

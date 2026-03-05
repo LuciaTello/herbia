@@ -95,6 +95,13 @@
   background: #246b3a;
 }
 
+.error-msg {
+  font-size: 0.85rem;
+  color: #d63031;
+  margin: 0.75rem 0 0;
+  text-align: center;
+}
+
 .locked-badge {
   display: inline-block;
   padding: 0.4rem 1rem;

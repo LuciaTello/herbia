@@ -20,6 +20,7 @@ export class ChallengesPage implements OnInit {
 
   protected readonly playing = signal(false);
   protected readonly loading = signal(true);
+  protected readonly error = signal<string | null>(null);
 
   protected readonly plantCount = computed(() => this.collection.getCollection()().length);
   protected readonly isUnlocked = computed(() => this.plantCount() >= MIN_PLANTS);
@@ -31,9 +32,12 @@ export class ChallengesPage implements OnInit {
   }
 
   protected startQuiz(): void {
+    this.error.set(null);
     const ok = this.challenge.generateQuiz(this.collection.getCollection()());
     if (ok) {
       this.playing.set(true);
+    } else {
+      this.error.set(this.i18n.t().challenges.notEnoughPhotos);
     }
   }
 

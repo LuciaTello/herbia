@@ -236,6 +236,7 @@ export interface Translations {
     lockedDescription: (n: number) => string;
     start: string;
     locked: string;
+    notEnoughPhotos: string;
     questionOf: (current: number, total: number) => string;
     nameQuestion: string;
     familyQuestion: string;

@@ -281,6 +281,7 @@ export const FR: Translations = {
     lockedDescription: (n) => `Il te faut encore ${n} plante${n !== 1 ? 's' : ''} dans ta collection pour débloquer ce défi.`,
     start: 'C\'est parti !',
     locked: 'Bloqué',
+    notEnoughPhotos: 'Il te faut au moins 10 plantes avec photo dans ta collection pour jouer.',
     questionOf: (current, total) => `Question ${current} sur ${total}`,
     nameQuestion: 'Comment s\'appelle cette plante ?',
     familyQuestion: 'À quelle famille appartient cette plante ?',
