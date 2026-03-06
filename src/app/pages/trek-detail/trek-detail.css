@@ -195,6 +195,12 @@ h2 {
   margin: 0.375rem 0 0.125rem;
 }
 
+.plant-info .chance .multiplier {
+  font-weight: 700;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
 .plant-info .description {
   font-size: 0.8rem;
   color: #636e72;

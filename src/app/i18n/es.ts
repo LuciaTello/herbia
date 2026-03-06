@@ -181,6 +181,7 @@ export const ES: Translations = {
       'Especie exacta — 100 pts',
       'Mismo género — 75 pts',
       'Misma familia — 40 pts',
+      'Bonus de rareza — ×2 y ×3',
       'Tus hallazgos',
     ],
     texts: [
@@ -189,6 +190,7 @@ export const ES: Translations = {
       'La especie es el nivel más fino: las diferencias entre dos especies del mismo género son sutiles. Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
       'El género agrupa especies como hermanos o primos cercanos: comparten un ancestro reciente y conservan muchos rasgos visibles en común. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
       'La familia son primos muy lejanos: comparten un ancestro de hace millones de años. Por eso una fresa y un manzano (ambos Rosáceas) parecen tan distintos. Si no encuentras la planta exacta, clica en «Familia» bajo el nombre científico para ver otras plantas que podrías cruzarte.',
+      'Algunas plantas son más difíciles de encontrar. Las plantas raras multiplican tus puntos por 2 y las muy raras por 3. Una especie exacta muy rara vale 300 puntos en vez de 100.',
       'Puedes guardar hasta 5 fotos por especie. A partir de la sexta, seguirás ganando puntos pero la foto no se guardará — puedes cambiarla por una existente. Cuando termines tu paseo, puedes archivar la excursión.',
     ],
     imageLabels: [

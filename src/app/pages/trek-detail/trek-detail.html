@@ -53,6 +53,9 @@
           <p class="scientific">{{ plant.scientificName }}</p>
           <p class="chance" [style.color]="rarity(plant.rarity).color">
             {{ rarity(plant.rarity).label }}
+            @if (rarity(plant.rarity).multiplier > 1) {
+              <span class="multiplier">×{{ rarity(plant.rarity).multiplier }}</span>
+            }
           </p>
           <p class="description">{{ plant.description }}</p>
           @if (plant.hint) {

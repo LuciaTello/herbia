@@ -62,7 +62,7 @@ function bboxPolygon(lat: number, lng: number, radiusKm: number): string {
 }
 
 async function fetchGbifSpecies(
-  lat: number, lng: number, radiusKm: number, month: number,
+  lat: number, lng: number, radiusKm: number, month: number, facetOffset: number = 0,
 ): Promise<INatSpecies[]> {
   const geometry = bboxPolygon(lat, lng, radiusKm);
   const params = new URLSearchParams({
@@ -73,6 +73,7 @@ async function fetchGbifSpecies(
     geometry,
     facet: 'speciesKey',
     facetLimit: '50',
+    'facetOffset': String(facetOffset),
     limit: '0',
   });
   const url = `https://api.gbif.org/v1/occurrence/search?${params}`;
@@ -192,9 +193,10 @@ function selectPlants(species: INatSpecies[], exclude: string[], count: number =
   const rare = withRarity.filter(s => s.rarity === 'rare');
   const veryRare = withRarity.filter(s => s.rarity === 'veryRare');
 
-  const nCommon = Math.ceil(count * 0.6);
-  const nRare = Math.ceil(count * 0.2);
-  const nVeryRare = count - nCommon - nRare;
+  const nCommon = Math.round(count * 0.7);   // 7 for 10, 4 for 5
+  const nHard = count - nCommon;              // 3 for 10, 1 for 5
+  const nVeryRare = Math.min(veryRare.length, Math.max(1, Math.floor(nHard / 2)));
+  const nRare = nHard - nVeryRare;
 
   const picked: (INatSpecies & { rarity: string })[] = [];
   picked.push(...common.slice(0, nCommon));
@@ -575,16 +577,39 @@ export async function getSuggestedPlants(
   const midLng = (originLng + destLng) / 2;
   const radius = isZone ? 10 : Math.max(5, Math.min(distance / 2, 50));
 
-  // Step 5: Fetch species from GBIF (family included in response)
-  const species = await fetchGbifSpecies(midLat, midLng, radius, currentMonth);
+  // Step 5: Fetch species from GBIF with pagination until we have enough after exclusion
+  const MAX_PAGES = 4;
+  let allSpecies: INatSpecies[] = [];
+  let selected: ReturnType<typeof selectPlants> = [];
 
-  // Step 6: If too few species → fall back to LLM-only
-  if (species.length < 3) {
-    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const species = await fetchGbifSpecies(midLat, midLng, radius, currentMonth, page * 50);
+
+    if (page === 0 && species.length < 3) {
+      // First page has almost nothing → fall back to LLM-only
+      return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
+    }
+
+    // Deduplicate by scientificName before adding
+    const existing = new Set(allSpecies.map(s => s.scientificName));
+    for (const s of species) {
+      if (!existing.has(s.scientificName)) {
+        allSpecies.push(s);
+        existing.add(s.scientificName);
+      }
+    }
+
+    selected = selectPlants(allSpecies, exclude, count);
+    console.log(`GBIF page ${page + 1}: ${allSpecies.length} total species, ${selected.length}/${count} after exclusion`);
+
+    if (selected.length >= count) break;       // We have enough
+    if (species.length < 50) break;             // GBIF has no more pages
   }
 
-  // Step 7: Select diverse plants with rarity, prioritizing common European families
-  const selected = selectPlants(species, exclude, count);
+  // If still not enough after all pages → fall back to LLM-only
+  if (selected.length === 0) {
+    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
+  }
 
   // Step 7b: Resolve common names in the user's language (GBIF + LLM fallback)
   await resolveCommonNames(selected, lang);

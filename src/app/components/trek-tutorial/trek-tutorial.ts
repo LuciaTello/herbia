@@ -23,6 +23,7 @@ export class TrekTutorialComponent {
     { emoji: '🎯', imageIndices: [0] },
     { emoji: '🌿', imageIndices: [0, 1] },
     { emoji: '🌳', imageIndices: [0, 2] },
+    { emoji: '💎', imageIndices: [] },
     { emoji: '🌼', imageIndices: [] },
   ];
 

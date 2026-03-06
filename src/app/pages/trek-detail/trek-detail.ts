@@ -220,9 +220,11 @@ export class TrekDetailPage implements OnInit {
   }
 
   protected matchReason(points: number): string {
-    if (points >= 100) return this.i18n.t().myTreks.matchSpecies;
-    if (points >= 75) return this.i18n.t().myTreks.matchGenus;
-    if (points >= 40) return this.i18n.t().myTreks.matchFamily;
+    // Points are multiplied by rarity (×1/×2/×3), so base values are 100/75/40
+    // Species: 100, 200, 300. Genus: 75, 150, 225. Family: 40, 80, 120.
+    if (points > 0 && points % 100 === 0) return this.i18n.t().myTreks.matchSpecies;
+    if (points > 0 && points % 75 === 0) return this.i18n.t().myTreks.matchGenus;
+    if (points > 0 && points % 40 === 0) return this.i18n.t().myTreks.matchFamily;
     return '';
   }
 
