@@ -13,11 +13,17 @@
     <!-- Question -->
     @if (currentQuestion(); as q) {
       <div class="question-card">
-        <div class="photo-strip">
-          @for (photo of q.photos; track photo) {
-            <img [src]="photo" [alt]="q.plantName" class="plant-photo" />
-          }
-        </div>
+        <img [src]="q.photos[0]" [alt]="q.plantName" class="main-photo"
+             (click)="openGallery(q.photos, 0)" />
+
+        @if (q.photos.length > 1) {
+          <div class="thumb-row">
+            @for (photo of q.photos.slice(1); track photo; let i = $index) {
+              <img [src]="photo" [alt]="q.plantName" class="thumb-photo"
+                   (click)="openGallery(q.photos, i + 1)" />
+            }
+          </div>
+        }
 
         <p class="question-text">
           @if (q.type === 'name') {
@@ -67,4 +73,13 @@
       <button class="action-secondary" (click)="backToHub()">{{ i18n.t().challenges.backToHub }}</button>
     </div>
   </div>
+}
+
+@if (galleryImages().length) {
+  <app-photo-gallery
+    [images]="galleryImages()"
+    [plantName]="currentQuestion()?.plantName || ''"
+    [startIndex]="galleryStartIndex()"
+    (closeGallery)="closeGallery()"
+  />
 }

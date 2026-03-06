@@ -1,10 +1,12 @@
-import { Component, computed, inject, output } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { I18nService } from '../../i18n';
 import { ChallengeService } from '../../services/challenge.service';
 import { AuthService } from '../../services/auth.service';
+import { PhotoGalleryComponent } from '../photo-gallery/photo-gallery';
 
 @Component({
   selector: 'app-quiz-game',
+  imports: [PhotoGalleryComponent],
   templateUrl: './quiz-game.html',
   styleUrl: './quiz-game.css',
 })
@@ -16,6 +18,8 @@ export class QuizGameComponent {
   readonly done = output<void>();
 
   protected submitted = false;
+  protected readonly galleryImages = signal<string[]>([]);
+  protected readonly galleryStartIndex = signal(0);
 
   protected readonly currentQuestion = computed(() => {
     return this.quiz.questions()[this.quiz.currentIndex()];
@@ -41,6 +45,15 @@ export class QuizGameComponent {
     if (s >= 4) return t.resultsGood;
     return t.resultsTryAgain;
   });
+
+  protected openGallery(photos: string[], startIndex = 0): void {
+    this.galleryImages.set(photos);
+    this.galleryStartIndex.set(startIndex);
+  }
+
+  protected closeGallery(): void {
+    this.galleryImages.set([]);
+  }
 
   protected quit(): void {
     this.done.emit();

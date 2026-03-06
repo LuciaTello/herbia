@@ -57,36 +57,34 @@
   gap: 1rem;
 }
 
-.photo-strip {
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+.main-photo {
   width: 100%;
-  padding-bottom: 0.25rem;
-}
-
-.photo-strip::-webkit-scrollbar {
-  height: 4px;
-}
-
-.photo-strip::-webkit-scrollbar-thumb {
-  background: #c8e6c9;
-  border-radius: 2px;
-}
-
-.plant-photo {
-  width: 160px;
-  height: 160px;
-  flex-shrink: 0;
+  max-width: 280px;
+  aspect-ratio: 1;
   object-fit: cover;
   border-radius: 12px;
-  border: 2px solid #e8f5e9;
-  scroll-snap-align: start;
+  border: 2px solid #2d7d46;
+  cursor: pointer;
 }
 
-.plant-photo:first-child {
+.thumb-row {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.thumb-photo {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1.5px solid #e8f5e9;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.thumb-photo:hover {
   border-color: #2d7d46;
 }
 
