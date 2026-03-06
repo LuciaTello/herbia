@@ -200,9 +200,13 @@ ${routeContext}
 Here are ${count} real plants found along this route:
 ${plantList}
 
-For each plant, write TWO separate fields:
-- "description": A surprising or little-known fact that makes this plant fascinating (2-3 sentences in ${langName}). Focus on ONE curiosity: a cultural or historical anecdote, an unusual survival trick, a weird use, a record, or a fun etymology. Avoid generic descriptions like "it's a common plant" — make the reader think "wow, I didn't know that!".
-- "hint": Concrete visual clues to find and recognize this plant in the field (1-2 sentences in ${langName}). Mention leaf shape, flower color/size, typical height, and WHERE exactly to look (roadside, walls, shade, near water, forest edge...). If it can be confused with another plant, explain how to tell them apart.
+For each plant, write TWO separate fields that must contain COMPLETELY DIFFERENT information — no overlap allowed:
+
+- "description": ONE fascinating anecdote (2-3 sentences in ${langName}). Pick from: a historical or cultural story, an unusual human use (medicine, cuisine, dye, poison...), a surprising ecological relationship (pollination trick, symbiosis, invasive behavior), a world record, or a fun etymology. NEVER mention the plant's physical appearance here — no colors, shapes, sizes, or habitat.
+
+- "hint": A practical field identification guide (1-2 sentences in ${langName}). Describe ONLY what to look for with your eyes: leaf shape (lobed, toothed, opposite vs alternate), flower structure (number of petals, symmetry, color), stem features (square, hairy, hollow), smell if distinctive, typical height, and WHERE to look (roadside, walls, shade, wet soil, forest edge...). NEVER mention history, uses, culture, or fun facts here.
+
+STRICT RULE: If the description mentions a use or story, the hint must NOT repeat it. If the hint mentions a visual feature, the description must NOT mention it.
 
 STYLE RULES for ${langName} text:
 - Write about the PLANTS, not about the traveler. Do not address or mention the user/traveler in descriptions or hints.
@@ -254,9 +258,13 @@ For each plant, assign a rarity category:
 
 Sort the results from most common to rarest.
 
-Each plant needs TWO separate text fields:
-- "description": A surprising or little-known fact that makes this plant fascinating (2-3 sentences in ${langName}). Focus on ONE curiosity: a cultural or historical anecdote, an unusual survival trick, a weird use, a record, or a fun etymology. Avoid generic descriptions like "it's a common plant" — make the reader think "wow, I didn't know that!".
-- "hint": Concrete visual clues to find and recognize this plant in the field (1-2 sentences in ${langName}). Mention leaf shape, flower color/size, typical height, and WHERE exactly to look (roadside, walls, shade, near water, forest edge...). If it can be confused with another plant, explain how to tell them apart.
+Each plant needs TWO separate text fields that must contain COMPLETELY DIFFERENT information — no overlap allowed:
+
+- "description": ONE fascinating anecdote (2-3 sentences in ${langName}). Pick from: a historical or cultural story, an unusual human use (medicine, cuisine, dye, poison...), a surprising ecological relationship (pollination trick, symbiosis, invasive behavior), a world record, or a fun etymology. NEVER mention the plant's physical appearance here — no colors, shapes, sizes, or habitat.
+
+- "hint": A practical field identification guide (1-2 sentences in ${langName}). Describe ONLY what to look for with your eyes: leaf shape (lobed, toothed, opposite vs alternate), flower structure (number of petals, symmetry, color), stem features (square, hairy, hollow), smell if distinctive, typical height, and WHERE to look (roadside, walls, shade, wet soil, forest edge...). NEVER mention history, uses, culture, or fun facts here.
+
+STRICT RULE: If the description mentions a use or story, the hint must NOT repeat it. If the hint mentions a visual feature, the description must NOT mention it.
 
 STYLE RULES for ${langName} text:
 - Write about the PLANTS, not about the traveler. Do not address or mention the user/traveler in descriptions or hints.
