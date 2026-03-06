@@ -13,6 +13,8 @@ import { ConfirmService } from '../../components/confirm-popup/confirm.service';
 import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
 import { FamilyPopupComponent } from '../../components/family-popup/family-popup';
 import { RouteMapComponent } from '../../components/route-map/route-map';
+import { ConnectivityService } from '../../services/connectivity.service';
+import { OfflineQueueService } from '../../services/offline-queue.service';
 
 @Component({
   selector: 'app-trek-detail',
@@ -28,6 +30,8 @@ export class TrekDetailPage implements OnInit {
   protected readonly cameraService = inject(CameraService);
   protected readonly i18n = inject(I18nService);
   private readonly confirmService = inject(ConfirmService);
+  protected readonly connectivity = inject(ConnectivityService);
+  private readonly offlineQueue = inject(OfflineQueueService);
   protected readonly treks = this.trekService.getTreks();
   protected readonly loading = signal(true);
   protected readonly galleryImages = signal<string[]>([]);
@@ -42,6 +46,7 @@ export class TrekDetailPage implements OnInit {
   protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
   protected readonly uploadingPhoto = signal(false);
+  protected readonly pendingCount = this.offlineQueue.pendingCount;
 
   private trekId = 0;
 
@@ -116,6 +121,14 @@ export class TrekDetailPage implements OnInit {
 
     try {
       const file = await resizeImage(raw);
+
+      if (!this.connectivity.online()) {
+        const photoUrl = URL.createObjectURL(file);
+        await this.offlineQueue.enqueue(this.trekId, file);
+        this.resultOverlay.set({ name: this.i18n.t().offline.photoQueued, points: 0, type: 'noMatch', photoUrl });
+        return;
+      }
+
       const photoUrl = URL.createObjectURL(file);
       this.pendingFile.set(file);
       this.identifyResult.set(null);
@@ -150,17 +163,17 @@ export class TrekDetailPage implements OnInit {
       const prevResult = pn.identifiedAs
         ? { match: false, score: pn.score, identifiedAs: pn.identifiedAs, commonName: pn.commonName, similarity: 0, genus: pn.genus, family: pn.family }
         : undefined;
-      await this.trekService.addUserPlant(this.trekId, file, prevResult);
-      const msg = matchesFull ? this.i18n.t().myTreks.maxPhotosInTrek : this.i18n.t().myTreks.noMatchInTrek;
-      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl, identifiedAs: pn.identifiedAs, commonName: pn.commonName, genus: pn.genus, family: pn.family });
-    } catch (err: any) {
-      let msg = this.i18n.t().myTreks.uploadError;
-      if (err?.status === 409) {
-        msg = err?.error?.error === 'region_limit_reached'
-          ? this.i18n.t().myTreks.regionLimitReached
-          : this.i18n.t().myTreks.maxPhotosReached;
+      const addResult = await this.trekService.addUserPlant(this.trekId, file, prevResult);
+      if (addResult.pointsOnly) {
+        // Species limit reached — photo not saved
+        const msg = this.i18n.t().myTreks.maxPhotosReached.replace('{points}', '0');
+        this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl });
+      } else {
+        const msg = matchesFull ? this.i18n.t().myTreks.alreadyCaptured : this.i18n.t().myTreks.noMatchInTrek;
+        this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl, identifiedAs: pn.identifiedAs, commonName: pn.commonName, genus: pn.genus, family: pn.family });
       }
-      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl });
+    } catch (err: any) {
+      this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch', photoUrl });
     } finally {
       this.pendingFile.set(null);
     }
@@ -174,27 +187,21 @@ export class TrekDetailPage implements OnInit {
     this.uploadingPhoto.set(true);
     try {
       const photo = await this.trekService.uploadPlantPhoto(plantId, file, similarity, pn ? { identifiedAs: pn.identifiedAs, commonName: pn.commonName } : undefined);
-      if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
       this.trekService.markPlantFoundLocally(plantId);
-      const missionName = plantName || this.treks().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
-      const displayName = pn?.commonName || missionName;
-      this.resultOverlay.set({ name: missionName, points: similarity, type: 'match', photoUrl, identifiedAs: pn?.identifiedAs, commonName: displayName, genus: pn?.genus, family: pn?.family });
-      await this.checkAutoComplete();
-    } catch (err: any) {
-      if (err?.status === 409 && err?.error?.error === 'max_photos_in_trek' && pn?.identifiedAs) {
-        // Max photos for this plant — save to collection instead
-        try {
-          const prevResult = { match: false, score: 0, identifiedAs: pn.identifiedAs, commonName: pn.commonName, similarity: 0, genus: pn.genus, family: pn.family };
-          await this.trekService.addUserPlant(this.trekId, file, prevResult);
-          this.resultOverlay.set({ name: this.i18n.t().myTreks.maxPhotosInTrek, points: 0, type: 'noMatch', photoUrl });
-        } catch {
-          this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch', photoUrl });
-        }
+      if (photo.pointsOnly) {
+        // Species limit reached — points awarded but photo not saved
+        if (similarity > 0) this.auth.points.update(p => p + similarity);
+        const msg = this.i18n.t().myTreks.maxPhotosReached.replace('{points}', String(similarity));
+        this.resultOverlay.set({ name: msg, points: similarity, type: 'noMatch', photoUrl });
       } else {
-        let msg = this.i18n.t().myTreks.uploadError;
-        if (err?.status === 409) msg = this.i18n.t().myTreks.maxPhotosReached;
-        this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl });
+        if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
+        const missionName = plantName || this.treks().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
+        const displayName = pn?.commonName || missionName;
+        this.resultOverlay.set({ name: missionName, points: similarity, type: 'match', photoUrl, identifiedAs: pn?.identifiedAs, commonName: displayName, genus: pn?.genus, family: pn?.family });
+        await this.checkAutoComplete();
       }
+    } catch (err: any) {
+      this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch', photoUrl });
     } finally {
       this.uploadingPhoto.set(false);
       this.pendingFile.set(null);

@@ -3,23 +3,54 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { Trek, SuggestedPlant, Plant, PlantPhoto, IdentifyResult, IdentifyAllResult } from '../models/plant.model';
 import { environment } from '../../environments/environment';
+import { TrekCacheService } from './trek-cache.service';
+import { ConnectivityService } from './connectivity.service';
 
 @Injectable({ providedIn: 'root' })
 export class TrekService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/treks`;
+  private readonly trekCache = inject(TrekCacheService);
+  private readonly connectivity = inject(ConnectivityService);
 
   private readonly treks = signal<Trek[]>([]);
+  private initialLoaded = false;
 
   getTreks() {
     return this.treks;
   }
 
   async loadTreks(): Promise<void> {
+    if (!this.initialLoaded) {
+      this.initialLoaded = true;
+      const cached = await this.trekCache.load();
+      if (cached) this.treks.set(cached);
+      if (!this.connectivity.online()) return;
+      try {
+        const treks = await firstValueFrom(this.http.get<Trek[]>(this.apiUrl));
+        this.treks.set(treks);
+        this.persistCache();
+      } catch {
+        // Already showing cached data
+      }
+      return;
+    }
+
+    if (!this.connectivity.online()) {
+      const cached = await this.trekCache.load();
+      if (cached) this.treks.set(cached);
+      return;
+    }
+
     const treks = await firstValueFrom(
       this.http.get<Trek[]>(this.apiUrl)
     );
     this.treks.set(treks);
+    this.persistCache();
+  }
+
+  private persistCache(): void {
+    this.trekCache.save(this.treks()).catch(() => {});
   }
 
   async createTrek(
@@ -36,6 +67,7 @@ export class TrekService {
     );
     // Add to the beginning of the list (newest first)
     this.treks.update(list => [trek, ...list]);
+    this.persistCache();
     return trek;
   }
 
@@ -101,7 +133,7 @@ export class TrekService {
     );
   }
 
-  async uploadPlantPhoto(plantId: number, file: File, similarity?: number, pn?: { identifiedAs?: string; commonName?: string }): Promise<PlantPhoto> {
+  async uploadPlantPhoto(plantId: number, file: File, similarity?: number, pn?: { identifiedAs?: string; commonName?: string }): Promise<PlantPhoto & { pointsOnly?: boolean }> {
     const formData = new FormData();
     formData.append('photo', file);
     if (similarity !== undefined) {
@@ -110,8 +142,12 @@ export class TrekService {
     if (pn?.identifiedAs) formData.append('identifiedAs', pn.identifiedAs);
     if (pn?.commonName) formData.append('identifiedCommonName', pn.commonName);
     const photo = await firstValueFrom(
-      this.http.post<PlantPhoto>(`${this.apiUrl}/plants/${plantId}/photo`, formData)
+      this.http.post<PlantPhoto & { pointsOnly?: boolean }>(`${this.apiUrl}/plants/${plantId}/photo`, formData)
     );
+    // pointsOnly: photo was not saved (species limit reached)
+    if (photo.pointsOnly) {
+      return photo;
+    }
     // Merge PlantNet identification into the photo (in case backend hasn't stored it yet)
     const enrichedPhoto: PlantPhoto = {
       ...photo,
@@ -132,6 +168,7 @@ export class TrekService {
         }))
       );
     }
+    this.persistCache();
     return enrichedPhoto;
   }
 
@@ -150,7 +187,7 @@ export class TrekService {
     );
   }
 
-  async addUserPlant(trekId: number, file: File, prevResult?: IdentifyResult): Promise<{ plant: SuggestedPlant; identified: boolean }> {
+  async addUserPlant(trekId: number, file: File, prevResult?: IdentifyResult): Promise<{ plant: SuggestedPlant; identified: boolean; pointsOnly?: boolean }> {
     const formData = new FormData();
     formData.append('photo', file);
     if (prevResult) {
@@ -158,7 +195,7 @@ export class TrekService {
       formData.append('commonName', prevResult.commonName);
     }
     const result = await firstValueFrom(
-      this.http.post<{ plant: SuggestedPlant; identified: boolean }>(
+      this.http.post<{ plant: SuggestedPlant; identified: boolean; pointsOnly?: boolean }>(
         `${this.apiUrl}/${trekId}/add-plant`, formData
       )
     );
@@ -184,6 +221,7 @@ export class TrekService {
       }
       return { ...trek, plants };
     }));
+    this.persistCache();
     return result;
   }
 

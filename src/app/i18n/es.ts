@@ -93,10 +93,8 @@ export const ES: Translations = {
     addingPlant: 'Identificando...',
     myPlantsTitle: 'Mis plantas',
     unidentifiedCount: (count) => `${count} planta${count !== 1 ? 's' : ''} sin identificar`,
-    maxPhotosReached: 'Límite de fotos alcanzado para esta especie. Borra fotos para seguir añadiendo.',
-    maxPhotosInTrek: 'Máximo de fotos alcanzado para esta planta en la excursión. Añadida a tu colección.',
-    alreadyCaptured: 'Ya has capturado esta especie en esta excursión.',
-    regionLimitReached: 'Límite de fotos alcanzado para esta especie en esta región. Borra fotos en tu colección para seguir añadiendo.',
+    maxPhotosReached: '¡+{points} puntos! Ya tienes 5 fotos de esta especie — la foto no se guardará. Puedes cambiarla por una existente en tu colección.',
+    alreadyCaptured: 'Ya has capturado esta especie.',
     uploadError: 'Error al subir la foto. Inténtalo de nuevo.',
     plantAdded: '¡Planta añadida!',
     completeTrek: 'Terminar excursión',
@@ -173,7 +171,7 @@ export const ES: Translations = {
   },
   trekTip: {
     title: 'Antes de empezar',
-    text: 'Las plantas que ves aquí se eligen según lo que crece en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando encuentres una planta, toca «Añadir foto» y sácale una foto. Herbia la identificará automáticamente y ganarás puntos:\n\n🎯 Especie exacta → 100 pts\n🌿 Mismo género → 75 pts\n🌳 Misma familia → 40 pts\n\nCada planta de la excursión admite hasta 4 fotos. Si la planta no coincide con ninguna de la excursión, se añade a tu colección (hasta 20 fotos por especie y región).\n\n¡Buena suerte, viajera!',
+    text: 'Las plantas que ves aquí se eligen según lo que crece en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando encuentres una planta, toca «Añadir foto» y sácale una foto. Herbia la identificará automáticamente y ganarás puntos:\n\n🎯 Especie exacta → 100 pts\n🌿 Mismo género → 75 pts\n🌳 Misma familia → 40 pts\n\nPuedes guardar hasta 5 fotos por especie. A partir de la sexta, seguirás ganando puntos pero la foto no se guardará.\n\n¡Buena suerte, viajera!',
     dismiss: '¡Entendido!',
   },
   trekTutorial: {
@@ -191,7 +189,7 @@ export const ES: Translations = {
       'La especie es el nivel más fino: las diferencias entre dos especies del mismo género son sutiles. Si la planta es exactamente la especie sugerida, ganas 100 puntos.',
       'El género agrupa especies como hermanos o primos cercanos: comparten un ancestro reciente y conservan muchos rasgos visibles en común. Por ejemplo, Lavandula angustifolia y Lavandula stoechas son del mismo género Lavandula.',
       'La familia son primos muy lejanos: comparten un ancestro de hace millones de años. Por eso una fresa y un manzano (ambos Rosáceas) parecen tan distintos. Si no encuentras la planta exacta, clica en «Familia» bajo el nombre científico para ver otras plantas que podrías cruzarte.',
-      'Cada planta de una excursión acepta hasta 4 fotos, y cada una te da puntos. Solo puede haber una planta de la misma especie por excursión. Cuando termines tu paseo, puedes archivar la excursión.',
+      'Puedes guardar hasta 5 fotos por especie. A partir de la sexta, seguirás ganando puntos pero la foto no se guardará — puedes cambiarla por una existente. Cuando termines tu paseo, puedes archivar la excursión.',
     ],
     imageLabels: [
       'Lavandula angustifolia',
@@ -308,6 +306,13 @@ export const ES: Translations = {
     pointsAdded: (pts) => `+${pts} puntos añadidos`,
     playAgain: 'Jugar otra vez',
     backToHub: 'Volver a desafíos',
+  },
+  offline: {
+    banner: 'Sin conexión',
+    photoQueued: 'Foto guardada. Se sincronizará cuando vuelvas a tener conexión.',
+    syncing: (n) => `Sincronizando ${n} foto${n !== 1 ? 's' : ''}...`,
+    syncDone: (n) => `${n} foto${n !== 1 ? 's' : ''} sincronizada${n !== 1 ? 's' : ''}`,
+    syncFailed: (n) => `${n} foto${n !== 1 ? 's' : ''} no se pudieron sincronizar`,
   },
   familiesTutorial: {
     titles: [

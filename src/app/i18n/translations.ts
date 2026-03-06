@@ -80,9 +80,7 @@ export interface Translations {
     myPlantsTitle: string;
     unidentifiedCount: (count: number) => string;
     maxPhotosReached: string;
-    maxPhotosInTrek: string;
     alreadyCaptured: string;
-    regionLimitReached: string;
     uploadError: string;
     plantAdded: string;
     completeTrek: string;
@@ -269,6 +267,13 @@ export interface Translations {
     pointsAdded: (pts: number) => string;
     playAgain: string;
     backToHub: string;
+  };
+  offline: {
+    banner: string;
+    photoQueued: string;
+    syncing: (n: number) => string;
+    syncDone: (n: number) => string;
+    syncFailed: (n: number) => string;
   };
 }
 

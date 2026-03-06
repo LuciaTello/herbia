@@ -93,10 +93,8 @@ export const FR: Translations = {
     addingPlant: 'Identification...',
     myPlantsTitle: 'Mes plantes',
     unidentifiedCount: (count) => `${count} plante${count !== 1 ? 's' : ''} non identifiée${count !== 1 ? 's' : ''}`,
-    maxPhotosReached: 'Limite de photos atteinte pour cette espèce. Efface des photos pour continuer à ajouter.',
-    maxPhotosInTrek: 'Max de photos atteint pour cette plante dans la balade. Ajoutée à ta collection.',
-    alreadyCaptured: 'Tu as déjà capturé cette espèce dans cette balade.',
-    regionLimitReached: 'Limite de photos atteinte pour cette espèce dans cette région. Efface dans ta collection pour continuer à ajouter.',
+    maxPhotosReached: '+{points} points ! Tu as déjà 5 photos de cette espèce — la photo ne sera pas enregistrée. Tu peux en remplacer une dans ta collection.',
+    alreadyCaptured: 'Tu as déjà capturé cette espèce.',
     uploadError: 'Erreur lors du téléchargement. Réessayez.',
     plantAdded: 'Plante ajoutée !',
     completeTrek: 'Terminer la balade',
@@ -173,7 +171,7 @@ export const FR: Translations = {
   },
   trekTip: {
     title: 'Avant de commencer',
-    text: 'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu trouves une plante, appuie sur « Ajouter photo » et prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points :\n\n🎯 Espèce exacte → 100 pts\n🌿 Même genre → 75 pts\n🌳 Même famille → 40 pts\n\nChaque plante de la balade accepte jusqu\'à 4 photos. Si la plante ne correspond à aucune de la balade, elle est ajoutée à ta collection (jusqu\'à 20 photos par espèce et région).\n\nBonne chance, voyageuse !',
+    text: 'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu trouves une plante, appuie sur « Ajouter photo » et prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points :\n\n🎯 Espèce exacte → 100 pts\n🌿 Même genre → 75 pts\n🌳 Même famille → 40 pts\n\nTu peux garder jusqu\'à 5 photos par espèce. À partir de la sixième, tu gagneras toujours des points mais la photo ne sera pas enregistrée.\n\nBonne chance, voyageuse !',
     dismiss: 'Compris !',
   },
   trekTutorial: {
@@ -191,7 +189,7 @@ export const FR: Translations = {
       'L\'espèce est le niveau le plus fin : les différences entre deux espèces du même genre sont subtiles. Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
       'Le genre regroupe des espèces comme des frères ou cousins proches : ils partagent un ancêtre récent et gardent beaucoup de traits visibles en commun. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
       'La famille, ce sont des cousins très éloignés : ils partagent un ancêtre vieux de millions d\'années. C\'est pour ça qu\'une fraise et un pommier (tous deux Rosacées) semblent si différents. Si tu ne trouves pas la plante exacte, clique sur « Famille » sous le nom scientifique pour voir d\'autres plantes que tu pourrais croiser.',
-      'Chaque plante d\'une balade accepte jusqu\'à 4 photos, et chacune te rapporte des points. Il ne peut y avoir qu\'une seule plante de la même espèce par balade. Une fois ta promenade terminée, tu peux archiver la balade.',
+      'Tu peux garder jusqu\'à 5 photos par espèce. À partir de la sixième, tu gagneras toujours des points mais la photo ne sera pas enregistrée — tu peux en remplacer une existante. Une fois ta promenade terminée, tu peux archiver la balade.',
     ],
     imageLabels: [
       'Lavandula angustifolia',
@@ -308,6 +306,13 @@ export const FR: Translations = {
     pointsAdded: (pts) => `+${pts} points ajoutés`,
     playAgain: 'Rejouer',
     backToHub: 'Retour aux défis',
+  },
+  offline: {
+    banner: 'Hors connexion',
+    photoQueued: 'Photo enregistrée. Elle sera synchronisée quand tu retrouveras du réseau.',
+    syncing: (n) => `Synchronisation de ${n} photo${n !== 1 ? 's' : ''}...`,
+    syncDone: (n) => `${n} photo${n !== 1 ? 's' : ''} synchronisée${n !== 1 ? 's' : ''}`,
+    syncFailed: (n) => `${n} photo${n !== 1 ? 's' : ''} n'ont pas pu être synchronisées`,
   },
   familiesTutorial: {
     titles: [

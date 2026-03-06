@@ -262,12 +262,11 @@ export function trekRouter(prisma: PrismaClient): Router {
           plant.family,
         );
         if (sim.similarity > 0) {
-          const hasUserPhoto = await prisma.plantPhoto.count({
+          const speciesPhotoCount = await prisma.plantPhoto.count({
             where: {
               source: 'user',
               plant: {
                 scientificName: plant.scientificName,
-                trekId: trekId,
                 trek: { userId: req.userId! },
               },
             },
@@ -277,7 +276,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             commonName: plant.commonName,
             scientificName: plant.scientificName,
             similarity: sim.similarity,
-            alreadyCaptured: hasUserPhoto >= 4,
+            alreadyCaptured: speciesPhotoCount >= 5,
           });
         }
       }
@@ -376,29 +375,39 @@ export function trekRouter(prisma: PrismaClient): Router {
         });
       }
 
-      // Limit: max 4 user photos per suggested plant per trek
-      const existingInTrek = await prisma.plantPhoto.count({
-        where: {
-          source: 'user',
-          plant: {
-            scientificName: plant.scientificName,
-            trekId: plant.trekId,
-            trek: { userId: req.userId! },
-          },
-        },
-      });
-      if (existingInTrek >= 4) {
-        res.status(409).json({ error: 'max_photos_in_trek' });
-        return;
-      }
-
-      const url = await uploadPhoto(file.buffer, plantId);
-
       // Award similarity points: use body param if provided (from identify-all), else pendingSimilarity
       const bodySimilarity = parseInt(req.body.similarity);
       const similarity = bodySimilarity > 0 ? bodySimilarity : (plant.pendingSimilarity || 0);
       const identifiedAs = req.body.identifiedAs || null;
       const identifiedCommonName = req.body.identifiedCommonName || null;
+
+      // Limit: max 5 user photos per species per user (global, across all treks)
+      const speciesPhotoCount = await prisma.plantPhoto.count({
+        where: {
+          source: 'user',
+          plant: {
+            scientificName: plant.scientificName,
+            trek: { userId: req.userId! },
+          },
+        },
+      });
+      if (speciesPhotoCount >= 5) {
+        // Award points but don't save the photo
+        if (similarity > 0) {
+          await prisma.user.update({
+            where: { id: req.userId! },
+            data: { points: { increment: similarity } },
+          });
+          await prisma.suggestedPlant.update({
+            where: { id: plantId },
+            data: { pendingSimilarity: 0 },
+          });
+        }
+        res.json({ pointsOnly: true, similarity });
+        return;
+      }
+
+      const url = await uploadPhoto(file.buffer, plantId);
       const photo = await prisma.plantPhoto.create({
         data: { url, source: 'user', plantId, similarity, identifiedAs, identifiedCommonName },
       });
@@ -509,18 +518,23 @@ export function trekRouter(prisma: PrismaClient): Router {
           data: { found: true, foundAt: now, foundInTrekId: trekId },
         });
 
-        // Limit: max 20 user photos per species per region
-        const regionPhotoCount = await prisma.plantPhoto.count({
+        // Limit: max 5 user photos per species per user (global)
+        const speciesPhotoCount = await prisma.plantPhoto.count({
           where: {
             source: 'user',
             plant: {
               scientificName: result.identifiedAs,
-              trek: { userId: req.userId!, regionCode: trek.regionCode },
+              trek: { userId: req.userId! },
             },
           },
         });
-        if (regionPhotoCount >= 20) {
-          res.status(409).json({ error: 'region_limit_reached' });
+        if (speciesPhotoCount >= 5) {
+          // Re-fetch with photos to return complete data
+          const updated = await prisma.suggestedPlant.findUnique({
+            where: { id: plant.id },
+            include: { photos: true },
+          });
+          res.status(201).json({ plant: updated, identified, pointsOnly: true });
           return;
         }
       } else {
@@ -641,6 +655,67 @@ export function trekRouter(prisma: PrismaClient): Router {
     } catch (error) {
       console.error('Error deleting photo:', error);
       res.status(500).json({ error: 'Failed to delete photo' });
+    }
+  });
+
+  // PUT /api/treks/photos/:photoId/replace - Swap a saved user photo with a new one
+  router.put('/photos/:photoId/replace', upload.single('photo'), async (req, res) => {
+    try {
+      const photoId = parseInt(req.params['photoId'] as string);
+      const file = req.file;
+
+      if (!file) {
+        res.status(400).json({ error: 'No photo provided' });
+        return;
+      }
+      if (!ALLOWED_MIMES.includes(file.mimetype)) {
+        res.status(400).json({ error: 'Invalid file type. Use JPEG or PNG' });
+        return;
+      }
+
+      // Verify ownership + user source
+      const photo = await prisma.plantPhoto.findUnique({
+        where: { id: photoId },
+        include: { plant: { include: { trek: { select: { userId: true } } } } },
+      });
+
+      if (!photo || photo.plant.trek.userId !== req.userId!) {
+        res.status(404).json({ error: 'Photo not found' });
+        return;
+      }
+      if (photo.source !== 'user') {
+        res.status(403).json({ error: 'Cannot replace reference photos' });
+        return;
+      }
+
+      // Delete old from Cloudinary, upload new
+      await deletePhoto(photo.url);
+      const newUrl = await uploadPhoto(file.buffer, photo.plantId);
+
+      // New similarity from body (from a fresh identification)
+      const newSimilarity = parseInt(req.body.similarity) || 0;
+      const identifiedAs = req.body.identifiedAs || null;
+      const identifiedCommonName = req.body.identifiedCommonName || null;
+
+      // Adjust points: deduct old, add new
+      const oldSimilarity = photo.similarity;
+      const pointsDelta = newSimilarity - oldSimilarity;
+      if (pointsDelta !== 0) {
+        await prisma.user.update({
+          where: { id: req.userId! },
+          data: { points: { increment: pointsDelta } },
+        });
+      }
+
+      const updated = await prisma.plantPhoto.update({
+        where: { id: photoId },
+        data: { url: newUrl, similarity: newSimilarity, identifiedAs, identifiedCommonName },
+      });
+
+      res.json(updated);
+    } catch (error) {
+      console.error('Error replacing photo:', error);
+      res.status(500).json({ error: 'Failed to replace photo' });
     }
   });
 

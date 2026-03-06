@@ -120,7 +120,12 @@
         <div class="fab-spinner"></div>
       </div>
     } @else {
-      <button class="fab-camera" (click)="takePhoto()">&#x1F4F7; {{ i18n.t().myTreks.addPhoto }}</button>
+      <button class="fab-camera" (click)="takePhoto()">
+        &#x1F4F7; {{ i18n.t().myTreks.addPhoto }}
+        @if (pendingCount() > 0) {
+          <span class="fab-badge">{{ pendingCount() }}</span>
+        }
+      </button>
     }
   }
 

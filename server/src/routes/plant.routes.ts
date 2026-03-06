@@ -13,7 +13,7 @@ export function plantRouter(prisma: PrismaClient): Router {
   // POST /api/plants/suggest
   router.post('/suggest', async (req, res) => {
     try {
-      const { origin, destination, lang, originLat, originLng, destLat, destLng, region, count } = req.body;
+      const { origin, destination, lang, originLat, originLng, destLat, destLng, count } = req.body;
 
       if (!origin) {
         res.status(400).json({ error: 'Origin is required' });
@@ -28,35 +28,15 @@ export function plantRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Exclude found plants (same region, last 30 days)
-      // + recently suggested but not found (same region, last 7 days)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-      const trekFilter = region
-        ? { userId: req.userId!, region }
-        : { userId: req.userId! };
-
-      const [found, recentlySuggested] = await Promise.all([
-        prisma.suggestedPlant.findMany({
-          where: { trek: trekFilter, found: true, foundAt: { gte: thirtyDaysAgo } },
-          select: { scientificName: true },
-          distinct: ['scientificName'],
-        }),
-        prisma.suggestedPlant.findMany({
-          where: { trek: { ...trekFilter, createdAt: { gte: sevenDaysAgo } }, found: false },
-          select: { scientificName: true },
-          distinct: ['scientificName'],
-        }),
-      ]);
-
-      const excludeSet = new Set([
-        ...found.map(p => p.scientificName),
-        ...recentlySuggested.map(p => p.scientificName),
-      ]);
-      const exclude = [...excludeSet];
+      // Exclude any plant suggested in the last 60 days (global, no region filtering)
+      const sixtyDaysAgo = new Date();
+      sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+      const recentPlants = await prisma.suggestedPlant.findMany({
+        where: { trek: { userId: req.userId!, createdAt: { gte: sixtyDaysAgo } } },
+        select: { scientificName: true },
+        distinct: ['scientificName'],
+      });
+      const exclude = recentPlants.map(p => p.scientificName).filter(Boolean);
 
       const plantCount = count === 10 ? 10 : 5;
       const result = await getSuggestedPlants(origin, dest, lang || 'es', undefined, exclude, originLat, originLng, destLat, destLng, plantCount);
