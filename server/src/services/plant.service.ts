@@ -61,10 +61,11 @@ function bboxPolygon(lat: number, lng: number, radiusKm: number): string {
   return `POLYGON((${minLng} ${minLat},${maxLng} ${minLat},${maxLng} ${maxLat},${minLng} ${maxLat},${minLng} ${minLat}))`;
 }
 
-async function fetchGbifSpecies(
-  lat: number, lng: number, radiusKm: number, month: number,
-): Promise<INatSpecies[]> {
-  const geometry = bboxPolygon(lat, lng, radiusKm);
+const GBIF_PAGE_SIZE = 300;
+
+async function fetchGbifSpeciesPage(
+  geometry: string, month: number, offset: number,
+): Promise<{ name: string; count: number }[]> {
   const params = new URLSearchParams({
     taxonKey: '6',
     hasCoordinate: 'true',
@@ -72,52 +73,41 @@ async function fetchGbifSpecies(
     month: String(month),
     geometry,
     facet: 'speciesKey',
-    facetLimit: '300',
+    facetLimit: String(GBIF_PAGE_SIZE),
+    facetOffset: String(offset),
     limit: '0',
   });
-  const url = `https://api.gbif.org/v1/occurrence/search?${params}`;
-  console.log(`GBIF query: month=${month}, radius=${radiusKm}km around (${lat.toFixed(3)}, ${lng.toFixed(3)})`);
-  const response = await fetch(url);
-  if (!response.ok) {
-    console.warn(`GBIF occurrence search returned ${response.status}`);
-    return [];
-  }
+  const response = await fetch(`https://api.gbif.org/v1/occurrence/search?${params}`);
+  if (!response.ok) return [];
   const data = await response.json();
+  return data.facets?.[0]?.counts || [];
+}
 
-  const facets: { name: string; count: number }[] = data.facets?.[0]?.counts || [];
-  if (facets.length === 0) return [];
-  console.log(`GBIF returned ${facets.length} species facets`);
-
-  // Resolve species in batches of 50 to avoid overwhelming the API
-  const BATCH = 50;
-  const allSpecies: INatSpecies[] = [];
-  for (let i = 0; i < facets.length; i += BATCH) {
-    const batch = facets.slice(i, i + BATCH);
-    const results = await Promise.all(
-      batch.map(async (f) => {
-        try {
-          const res = await fetch(`https://api.gbif.org/v1/species/${f.name}`);
-          if (!res.ok) return null;
-          const sp = await res.json();
-          if (!sp.canonicalName || !sp.canonicalName.includes(' ')) return null;
-          return {
-            scientificName: sp.canonicalName,
-            commonName: sp.canonicalName,
-            count: f.count,
-            photoUrl: '',
-            taxonId: sp.key,
-            genus: sp.genus || sp.canonicalName.split(' ')[0],
-            family: sp.family || '',
-          } as INatSpecies;
-        } catch {
-          return null;
-        }
-      })
-    );
-    allSpecies.push(...results.filter((s): s is INatSpecies => s !== null));
-  }
-
-  return allSpecies;
+async function resolveSpeciesBatch(
+  facets: { name: string; count: number }[],
+): Promise<INatSpecies[]> {
+  const results = await Promise.all(
+    facets.map(async (f) => {
+      try {
+        const res = await fetch(`https://api.gbif.org/v1/species/${f.name}`);
+        if (!res.ok) return null;
+        const sp = await res.json();
+        if (!sp.canonicalName || !sp.canonicalName.includes(' ')) return null;
+        return {
+          scientificName: sp.canonicalName,
+          commonName: sp.canonicalName,
+          count: f.count,
+          photoUrl: '',
+          taxonId: sp.key,
+          genus: sp.genus || sp.canonicalName.split(' ')[0],
+          family: sp.family || '',
+        } as INatSpecies;
+      } catch {
+        return null;
+      }
+    })
+  );
+  return results.filter((s): s is INatSpecies => s !== null);
 }
 
 async function resolveCommonNames(
@@ -583,19 +573,41 @@ export async function getSuggestedPlants(
   const midLng = (originLng + destLng) / 2;
   const radius = isZone ? 10 : Math.max(5, Math.min(distance / 2, 50));
 
-  // Step 5: Fetch species from GBIF (up to 300 species in one call)
-  const species = await fetchGbifSpecies(midLat, midLng, radius, currentMonth);
+  // Step 5: Fetch species from GBIF with pagination (300 per page, resolve in batches of 50)
+  const geometry = bboxPolygon(midLat, midLng, radius);
+  const allSpecies: INatSpecies[] = [];
+  const seenNames = new Set<string>();
+  let selected: ReturnType<typeof selectPlants> = [];
 
-  // Step 6: If too few species → fall back to LLM-only
-  if (species.length < 3) {
-    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
+  for (let offset = 0; ; offset += GBIF_PAGE_SIZE) {
+    const facets = await fetchGbifSpeciesPage(geometry, currentMonth, offset);
+
+    if (offset === 0) {
+      console.log(`GBIF query: month=${currentMonth}, radius=${radius}km around (${midLat.toFixed(3)}, ${midLng.toFixed(3)})`);
+    }
+
+    if (offset === 0 && facets.length < 3) {
+      return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
+    }
+
+    // Resolve this page in batches of 50
+    for (let i = 0; i < facets.length; i += 50) {
+      const resolved = await resolveSpeciesBatch(facets.slice(i, i + 50));
+      for (const s of resolved) {
+        if (!seenNames.has(s.scientificName)) {
+          allSpecies.push(s);
+          seenNames.add(s.scientificName);
+        }
+      }
+    }
+
+    selected = selectPlants(allSpecies, exclude, count);
+    console.log(`GBIF offset ${offset}: ${allSpecies.length} species, ${selected.length}/${count} after exclusion`);
+
+    if (selected.length >= count) break;          // Got enough
+    if (facets.length < GBIF_PAGE_SIZE) break;    // No more pages
   }
 
-  // Step 7: Select diverse plants with rarity, prioritizing common European families
-  const selected = selectPlants(species, exclude, count);
-  console.log(`GBIF: ${species.length} species total, ${selected.length}/${count} after exclusion`);
-
-  // If not enough after exclusion → fall back to LLM-only
   if (selected.length === 0) {
     return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
   }
