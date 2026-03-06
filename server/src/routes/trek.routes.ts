@@ -111,7 +111,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             })),
           },
         },
-        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
+        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { family: 'asc' } } },
       });
 
       res.status(201).json(trek);
@@ -126,7 +126,7 @@ export function trekRouter(prisma: PrismaClient): Router {
     try {
       const treks = await prisma.trek.findMany({
         where: { userId: req.userId! },
-        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { rarity: 'asc' } } },
+        include: { plants: { include: { photos: true, foundInTrek: { select: { origin: true, destination: true } } }, orderBy: { family: 'asc' } } },
         orderBy: { createdAt: 'desc' },
       });
       res.json(treks);

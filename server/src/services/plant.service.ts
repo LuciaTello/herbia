@@ -117,8 +117,10 @@ async function enrichWithTaxonomy(species: INatSpecies[]): Promise<void> {
 
 function assignRarity(count: number, maxCount: number): 'common' | 'rare' | 'veryRare' {
   const ratio = count / maxCount;
-  if (ratio > 0.3) return 'common';
-  if (ratio > 0.05) return 'rare';
+  // Combine absolute observation count with relative ratio
+  // A plant with 20+ observations is common regardless of the top species
+  if (count >= 20 || ratio > 0.3) return 'common';
+  if (count >= 5 || ratio > 0.1) return 'rare';
   return 'veryRare';
 }
 
@@ -253,10 +255,12 @@ Try to include a balanced variety of plant types: trees, flowers, shrubs, grasse
 
 IMPORTANT: At least 5 of the ${count} plants MUST belong to one of these common European families: Asteraceae, Fabaceae, Lamiaceae, Brassicaceae, Apiaceae, Poaceae, or Rosaceae. Include the "family" field for each plant.
 
-For each plant, assign a rarity category:
-- "common": easy to find, you'll likely spot it without trying
-- "rare": you'll need to look carefully
-- "veryRare": with a bit of luck you might find it
+For each plant, assign a rarity category based on how frequently it is encountered in the wild in this region:
+- "common": widespread and abundant — you'll see it without trying. Examples: dandelion, clover, daisy, plantain, grass species, common poppy, nettle, ivy, bramble.
+- "rare": present in the area but you need to pay attention to spot it.
+- "veryRare": uncommon, localized, or easily overlooked — finding it requires luck or specific habitat knowledge.
+
+Be realistic: well-known European wildflowers and weeds are ALWAYS "common". Reserve "rare" and "veryRare" for plants that genuinely require effort to find.
 
 Sort the results from most common to rarest.
 
