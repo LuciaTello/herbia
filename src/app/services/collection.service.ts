@@ -35,6 +35,28 @@ export class CollectionService {
   }
 
   // Soft-toggle: marks the plant as not found (removes from collection, keeps in trek)
+  async refreshPhoto(photoId: number): Promise<void> {
+    try {
+      const result = await firstValueFrom(
+        this.http.post<{ url: string | null }>(`${environment.apiUrl}/plants/photos/${photoId}/refresh`, {})
+      );
+      this.updatePhotoUrl(photoId, result.url || '');
+    } catch {
+      this.updatePhotoUrl(photoId, '');
+    }
+  }
+
+  private updatePhotoUrl(photoId: number, url: string): void {
+    this.collection.update(list =>
+      list.map(p => ({
+        ...p,
+        photos: p.photos.map(ph =>
+          ph.id === photoId ? { ...ph, url } : ph
+        ),
+      }))
+    );
+  }
+
   async removePlant(id: number): Promise<void> {
     await firstValueFrom(
       this.http.delete(`${this.apiUrl}/${id}`)

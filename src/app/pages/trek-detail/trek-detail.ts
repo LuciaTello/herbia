@@ -88,6 +88,12 @@ export class TrekDetailPage implements OnInit {
     return plants.filter(p => p.found).length;
   }
 
+  protected async onRefPhotoError(plant: SuggestedPlant, index: number): Promise<void> {
+    const photo = this.refPhotos(plant.photos)[index];
+    if (!photo?.id) return;
+    await this.trekService.refreshPhoto(photo.id);
+  }
+
   protected openGallery(photos: PlantPhoto[] | undefined, name: string): void {
     if (photos?.length) {
       this.galleryImages.set(photos.map(p => p.url));
