@@ -256,8 +256,11 @@ export class TrekDetailPage implements OnInit {
   async reactivateTrek(): Promise<void> {
     const trek = this.trek();
     if (!trek) return;
-    await this.trekService.reactivateTrek(trek.id);
-    this.router.navigate(['/my-treks', trek.id]);
+    try {
+      await this.trekService.reactivateTrek(trek.id);
+    } catch (err) {
+      console.error('Reactivate failed:', err);
+    }
   }
 
   async deleteTrek(): Promise<void> {
