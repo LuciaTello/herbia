@@ -112,6 +112,12 @@ export class TrekService {
     const photo = await firstValueFrom(
       this.http.post<PlantPhoto>(`${this.apiUrl}/plants/${plantId}/photo`, formData)
     );
+    // Merge PlantNet identification into the photo (in case backend hasn't stored it yet)
+    const enrichedPhoto: PlantPhoto = {
+      ...photo,
+      identifiedAs: photo.identifiedAs || pn?.identifiedAs,
+      identifiedCommonName: photo.identifiedCommonName || pn?.commonName,
+    };
     // Add the new photo to the matching plant (and all plants with same scientificName)
     const targetPlant = this.treks().flatMap(m => m.plants).find(p => p.id === plantId);
     if (targetPlant) {
@@ -120,13 +126,13 @@ export class TrekService {
           ...trek,
           plants: trek.plants.map(p =>
             p.scientificName === targetPlant.scientificName
-              ? { ...p, photos: [...p.photos, photo] }
+              ? { ...p, photos: [...p.photos, enrichedPhoto] }
               : p
           ),
         }))
       );
     }
-    return photo;
+    return enrichedPhoto;
   }
 
   async deletePlantPhoto(photoId: number): Promise<void> {
