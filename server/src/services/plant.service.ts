@@ -94,7 +94,7 @@ async function enrichWithTaxonomy(species: INatSpecies[]): Promise<void> {
   const ids = species.map(s => s.taxonId).join(',');
   if (!ids) return;
   try {
-    const url = `https://api.inaturalist.org/v1/taxa/${ids}`;
+    const url = `https://api.inaturalist.org/v1/taxa/${ids}?per_page=${species.length}`;
     const response = await fetch(url, {
       headers: { 'User-Agent': 'herbia-app' },
     });
