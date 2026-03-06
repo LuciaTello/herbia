@@ -35,13 +35,18 @@ export class ChallengesPage implements OnInit {
     this.loading.set(false);
   }
 
-  protected startQuiz(): void {
+  protected async startQuiz(): Promise<void> {
     this.error.set(null);
-    const ok = this.challenge.generateQuiz();
-    if (ok) {
-      this.playing.set(true);
-    } else {
-      this.error.set(this.i18n.t().challenges.notEnoughPhotos);
+    this.loading.set(true);
+    try {
+      const ok = await this.challenge.generateQuiz();
+      if (ok) {
+        this.playing.set(true);
+      } else {
+        this.error.set(this.i18n.t().challenges.notEnoughPhotos);
+      }
+    } finally {
+      this.loading.set(false);
     }
   }
 

@@ -57,13 +57,37 @@
   gap: 1rem;
 }
 
-.plant-photo {
+.photo-strip {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
   width: 100%;
-  max-width: 280px;
-  aspect-ratio: 1;
+  padding-bottom: 0.25rem;
+}
+
+.photo-strip::-webkit-scrollbar {
+  height: 4px;
+}
+
+.photo-strip::-webkit-scrollbar-thumb {
+  background: #c8e6c9;
+  border-radius: 2px;
+}
+
+.plant-photo {
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
   object-fit: cover;
   border-radius: 12px;
   border: 2px solid #e8f5e9;
+  scroll-snap-align: start;
+}
+
+.plant-photo:first-child {
+  border-color: #2d7d46;
 }
 
 .question-text {

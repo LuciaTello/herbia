@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
-import { translatePlantNames } from '../services/plant.service';
+import { translatePlantNames, fetchFromINaturalist } from '../services/plant.service';
 
 export function challengeRouter(prisma: PrismaClient): Router {
   const router = Router();
@@ -76,6 +76,30 @@ export function challengeRouter(prisma: PrismaClient): Router {
     } catch (error) {
       console.error('Error fetching quiz plants:', error);
       res.status(500).json({ error: 'Failed to fetch quiz plants' });
+    }
+  });
+
+  // POST /api/challenges/quiz-extra-photos — Fetch iNaturalist photos for plants lacking enough
+  router.post('/quiz-extra-photos', async (req, res) => {
+    try {
+      const { plants } = req.body as { plants: { scientificName: string; need: number }[] };
+      if (!Array.isArray(plants) || plants.length === 0) {
+        res.json({});
+        return;
+      }
+
+      const result: Record<string, string[]> = {};
+      await Promise.all(
+        plants.map(async (p) => {
+          const urls = await fetchFromINaturalist(p.scientificName);
+          result[p.scientificName] = urls.slice(0, p.need);
+        })
+      );
+
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching extra quiz photos:', error);
+      res.status(500).json({ error: 'Failed to fetch extra photos' });
     }
   });
 
