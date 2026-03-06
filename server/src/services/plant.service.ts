@@ -62,7 +62,7 @@ function bboxPolygon(lat: number, lng: number, radiusKm: number): string {
 }
 
 async function fetchGbifSpecies(
-  lat: number, lng: number, radiusKm: number, month: number, facetOffset: number = 0,
+  lat: number, lng: number, radiusKm: number, month: number,
 ): Promise<INatSpecies[]> {
   const geometry = bboxPolygon(lat, lng, radiusKm);
   const params = new URLSearchParams({
@@ -72,8 +72,7 @@ async function fetchGbifSpecies(
     month: String(month),
     geometry,
     facet: 'speciesKey',
-    facetLimit: '50',
-    'facetOffset': String(facetOffset),
+    facetLimit: '300',
     limit: '0',
   });
   const url = `https://api.gbif.org/v1/occurrence/search?${params}`;
@@ -85,33 +84,40 @@ async function fetchGbifSpecies(
   }
   const data = await response.json();
 
-  const facets = data.facets?.[0]?.counts || [];
+  const facets: { name: string; count: number }[] = data.facets?.[0]?.counts || [];
   if (facets.length === 0) return [];
   console.log(`GBIF returned ${facets.length} species facets`);
 
-  const speciesResults = await Promise.all(
-    facets.map(async (f: { name: string; count: number }) => {
-      try {
-        const res = await fetch(`https://api.gbif.org/v1/species/${f.name}`);
-        if (!res.ok) return null;
-        const sp = await res.json();
-        if (!sp.canonicalName || !sp.canonicalName.includes(' ')) return null;
-        return {
-          scientificName: sp.canonicalName,
-          commonName: sp.canonicalName,
-          count: f.count,
-          photoUrl: '',
-          taxonId: sp.key,
-          genus: sp.genus || sp.canonicalName.split(' ')[0],
-          family: sp.family || '',
-        } as INatSpecies;
-      } catch {
-        return null;
-      }
-    })
-  );
+  // Resolve species in batches of 50 to avoid overwhelming the API
+  const BATCH = 50;
+  const allSpecies: INatSpecies[] = [];
+  for (let i = 0; i < facets.length; i += BATCH) {
+    const batch = facets.slice(i, i + BATCH);
+    const results = await Promise.all(
+      batch.map(async (f) => {
+        try {
+          const res = await fetch(`https://api.gbif.org/v1/species/${f.name}`);
+          if (!res.ok) return null;
+          const sp = await res.json();
+          if (!sp.canonicalName || !sp.canonicalName.includes(' ')) return null;
+          return {
+            scientificName: sp.canonicalName,
+            commonName: sp.canonicalName,
+            count: f.count,
+            photoUrl: '',
+            taxonId: sp.key,
+            genus: sp.genus || sp.canonicalName.split(' ')[0],
+            family: sp.family || '',
+          } as INatSpecies;
+        } catch {
+          return null;
+        }
+      })
+    );
+    allSpecies.push(...results.filter((s): s is INatSpecies => s !== null));
+  }
 
-  return speciesResults.filter((s): s is INatSpecies => s !== null);
+  return allSpecies;
 }
 
 async function resolveCommonNames(
@@ -577,36 +583,19 @@ export async function getSuggestedPlants(
   const midLng = (originLng + destLng) / 2;
   const radius = isZone ? 10 : Math.max(5, Math.min(distance / 2, 50));
 
-  // Step 5: Fetch species from GBIF with pagination until we have enough after exclusion
-  const MAX_PAGES = 4;
-  let allSpecies: INatSpecies[] = [];
-  let selected: ReturnType<typeof selectPlants> = [];
+  // Step 5: Fetch species from GBIF (up to 300 species in one call)
+  const species = await fetchGbifSpecies(midLat, midLng, radius, currentMonth);
 
-  for (let page = 0; page < MAX_PAGES; page++) {
-    const species = await fetchGbifSpecies(midLat, midLng, radius, currentMonth, page * 50);
-
-    if (page === 0 && species.length < 3) {
-      // First page has almost nothing → fall back to LLM-only
-      return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
-    }
-
-    // Deduplicate by scientificName before adding
-    const existing = new Set(allSpecies.map(s => s.scientificName));
-    for (const s of species) {
-      if (!existing.has(s.scientificName)) {
-        allSpecies.push(s);
-        existing.add(s.scientificName);
-      }
-    }
-
-    selected = selectPlants(allSpecies, exclude, count);
-    console.log(`GBIF page ${page + 1}: ${allSpecies.length} total species, ${selected.length}/${count} after exclusion`);
-
-    if (selected.length >= count) break;       // We have enough
-    if (species.length < 50) break;             // GBIF has no more pages
+  // Step 6: If too few species → fall back to LLM-only
+  if (species.length < 3) {
+    return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
   }
 
-  // If still not enough after all pages → fall back to LLM-only
+  // Step 7: Select diverse plants with rarity, prioritizing common European families
+  const selected = selectPlants(species, exclude, count);
+  console.log(`GBIF: ${species.length} species total, ${selected.length}/${count} after exclusion`);
+
+  // If not enough after exclusion → fall back to LLM-only
   if (selected.length === 0) {
     return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
   }
