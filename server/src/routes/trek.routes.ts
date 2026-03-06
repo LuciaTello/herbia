@@ -57,21 +57,38 @@ export function trekRouter(prisma: PrismaClient): Router {
       const plantsWithIds = await Promise.all(
         (clientPlants || []).map(async (p: any) => {
           let plantId: number | null = null;
+          let family = p.family || '';
+          const genus = p.genus || (p.scientificName ? p.scientificName.trim().split(/\s+/)[0] : '') || '';
+
+          // If family is missing, try to look it up from canonical table or GBIF
+          if (!family && p.scientificName) {
+            const existing = await prisma.plant.findUnique({ where: { scientificName: p.scientificName }, select: { family: true } });
+            if (existing?.family) {
+              family = existing.family;
+            } else {
+              try {
+                const gbifRes = await fetch(`https://api.gbif.org/v1/species/match?name=${encodeURIComponent(p.scientificName)}&kingdom=Plantae`);
+                const gbifData = await gbifRes.json() as any;
+                family = gbifData.family || '';
+              } catch {}
+            }
+          }
+
           if (p.scientificName) {
             const canonical = await prisma.plant.upsert({
               where: { scientificName: p.scientificName },
-              update: {},
+              update: { family: family || undefined },
               create: {
                 scientificName: p.scientificName,
                 commonNameEs: lang === 'es' ? p.commonName : null,
                 commonNameFr: lang === 'fr' ? p.commonName : null,
-                genus: p.genus || p.scientificName.trim().split(/\s+/)[0] || '',
-                family: p.family || '',
+                genus,
+                family,
               },
             });
             plantId = canonical.id;
           }
-          return { ...p, plantId };
+          return { ...p, plantId, family, genus };
         })
       );
 
