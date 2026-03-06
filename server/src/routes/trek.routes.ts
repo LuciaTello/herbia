@@ -768,7 +768,7 @@ export function trekRouter(prisma: PrismaClient): Router {
     try {
       const id = parseInt(req.params['id']);
       const result = await prisma.trek.updateMany({
-        where: { id, userId: req.userId!, status: 'completed' },
+        where: { id, userId: req.userId! },
         data: { status: 'active' },
       });
       if (result.count === 0) {

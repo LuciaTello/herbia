@@ -260,8 +260,8 @@ export class TrekDetailPage implements OnInit {
     this.reactivating.set(true);
     try {
       await this.trekService.reactivateTrek(trek.id);
-    } catch (err) {
-      console.error('Reactivate failed:', err);
+    } catch {
+      // Ignore — UI stays on completed state
     } finally {
       this.reactivating.set(false);
     }
