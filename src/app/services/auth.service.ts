@@ -38,6 +38,7 @@ export class AuthService {
 
   readonly username = signal<string | null>(null);
   readonly points = signal(0);
+  readonly quizUnlocked = signal(false);
   readonly photoUrl = signal<string | null>(null);
   readonly bio = signal<string | null>(null);
   readonly email = signal<string | null>(null);
@@ -62,6 +63,7 @@ export class AuthService {
     this.trekTipCount.set(result.user.trekTipCount);
     this.username.set(result.user.username);
     this.points.set(result.user.points);
+    this.quizUnlocked.set(result.user.quizUnlocked);
     this.photoUrl.set(result.user.photoUrl);
     this.bio.set(result.user.bio);
     this.email.set(result.user.email);
@@ -76,6 +78,7 @@ export class AuthService {
     this.trekTipCount.set(result.user.trekTipCount);
     this.username.set(result.user.username);
     this.points.set(result.user.points);
+    this.quizUnlocked.set(result.user.quizUnlocked);
     this.photoUrl.set(result.user.photoUrl);
     this.bio.set(result.user.bio);
     this.email.set(result.user.email);
@@ -98,10 +101,11 @@ export class AuthService {
 
   async refreshProfile(): Promise<void> {
     const user = await firstValueFrom(
-      this.http.get<{ username: string | null; points: number; email: string; photoUrl: string | null; bio: string | null }>(`${environment.apiUrl}/users/me`)
+      this.http.get<{ username: string | null; points: number; quizUnlocked: boolean; email: string; photoUrl: string | null; bio: string | null }>(`${environment.apiUrl}/users/me`)
     );
     this.username.set(user.username);
     this.points.set(user.points);
+    this.quizUnlocked.set(user.quizUnlocked);
     this.photoUrl.set(user.photoUrl);
     this.bio.set(user.bio);
     this.email.set(user.email);

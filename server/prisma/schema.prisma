@@ -19,6 +19,7 @@ model User {
   lang         String   @default("es")                  // "es" | "fr"
   username     String?  @unique
   points       Int      @default(0)
+  quizUnlocked Boolean  @default(false) @map("quiz_unlocked")
   photoUrl     String?  @map("photo_url")
   bio          String?
   trekTipCount Int @default(0) @map("mission_tip_count")

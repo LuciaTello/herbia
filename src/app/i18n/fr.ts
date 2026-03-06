@@ -290,7 +290,7 @@ export const FR: Translations = {
     title: 'Défis',
     quizTitle: 'Quiz de plantes',
     quizDescription: '10 questions sur les plantes de ta collection. Combien en trouveras-tu ?',
-    lockedDescription: (n) => `Il te faut encore ${n} plante${n !== 1 ? 's' : ''} dans ta collection pour débloquer ce défi.`,
+    lockedDescription: 'Atteins le niveau Pousse aventurière (750 pts) pour débloquer ce défi.',
     start: 'C\'est parti !',
     locked: 'Bloqué',
     notEnoughPhotos: 'Il te faut au moins 10 plantes avec photo dans ta collection pour jouer.',
@@ -310,6 +310,11 @@ export const FR: Translations = {
     pointsAdded: (pts) => `+${pts} points ajoutés`,
     playAgain: 'Rejouer',
     backToHub: 'Retour aux défis',
+  },
+  quizUnlockPopup: {
+    title: 'Quiz débloqué !',
+    message: 'Tu as atteint le niveau Pousse aventurière. Tu peux maintenant tester tes connaissances avec le quiz de plantes !',
+    dismiss: 'Super !',
   },
   offline: {
     banner: 'Hors connexion',

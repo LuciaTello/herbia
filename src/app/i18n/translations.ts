@@ -249,7 +249,7 @@ export interface Translations {
     title: string;
     quizTitle: string;
     quizDescription: string;
-    lockedDescription: (n: number) => string;
+    lockedDescription: string;
     start: string;
     locked: string;
     notEnoughPhotos: string;
@@ -269,6 +269,11 @@ export interface Translations {
     pointsAdded: (pts: number) => string;
     playAgain: string;
     backToHub: string;
+  };
+  quizUnlockPopup: {
+    title: string;
+    message: string;
+    dismiss: string;
   };
   offline: {
     banner: string;
