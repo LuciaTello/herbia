@@ -32,27 +32,27 @@ export class FamiliesTutorialComponent {
 
   protected readonly totalSlides = this.slides.length;
 
-  // Representative photos for each family
+  // Representative photos for each family (verified Wikipedia API thumbnails)
   protected readonly familyImages = [
     // Asteraceae — Leucanthemum vulgare (ox-eye daisy)
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Leucanthemum_vulgare_%27Filigran%27_Flower_2200px.jpg/250px-Leucanthemum_vulgare_%27Filigran%27_Flower_2200px.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Leucanthemum_vulgare_%27Filigran%27_Flower_2200px.jpg/250px-Leucanthemum_vulgare_%27Filigran%27_Flower_2200px.jpg',
     // Fabaceae — Trifolium pratense (red clover)
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Trifolium_pratense.jpg/250px-Trifolium_pratense.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Trifolium_pratense_-_Keila2.jpg/250px-Trifolium_pratense_-_Keila2.jpg',
     // Lamiaceae — Lavandula angustifolia (lavender)
     'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Single_lavender_flower02.jpg/250px-Single_lavender_flower02.jpg',
-    // Brassicaceae — Brassica napus (rapeseed/colza)
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Brassica_napus_2.jpg/250px-Brassica_napus_2.jpg',
+    // Brassicaceae — Brassica rapa
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Brassica_rapa_plant.jpg/250px-Brassica_rapa_plant.jpg',
     // Apiaceae — Daucus carota (wild carrot)
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Daucus_Carota.jpg/250px-Daucus_Carota.jpg',
-    // Poaceae — Triticum aestivum (wheat)
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Wheat_close-up.JPG/250px-Wheat_close-up.JPG',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Daucus_carota_May_2008-1_edit.jpg/250px-Daucus_carota_May_2008-1_edit.jpg',
+    // Poaceae — Triticum (wheat)
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Vehn%C3%A4pelto_6.jpg/250px-Vehn%C3%A4pelto_6.jpg',
   ];
 
   protected readonly familyImageLabels = [
     'Leucanthemum vulgare',
     'Trifolium pratense',
     'Lavandula angustifolia',
-    'Brassica napus',
+    'Brassica rapa',
     'Daucus carota',
     'Triticum aestivum',
   ];
