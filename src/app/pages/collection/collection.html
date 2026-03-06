@@ -134,13 +134,15 @@
               }
               <p class="date">{{ found.foundAt }}</p>
             </div>
-            @if (!readonly() && userPhotos(found.photos).length) {
+            @if (userPhotos(found.photos).length) {
               <div class="user-photos-box">
                 @for (photo of userPhotos(found.photos); track photo.id) {
                   <div class="user-photo-wrapper">
                     <img class="user-photo-thumb" [src]="photo.url" [alt]="found.commonName"
                          (click)="openGallery(userPhotos(found.photos), found.commonName)" />
-                    <button class="photo-delete-btn" (click)="deletePhoto(photo.id!, found.id)">&times;</button>
+                    @if (!readonly()) {
+                      <button class="photo-delete-btn" (click)="deletePhoto(photo.id!, found.id)">&times;</button>
+                    }
                   </div>
                 }
               </div>

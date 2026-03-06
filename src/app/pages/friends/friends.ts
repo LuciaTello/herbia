@@ -91,6 +91,8 @@ export class FriendsPage implements OnInit {
   }
 
   async accept(friendshipId: number): Promise<void> {
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.acceptFriend);
+    if (!ok) return;
     await this.friendService.acceptRequest(friendshipId);
   }
 

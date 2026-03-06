@@ -265,6 +265,7 @@ export const FR: Translations = {
     completeTrek: 'Tu veux vraiment terminer la balade ? Tu ne pourras plus ajouter de photos et elle sera archivée.',
     removePlant: 'Tu veux vraiment retirer cette plante de ta collection ?',
     removeFriend: 'Tu veux vraiment supprimer cette amie ?',
+    acceptFriend: 'Tu veux vraiment l\'accepter ? Elle pourra voir tes photos de plantes.',
   },
   tutorials: {
     back: 'Retour à l\'accueil',

@@ -214,6 +214,7 @@ export interface Translations {
     removePlant: string;
     completeTrek: string;
     removeFriend: string;
+    acceptFriend: string;
   };
   tutorials: {
     back: string;

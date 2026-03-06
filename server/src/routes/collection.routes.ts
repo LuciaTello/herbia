@@ -56,7 +56,7 @@ export function collectionRouter(prisma: PrismaClient): Router {
           trek: { userId },
         },
         include: {
-          photos: { where: { source: { not: 'user' } } },
+          photos: true,
           trek: { select: { origin: true, destination: true, country: true, countryCode: true, region: true, regionCode: true } },
         },
         orderBy: { foundAt: 'desc' },
