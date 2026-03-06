@@ -206,7 +206,9 @@ For each plant, write TWO separate fields that must contain COMPLETELY DIFFERENT
 
 - "hint": A practical field identification guide (1-2 sentences in ${langName}). Describe ONLY what to look for with your eyes: leaf shape (lobed, toothed, opposite vs alternate), flower structure (number of petals, symmetry, color), stem features (square, hairy, hollow), smell if distinctive, typical height, and WHERE to look (roadside, walls, shade, wet soil, forest edge...). NEVER mention history, uses, culture, or fun facts here.
 
-STRICT RULE: If the description mentions a use or story, the hint must NOT repeat it. If the hint mentions a visual feature, the description must NOT mention it.
+STRICT RULES:
+- If the description mentions a use or story, the hint must NOT repeat it. If the hint mentions a visual feature, the description must NOT mention it.
+- NEVER start a description or hint with the plant's name. The name is already displayed separately in the UI. Jump straight into the fact or the visual clue. Bad: "La lavande est utilisée..." Good: "Utilisée depuis l'Antiquité..."
 
 STYLE RULES for ${langName} text:
 - Write about the PLANTS, not about the traveler. Do not address or mention the user/traveler in descriptions or hints.
@@ -264,7 +266,9 @@ Each plant needs TWO separate text fields that must contain COMPLETELY DIFFERENT
 
 - "hint": A practical field identification guide (1-2 sentences in ${langName}). Describe ONLY what to look for with your eyes: leaf shape (lobed, toothed, opposite vs alternate), flower structure (number of petals, symmetry, color), stem features (square, hairy, hollow), smell if distinctive, typical height, and WHERE to look (roadside, walls, shade, wet soil, forest edge...). NEVER mention history, uses, culture, or fun facts here.
 
-STRICT RULE: If the description mentions a use or story, the hint must NOT repeat it. If the hint mentions a visual feature, the description must NOT mention it.
+STRICT RULES:
+- If the description mentions a use or story, the hint must NOT repeat it. If the hint mentions a visual feature, the description must NOT mention it.
+- NEVER start a description or hint with the plant's name. The name is already displayed separately in the UI. Jump straight into the fact or the visual clue. Bad: "La lavande est utilisée..." Good: "Utilisée depuis l'Antiquité..."
 
 STYLE RULES for ${langName} text:
 - Write about the PLANTS, not about the traveler. Do not address or mention the user/traveler in descriptions or hints.
