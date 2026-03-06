@@ -3,13 +3,21 @@
      (touchend)="onTouchEnd($event)">
   <div class="tutorial-content">
     <div class="slide">
-      <span class="emoji">{{ emojis[currentSlide()] }}</span>
+      <span class="emoji">{{ slides[currentSlide()].emoji }}</span>
       <h2>{{ i18n.t().familiesTutorial.titles[currentSlide()] }}</h2>
-      <p>{{ i18n.t().familiesTutorial.texts[currentSlide()] }}</p>
+      <p [innerHTML]="i18n.t().familiesTutorial.texts[currentSlide()]"></p>
+
+      @if (slides[currentSlide()].imageIndex !== null) {
+        <div class="family-image">
+          <img [src]="familyImages[slides[currentSlide()].imageIndex!]"
+               [alt]="familyImageLabels[slides[currentSlide()].imageIndex!]" />
+          <span class="caption">{{ familyImageLabels[slides[currentSlide()].imageIndex!] }}</span>
+        </div>
+      }
     </div>
 
     <div class="dots">
-      @for (emoji of emojis; track $index) {
+      @for (slide of slides; track $index) {
         <button
           class="dot"
           [class.active]="$index === currentSlide()"
