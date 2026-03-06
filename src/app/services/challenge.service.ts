@@ -141,7 +141,7 @@ export class ChallengeService {
     const distractors = this.pickDistractors(
       correctAnswer,
       pool.filter(p => p.id !== plant.id).map(p => this.formatName(p)),
-      3
+      2
     );
     const { options, correctIndex } = this.shuffleOptions(correctAnswer, distractors);
 
@@ -159,7 +159,7 @@ export class ChallengeService {
     const distractors = this.pickDistractors(
       correctAnswer,
       [...new Set(pool.filter(p => p.family && p.family !== correctAnswer).map(p => p.family!))],
-      3
+      2
     );
     const { options, correctIndex } = this.shuffleOptions(correctAnswer, distractors);
 
