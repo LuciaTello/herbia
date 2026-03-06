@@ -2,36 +2,40 @@
   display: block;
 }
 
-.quit-btn {
-  background: none;
-  border: none;
-  color: #2d7d46;
-  font-size: 0.95rem;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 0.75rem;
-}
-
-.quit-btn:hover {
-  text-decoration: underline;
-}
-
 .quiz-container {
   max-width: 400px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.5rem 1rem 1rem;
 }
 
 /* Progress */
 .progress-header {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
 }
 
 .progress-label {
   font-size: 0.85rem;
   color: #636e72;
-  display: block;
-  margin-bottom: 0.5rem;
+}
+
+.quit-btn {
+  background: none;
+  border: none;
+  color: #b2bec3;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.quit-btn:hover {
+  color: #d63031;
 }
 
 .progress-bar {
