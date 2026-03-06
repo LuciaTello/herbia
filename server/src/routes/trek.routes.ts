@@ -7,6 +7,7 @@ import type { PrismaClient } from '../generated/prisma/client';
 import { uploadPhoto, deletePhoto } from '../services/cloudinary.service';
 import { identifyPlant, callPlantNet, calculateSimilarity, normalize } from '../services/plantnet.service';
 import { translatePlantNames } from '../services/plant.service';
+import { checkQuizUnlock } from '../services/quiz-unlock.service';
 
 const upload = multer({
   storage: memoryStorage(),
@@ -427,6 +428,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             where: { id: plantId },
             data: { pendingSimilarity: 0 },
           });
+          await checkQuizUnlock(prisma, req.userId!);
         }
         res.json({ pointsOnly: true, similarity });
         return;
@@ -446,6 +448,7 @@ export function trekRouter(prisma: PrismaClient): Router {
           where: { id: plantId },
           data: { pendingSimilarity: 0 },
         });
+        await checkQuizUnlock(prisma, req.userId!);
       }
 
       res.status(201).json(photo);
@@ -730,6 +733,9 @@ export function trekRouter(prisma: PrismaClient): Router {
           where: { id: req.userId! },
           data: { points: { increment: pointsDelta } },
         });
+        if (pointsDelta > 0) {
+          await checkQuizUnlock(prisma, req.userId!);
+        }
       }
 
       const updated = await prisma.plantPhoto.update({

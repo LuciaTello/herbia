@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { PrismaClient } from '../generated/prisma/client';
 import { translatePlantNames, fetchFromINaturalist } from '../services/plant.service';
+import { checkQuizUnlock } from '../services/quiz-unlock.service';
 
 export function challengeRouter(prisma: PrismaClient): Router {
   const router = Router();
@@ -118,6 +119,10 @@ export function challengeRouter(prisma: PrismaClient): Router {
         data: { points: { increment: score } },
         select: { points: true },
       });
+
+      if (score > 0) {
+        await checkQuizUnlock(prisma, req.userId!);
+      }
 
       res.json({ points: user.points });
     } catch (error) {

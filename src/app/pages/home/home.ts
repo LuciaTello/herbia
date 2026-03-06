@@ -1,9 +1,10 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18nService } from '../../i18n';
 import { AuthService } from '../../services/auth.service';
 
 const LEVEL_THRESHOLDS = [0, 750, 1500, 3750, 7500, 25000];
+const QUIZ_POPUP_KEY = 'herbia-quiz-popup-shown';
 
 @Component({
   selector: 'app-home',
@@ -14,9 +15,18 @@ const LEVEL_THRESHOLDS = [0, 750, 1500, 3750, 7500, 25000];
 export class HomePage implements OnInit {
   protected readonly i18n = inject(I18nService);
   protected readonly auth = inject(AuthService);
+  protected readonly showQuizPopup = signal(false);
 
   async ngOnInit(): Promise<void> {
     await this.auth.refreshProfile();
+    if (this.auth.quizUnlocked() && !localStorage.getItem(QUIZ_POPUP_KEY)) {
+      this.showQuizPopup.set(true);
+    }
+  }
+
+  protected dismissQuizPopup(): void {
+    localStorage.setItem(QUIZ_POPUP_KEY, '1');
+    this.showQuizPopup.set(false);
   }
 
   protected readonly currentLevel = computed(() => {

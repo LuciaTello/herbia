@@ -18,7 +18,7 @@ export function userRouter(prisma: PrismaClient): Router {
     try {
       const user = await prisma.user.findUnique({
         where: { id: req.userId! },
-        select: { id: true, email: true, lang: true, username: true, points: true, trekTipCount: true, photoUrl: true, bio: true },
+        select: { id: true, email: true, lang: true, username: true, points: true, quizUnlocked: true, trekTipCount: true, photoUrl: true, bio: true },
       });
       if (!user) {
         res.status(404).json({ error: 'User not found' });

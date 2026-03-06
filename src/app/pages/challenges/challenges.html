@@ -16,7 +16,7 @@
           @if (isUnlocked()) {
             {{ i18n.t().challenges.quizDescription }}
           } @else {
-            {{ i18n.t().challenges.lockedDescription(plantsNeeded()) }}
+            {{ i18n.t().challenges.lockedDescription }}
           }
         </p>
         @if (isUnlocked()) {

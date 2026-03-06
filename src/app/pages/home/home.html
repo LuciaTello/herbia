@@ -57,6 +57,17 @@
   </section>
 }
 
+@if (showQuizPopup()) {
+  <div class="quiz-popup-backdrop" (click)="dismissQuizPopup()">
+    <div class="quiz-popup-dialog" (click)="$event.stopPropagation()">
+      <span class="quiz-popup-emoji">🌿</span>
+      <strong class="quiz-popup-title">{{ i18n.t().quizUnlockPopup.title }}</strong>
+      <p class="quiz-popup-message">{{ i18n.t().quizUnlockPopup.message }}</p>
+      <button class="quiz-popup-btn" (click)="dismissQuizPopup()">{{ i18n.t().quizUnlockPopup.dismiss }}</button>
+    </div>
+  </div>
+}
+
 @if (auth.isLoggedIn()) {
   <nav class="bottom-nav">
     <a routerLink="/profile">
