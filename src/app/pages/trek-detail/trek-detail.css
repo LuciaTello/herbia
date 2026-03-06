@@ -262,6 +262,15 @@ h2 {
   text-overflow: ellipsis;
 }
 
+.photo-row-scientific {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: #636e72;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .photo-points {
   font-size: 0.75rem;
   font-weight: 600;

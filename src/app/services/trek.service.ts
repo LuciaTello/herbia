@@ -101,12 +101,14 @@ export class TrekService {
     );
   }
 
-  async uploadPlantPhoto(plantId: number, file: File, similarity?: number): Promise<PlantPhoto> {
+  async uploadPlantPhoto(plantId: number, file: File, similarity?: number, pn?: { identifiedAs?: string; commonName?: string }): Promise<PlantPhoto> {
     const formData = new FormData();
     formData.append('photo', file);
     if (similarity !== undefined) {
       formData.append('similarity', String(similarity));
     }
+    if (pn?.identifiedAs) formData.append('identifiedAs', pn.identifiedAs);
+    if (pn?.commonName) formData.append('identifiedCommonName', pn.commonName);
     const photo = await firstValueFrom(
       this.http.post<PlantPhoto>(`${this.apiUrl}/plants/${plantId}/photo`, formData)
     );

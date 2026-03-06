@@ -173,7 +173,7 @@ export class TrekDetailPage implements OnInit {
     this.identifyResult.set(null);
     this.uploadingPhoto.set(true);
     try {
-      const photo = await this.trekService.uploadPlantPhoto(plantId, file, similarity);
+      const photo = await this.trekService.uploadPlantPhoto(plantId, file, similarity, pn ? { identifiedAs: pn.identifiedAs, commonName: pn.commonName } : undefined);
       if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
       this.trekService.markPlantFoundLocally(plantId);
       const missionName = plantName || this.treks().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
@@ -202,7 +202,8 @@ export class TrekDetailPage implements OnInit {
   }
 
   protected selectMatch(match: { plantId: number; similarity: number; commonName: string }): void {
-    this.confirmUpload(match.plantId, match.similarity, match.commonName);
+    const pn = this.identifyResult()?.plantnetResult;
+    this.confirmUpload(match.plantId, match.similarity, match.commonName, undefined, pn);
   }
 
   protected dismissOverlay(): void {

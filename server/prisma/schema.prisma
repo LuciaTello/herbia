@@ -118,12 +118,14 @@ model SuggestedPlant {
 
 // A photo for a plant, fetched from Wikipedia or iNaturalist
 model PlantPhoto {
-  id         Int    @id @default(autoincrement())
-  url        String
-  source     String   // "wikipedia" | "inaturalist" | "user"
-  similarity Int    @default(0)
-  plantId    Int    @map("plant_id")
-  plant      SuggestedPlant @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  id                  Int     @id @default(autoincrement())
+  url                 String
+  source              String    // "wikipedia" | "inaturalist" | "user"
+  similarity          Int     @default(0)
+  identifiedAs        String?   @map("identified_as")     // PlantNet scientific name
+  identifiedCommonName String?  @map("identified_common_name") // PlantNet common name
+  plantId             Int     @map("plant_id")
+  plant               SuggestedPlant @relation(fields: [plantId], references: [id], onDelete: Cascade)
 
   @@map("plant_photos")
 }

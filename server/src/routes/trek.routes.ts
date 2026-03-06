@@ -397,8 +397,10 @@ export function trekRouter(prisma: PrismaClient): Router {
       // Award similarity points: use body param if provided (from identify-all), else pendingSimilarity
       const bodySimilarity = parseInt(req.body.similarity);
       const similarity = bodySimilarity > 0 ? bodySimilarity : (plant.pendingSimilarity || 0);
+      const identifiedAs = req.body.identifiedAs || null;
+      const identifiedCommonName = req.body.identifiedCommonName || null;
       const photo = await prisma.plantPhoto.create({
-        data: { url, source: 'user', plantId, similarity },
+        data: { url, source: 'user', plantId, similarity, identifiedAs, identifiedCommonName },
       });
 
       if (similarity > 0) {

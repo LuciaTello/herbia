@@ -74,7 +74,10 @@
                     <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
                          (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
                     <div class="photo-row-info">
-                      <span class="photo-row-name">{{ plant.commonName }}</span>
+                      <span class="photo-row-name">{{ photo.identifiedCommonName || plant.commonName }}</span>
+                      @if (photo.identifiedAs) {
+                        <span class="photo-row-scientific">{{ photo.identifiedAs }}</span>
+                      }
                       <span class="photo-points">{{ i18n.t().myTreks.pointsEarned(photo.similarity || 0) }}</span>
                     </div>
                     @if (trek()!.status !== 'completed') {
