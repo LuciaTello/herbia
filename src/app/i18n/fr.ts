@@ -94,6 +94,7 @@ export const FR: Translations = {
     myPlantsTitle: 'Mes plantes',
     unidentifiedCount: (count) => `${count} plante${count !== 1 ? 's' : ''} non identifiée${count !== 1 ? 's' : ''}`,
     maxPhotosReached: 'Limite de photos atteinte pour cette espèce. Efface des photos pour continuer à ajouter.',
+    maxPhotosInTrek: 'Max de photos atteint pour cette plante dans la balade. Ajoutée à ta collection.',
     alreadyCaptured: 'Tu as déjà capturé cette espèce dans cette balade.',
     regionLimitReached: 'Limite de photos atteinte pour cette espèce dans cette région. Efface dans ta collection pour continuer à ajouter.',
     uploadError: 'Erreur lors du téléchargement. Réessayez.',
@@ -170,7 +171,7 @@ export const FR: Translations = {
   },
   trekTip: {
     title: 'Avant de commencer',
-    text: 'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu trouves une plante, appuie sur « Ajouter photo » et prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points :\n\n🎯 Espèce exacte → 100 pts\n🌿 Même genre → 75 pts\n🌳 Même famille → 40 pts\n\nChaque espèce accepte 1 photo par balade. Si la plante ne correspond à aucune de la balade, elle est ajoutée à ta collection (jusqu\'à 20 photos par espèce et région).\n\nBonne chance, voyageuse !',
+    text: 'Les plantes que tu vois ici sont choisies d\'après ce qui pousse dans cette zone à cette période de l\'année. C\'est presque impossible de toutes les trouver — et c\'est ça l\'aventure !\n\nQuand tu trouves une plante, appuie sur « Ajouter photo » et prends-la en photo. Herbia l\'identifiera automatiquement et tu gagneras des points :\n\n🎯 Espèce exacte → 100 pts\n🌿 Même genre → 75 pts\n🌳 Même famille → 40 pts\n\nChaque plante de la balade accepte jusqu\'à 4 photos. Si la plante ne correspond à aucune de la balade, elle est ajoutée à ta collection (jusqu\'à 20 photos par espèce et région).\n\nBonne chance, voyageuse !',
     dismiss: 'Compris !',
   },
   trekTutorial: {

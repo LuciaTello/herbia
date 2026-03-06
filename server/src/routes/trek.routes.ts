@@ -277,7 +277,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             commonName: plant.commonName,
             scientificName: plant.scientificName,
             similarity: sim.similarity,
-            alreadyCaptured: hasUserPhoto > 0,
+            alreadyCaptured: hasUserPhoto >= 4,
           });
         }
       }
@@ -376,7 +376,7 @@ export function trekRouter(prisma: PrismaClient): Router {
         });
       }
 
-      // Limit: max 1 user photo per species per trek
+      // Limit: max 4 user photos per suggested plant per trek
       const existingInTrek = await prisma.plantPhoto.count({
         where: {
           source: 'user',
@@ -387,8 +387,8 @@ export function trekRouter(prisma: PrismaClient): Router {
           },
         },
       });
-      if (existingInTrek >= 1) {
-        res.status(409).json({ error: 'already_captured_in_trek' });
+      if (existingInTrek >= 4) {
+        res.status(409).json({ error: 'max_photos_in_trek' });
         return;
       }
 

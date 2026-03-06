@@ -94,6 +94,7 @@ export const ES: Translations = {
     myPlantsTitle: 'Mis plantas',
     unidentifiedCount: (count) => `${count} planta${count !== 1 ? 's' : ''} sin identificar`,
     maxPhotosReached: 'Límite de fotos alcanzado para esta especie. Borra fotos para seguir añadiendo.',
+    maxPhotosInTrek: 'Máximo de fotos alcanzado para esta planta en la excursión. Añadida a tu colección.',
     alreadyCaptured: 'Ya has capturado esta especie en esta excursión.',
     regionLimitReached: 'Límite de fotos alcanzado para esta especie en esta región. Borra fotos en tu colección para seguir añadiendo.',
     uploadError: 'Error al subir la foto. Inténtalo de nuevo.',
@@ -170,7 +171,7 @@ export const ES: Translations = {
   },
   trekTip: {
     title: 'Antes de empezar',
-    text: 'Las plantas que ves aquí se eligen según lo que crece en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando encuentres una planta, toca «Añadir foto» y sácale una foto. Herbia la identificará automáticamente y ganarás puntos:\n\n🎯 Especie exacta → 100 pts\n🌿 Mismo género → 75 pts\n🌳 Misma familia → 40 pts\n\nCada especie admite 1 foto por excursión. Si la planta no coincide con ninguna de la excursión, se añade a tu colección (hasta 20 fotos por especie y región).\n\n¡Buena suerte, viajera!',
+    text: 'Las plantas que ves aquí se eligen según lo que crece en esta zona en esta época del año. Es casi imposible encontrarlas todas — ¡y eso es parte de la aventura!\n\nCuando encuentres una planta, toca «Añadir foto» y sácale una foto. Herbia la identificará automáticamente y ganarás puntos:\n\n🎯 Especie exacta → 100 pts\n🌿 Mismo género → 75 pts\n🌳 Misma familia → 40 pts\n\nCada planta de la excursión admite hasta 4 fotos. Si la planta no coincide con ninguna de la excursión, se añade a tu colección (hasta 20 fotos por especie y región).\n\n¡Buena suerte, viajera!',
     dismiss: '¡Entendido!',
   },
   trekTutorial: {

@@ -80,6 +80,7 @@ export interface Translations {
     myPlantsTitle: string;
     unidentifiedCount: (count: number) => string;
     maxPhotosReached: string;
+    maxPhotosInTrek: string;
     alreadyCaptured: string;
     regionLimitReached: string;
     uploadError: string;
