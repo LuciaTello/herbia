@@ -122,6 +122,8 @@ function assignRarity(count: number, maxCount: number): 'common' | 'rare' | 'ver
   return 'veryRare';
 }
 
+const COMMON_FAMILIES = ['Asteraceae', 'Fabaceae', 'Lamiaceae', 'Brassicaceae', 'Apiaceae', 'Poaceae', 'Rosaceae'];
+
 function selectPlants(species: INatSpecies[], exclude: string[], count: number = 5): (INatSpecies & { rarity: string; genus: string; family: string })[] {
   const excludeLower = new Set(exclude.map(n => n.toLowerCase()));
   const filtered = species.filter(s => !excludeLower.has(s.scientificName.toLowerCase()));
@@ -152,7 +154,28 @@ function selectPlants(species: INatSpecies[], exclude: string[], count: number =
     }
   }
 
-  return picked.slice(0, count);
+  let result = picked.slice(0, count);
+
+  // Ensure at least 5 plants from common European families (tutorial families)
+  const minCommonFamilies = Math.min(5, count);
+  const commonFamilyCount = result.filter(p => COMMON_FAMILIES.includes(p.family)).length;
+  if (commonFamilyCount < minCommonFamilies) {
+    const pickedNames = new Set(result.map(p => p.scientificName));
+    const commonFamilyCandidates = withRarity
+      .filter(s => COMMON_FAMILIES.includes(s.family) && !pickedNames.has(s.scientificName));
+
+    // Replace non-common-family plants (from end) with common-family candidates
+    let needed = minCommonFamilies - commonFamilyCount;
+    let candidateIdx = 0;
+    for (let i = result.length - 1; i >= 0 && needed > 0 && candidateIdx < commonFamilyCandidates.length; i--) {
+      if (!COMMON_FAMILIES.includes(result[i].family)) {
+        result[i] = commonFamilyCandidates[candidateIdx++];
+        needed--;
+      }
+    }
+  }
+
+  return result;
 }
 
 // --- LLM prompts ---
@@ -222,6 +245,8 @@ Suggest exactly ${count} plants that can be found along this path in ${monthName
 Consider the region, climate, season, and typical vegetation.
 Try to include a balanced variety of plant types: trees, flowers, shrubs, grasses, herbs, ferns, etc. Don't force it if the route doesn't support it, but aim for diversity when possible.
 
+IMPORTANT: At least 5 of the ${count} plants MUST belong to one of these common European families: Asteraceae, Fabaceae, Lamiaceae, Brassicaceae, Apiaceae, Poaceae, or Rosaceae. Include the "family" field for each plant.
+
 For each plant, assign a rarity category:
 - "common": easy to find, you'll likely spot it without trying
 - "rare": you'll need to look carefully
@@ -245,6 +270,7 @@ Respond ONLY with a JSON object (no markdown, no backticks, no explanation), wit
     {
       "commonName": "name in ${langName}",
       "scientificName": "Latin name",
+      "family": "Asteraceae",
       "rarity": "common",
       "description": "...",
       "hint": "..."
@@ -487,11 +513,11 @@ export async function getSuggestedPlants(
     return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
   }
 
-  // Step 7: Select diverse plants with rarity
-  const selected = selectPlants(species, exclude, count);
+  // Step 7: Enrich with family taxonomy before selection (needed for common-family prioritization)
+  await enrichWithTaxonomy(species);
 
-  // Step 7b: Enrich with family taxonomy from iNaturalist
-  await enrichWithTaxonomy(selected);
+  // Step 7b: Select diverse plants with rarity, prioritizing common European families
+  const selected = selectPlants(species, exclude, count);
 
   // Step 8: Ask LLM for descriptions only
   const descPrompt = buildDescriptionPrompt(selected, origin, destination, lang, currentMonth, count);
