@@ -176,8 +176,9 @@ export class TrekDetailPage implements OnInit {
       const photo = await this.trekService.uploadPlantPhoto(plantId, file, similarity);
       if (photo.similarity) this.auth.points.update(p => p + photo.similarity!);
       this.trekService.markPlantFoundLocally(plantId);
-      const name = plantName || this.treks().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
-      this.resultOverlay.set({ name, points: similarity, type: 'match', photoUrl, identifiedAs: pn?.identifiedAs, commonName: pn?.commonName, genus: pn?.genus, family: pn?.family });
+      const missionName = plantName || this.treks().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
+      const displayName = pn?.commonName || missionName;
+      this.resultOverlay.set({ name: missionName, points: similarity, type: 'match', photoUrl, identifiedAs: pn?.identifiedAs, commonName: displayName, genus: pn?.genus, family: pn?.family });
       await this.checkAutoComplete();
     } catch (err: any) {
       if (err?.status === 409 && err?.error?.error === 'max_photos_in_trek' && pn?.identifiedAs) {
