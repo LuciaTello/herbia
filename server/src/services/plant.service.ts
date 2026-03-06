@@ -29,7 +29,7 @@ const TOO_FAR: Record<string, string> = {
   fr: 'Cet itinéraire traverse plusieurs climats — essayez une balade plus courte pour que les suggestions de plantes soient plus précises.',
 };
 
-// --- iNaturalist species discovery ---
+// --- GBIF species discovery ---
 
 interface INatSpecies {
   scientificName: string;
@@ -51,67 +51,121 @@ function haversine(lat1: number, lng1: number, lat2: number, lng2: number): numb
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-async function fetchSpeciesCounts(
-  lat: number, lng: number, radiusKm: number, month: number, locale: string,
+function bboxPolygon(lat: number, lng: number, radiusKm: number): string {
+  const latDelta = radiusKm / 111.32;
+  const lngDelta = radiusKm / (111.32 * Math.cos(lat * Math.PI / 180));
+  const minLat = lat - latDelta;
+  const maxLat = lat + latDelta;
+  const minLng = lng - lngDelta;
+  const maxLng = lng + lngDelta;
+  return `POLYGON((${minLng} ${minLat},${maxLng} ${minLat},${maxLng} ${maxLat},${minLng} ${maxLat},${minLng} ${minLat}))`;
+}
+
+async function fetchGbifSpecies(
+  lat: number, lng: number, radiusKm: number, month: number,
 ): Promise<INatSpecies[]> {
+  const geometry = bboxPolygon(lat, lng, radiusKm);
   const params = new URLSearchParams({
-    lat: String(lat),
-    lng: String(lng),
-    radius: String(radiusKm),
-    iconic_taxa: 'Plantae',
+    taxonKey: '6',
+    hasCoordinate: 'true',
+    occurrenceStatus: 'PRESENT',
     month: String(month),
-    quality_grade: 'research',
-    per_page: '50',
-    locale,
+    geometry,
+    facet: 'speciesKey',
+    facetLimit: '50',
+    limit: '0',
   });
-  const url = `https://api.inaturalist.org/v1/observations/species_counts?${params}`;
-  const response = await fetch(url, {
-    headers: { 'User-Agent': 'herbia-app' },
-  });
+  const url = `https://api.gbif.org/v1/occurrence/search?${params}`;
+  console.log(`GBIF query: month=${month}, radius=${radiusKm}km around (${lat.toFixed(3)}, ${lng.toFixed(3)})`);
+  const response = await fetch(url);
   if (!response.ok) {
-    console.warn(`iNaturalist species_counts returned ${response.status}`);
+    console.warn(`GBIF occurrence search returned ${response.status}`);
     return [];
   }
   const data = await response.json();
-  const species: INatSpecies[] = [];
-  for (const result of data.results || []) {
-    const taxon = result.taxon;
-    if (!taxon || taxon.rank !== 'species') continue;
-    species.push({
-      scientificName: taxon.name,
-      commonName: taxon.preferred_common_name || taxon.name,
-      count: result.count,
-      photoUrl: taxon.default_photo?.medium_url || '',
-      taxonId: taxon.id,
-      genus: taxon.name.split(' ')[0],
-      family: '',
-    });
-  }
-  return species;
+
+  const facets = data.facets?.[0]?.counts || [];
+  if (facets.length === 0) return [];
+  console.log(`GBIF returned ${facets.length} species facets`);
+
+  const speciesResults = await Promise.all(
+    facets.map(async (f: { name: string; count: number }) => {
+      try {
+        const res = await fetch(`https://api.gbif.org/v1/species/${f.name}`);
+        if (!res.ok) return null;
+        const sp = await res.json();
+        if (!sp.canonicalName || !sp.canonicalName.includes(' ')) return null;
+        return {
+          scientificName: sp.canonicalName,
+          commonName: sp.canonicalName,
+          count: f.count,
+          photoUrl: '',
+          taxonId: sp.key,
+          genus: sp.genus || sp.canonicalName.split(' ')[0],
+          family: sp.family || '',
+        } as INatSpecies;
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  return speciesResults.filter((s): s is INatSpecies => s !== null);
 }
 
-async function enrichWithTaxonomy(species: INatSpecies[]): Promise<void> {
-  const ids = species.map(s => s.taxonId).join(',');
-  if (!ids) return;
-  try {
-    const url = `https://api.inaturalist.org/v1/taxa/${ids}?per_page=${species.length}`;
-    const response = await fetch(url, {
-      headers: { 'User-Agent': 'herbia-app' },
-    });
-    if (!response.ok) return;
-    const data = await response.json();
-    const familyMap = new Map<number, string>();
-    for (const taxon of data.results || []) {
-      const familyAncestor = (taxon.ancestors || []).find((a: any) => a.rank === 'family');
-      if (familyAncestor) {
-        familyMap.set(taxon.id, familyAncestor.name);
+async function resolveCommonNames(
+  plants: { scientificName: string; commonName: string; taxonId: number }[],
+  lang: string,
+): Promise<void> {
+  const gbifLang = lang === 'es' ? 'spa' : lang === 'fr' ? 'fra' : 'eng';
+
+  await Promise.all(
+    plants.map(async (plant) => {
+      try {
+        const res = await fetch(`https://api.gbif.org/v1/species/${plant.taxonId}/vernacularNames`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const match = (data.results || []).find((v: any) => v.language === gbifLang);
+        if (match?.vernacularName) {
+          plant.commonName = match.vernacularName;
+        }
+      } catch {
+        // will be resolved by LLM fallback below
       }
+    })
+  );
+
+  const missing = plants.filter(p => p.commonName === p.scientificName);
+  if (missing.length > 0) {
+    const resolved = await lookupCommonNames(missing.map(p => p.scientificName), lang);
+    for (const p of missing) {
+      const name = resolved.get(p.scientificName);
+      if (name) p.commonName = name;
     }
-    for (const s of species) {
-      s.family = familyMap.get(s.taxonId) || '';
-    }
+  }
+}
+
+async function lookupCommonNames(
+  scientificNames: string[],
+  lang: string,
+): Promise<Map<string, string>> {
+  const langName = LANG_NAMES[lang] || 'Spanish';
+  const list = scientificNames.join(', ');
+  const prompt = `Give me the common name in ${langName} for each of these plants. Return ONLY a JSON object mapping scientific name to common name, no markdown.\n\nPlants: ${list}`;
+
+  try {
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3,
+    });
+    const text = (completion.choices[0]?.message?.content || '')
+      .replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+    const obj = JSON.parse(text);
+    return new Map(Object.entries(obj));
   } catch (e) {
-    console.warn('Failed to enrich taxonomy:', e);
+    console.error('Error looking up common names:', e);
+    return new Map();
   }
 }
 
@@ -521,19 +575,19 @@ export async function getSuggestedPlants(
   const midLng = (originLng + destLng) / 2;
   const radius = isZone ? 10 : Math.max(5, Math.min(distance / 2, 50));
 
-  // Step 5: Fetch species from iNaturalist
-  const species = await fetchSpeciesCounts(midLat, midLng, radius, currentMonth, lang);
+  // Step 5: Fetch species from GBIF (family included in response)
+  const species = await fetchGbifSpecies(midLat, midLng, radius, currentMonth);
 
   // Step 6: If too few species → fall back to LLM-only
   if (species.length < 3) {
     return llmOnlyFlow(origin, destination, lang, currentMonth, exclude, count);
   }
 
-  // Step 7: Enrich with family taxonomy before selection (needed for common-family prioritization)
-  await enrichWithTaxonomy(species);
-
-  // Step 7b: Select diverse plants with rarity, prioritizing common European families
+  // Step 7: Select diverse plants with rarity, prioritizing common European families
   const selected = selectPlants(species, exclude, count);
+
+  // Step 7b: Resolve common names in the user's language (GBIF + LLM fallback)
+  await resolveCommonNames(selected, lang);
 
   // Step 8: Ask LLM for descriptions only
   const descPrompt = buildDescriptionPrompt(selected, origin, destination, lang, currentMonth, count);
