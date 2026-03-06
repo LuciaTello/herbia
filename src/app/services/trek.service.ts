@@ -253,6 +253,7 @@ export class TrekService {
     this.treks.update(list =>
       list.map(trek => trek.id === id ? { ...trek, status: 'active' } : trek)
     );
+    this.persistCache();
   }
 
   async deleteTrek(id: number): Promise<void> {
