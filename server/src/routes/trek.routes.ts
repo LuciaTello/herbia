@@ -763,6 +763,25 @@ export function trekRouter(prisma: PrismaClient): Router {
     }
   });
 
+  // PATCH /api/treks/:id/reactivate - Unarchive a completed trek
+  router.patch('/:id/reactivate', async (req, res) => {
+    try {
+      const id = parseInt(req.params['id']);
+      const result = await prisma.trek.updateMany({
+        where: { id, userId: req.userId!, status: 'completed' },
+        data: { status: 'active' },
+      });
+      if (result.count === 0) {
+        res.status(404).json({ error: 'Trek not found' });
+        return;
+      }
+      res.json({ id, status: 'active' });
+    } catch (error) {
+      console.error('Error reactivating trek:', error);
+      res.status(500).json({ error: 'Failed to reactivate trek' });
+    }
+  });
+
   // DELETE /api/treks/:id - Delete a trek (cascade deletes its plants)
   router.delete('/:id', async (req, res) => {
     try {

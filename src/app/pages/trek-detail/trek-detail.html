@@ -110,6 +110,12 @@
         &times;
       </button>
     </div>
+  } @else {
+    <div class="action-buttons">
+      <button class="reactivate-trek-button" (click)="reactivateTrek()">
+        {{ i18n.t().myTreks.reactivateTrek }}
+      </button>
+    </div>
   }
 
   <!-- FAB camera button -->

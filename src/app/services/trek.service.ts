@@ -246,6 +246,15 @@ export class TrekService {
     );
   }
 
+  async reactivateTrek(id: number): Promise<void> {
+    await firstValueFrom(
+      this.http.patch(`${this.apiUrl}/${id}/reactivate`, {})
+    );
+    this.treks.update(list =>
+      list.map(trek => trek.id === id ? { ...trek, status: 'active' } : trek)
+    );
+  }
+
   async deleteTrek(id: number): Promise<void> {
     await firstValueFrom(
       this.http.delete(`${this.apiUrl}/${id}`)

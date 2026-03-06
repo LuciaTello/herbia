@@ -460,6 +460,23 @@ h2 {
   color: #d63031;
 }
 
+.reactivate-trek-button {
+  flex: 1;
+  padding: 0.5rem;
+  background: #2d7d46;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.reactivate-trek-button:hover {
+  background: #236b38;
+}
+
 /* FAB camera */
 .fab-camera {
   position: fixed;

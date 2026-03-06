@@ -85,6 +85,7 @@ export interface Translations {
     uploadError: string;
     plantAdded: string;
     completeTrek: string;
+    reactivateTrek: string;
     completed: string;
     activeTreks: string;
     completedTreks: string;

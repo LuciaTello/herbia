@@ -253,6 +253,12 @@ export class TrekDetailPage implements OnInit {
     this.completingId.set(null);
   }
 
+  async reactivateTrek(): Promise<void> {
+    const trek = this.trek();
+    if (!trek) return;
+    await this.trekService.reactivateTrek(trek.id);
+  }
+
   async deleteTrek(): Promise<void> {
     const trek = this.trek();
     if (!trek) return;
