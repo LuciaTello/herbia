@@ -41,12 +41,26 @@ export class ChallengeService {
 
     if (eligible.length < 10) return false;
 
+    // Deduplicate by scientificName (merge photos from different treks)
+    const bySpecies = new Map<string, SuggestedPlant>();
+    for (const p of eligible) {
+      const existing = bySpecies.get(p.scientificName);
+      if (existing) {
+        existing.photos = [...existing.photos, ...p.photos];
+      } else {
+        bySpecies.set(p.scientificName, { ...p, photos: [...p.photos] });
+      }
+    }
+    const unique = [...bySpecies.values()];
+
+    if (unique.length < 10) return false;
+
     // Unique families for family-type questions
-    const families = new Set(eligible.filter(p => p.family).map(p => p.family!));
+    const families = new Set(unique.filter(p => p.family).map(p => p.family!));
     const canAskFamily = families.size >= 4;
 
     // Pick 10 random plants
-    const shuffled = [...eligible].sort(() => Math.random() - 0.5);
+    const shuffled = unique.sort(() => Math.random() - 0.5);
     const picked = shuffled.slice(0, 10);
 
     // Collect photos for each picked plant: user photos first, then reference
