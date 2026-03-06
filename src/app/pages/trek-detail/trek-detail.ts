@@ -46,6 +46,7 @@ export class TrekDetailPage implements OnInit {
   protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
   protected readonly uploadingPhoto = signal(false);
+  protected readonly reactivating = signal(false);
   protected readonly pendingCount = this.offlineQueue.pendingCount;
 
   private trekId = 0;
@@ -256,10 +257,13 @@ export class TrekDetailPage implements OnInit {
   async reactivateTrek(): Promise<void> {
     const trek = this.trek();
     if (!trek) return;
+    this.reactivating.set(true);
     try {
       await this.trekService.reactivateTrek(trek.id);
     } catch (err) {
       console.error('Reactivate failed:', err);
+    } finally {
+      this.reactivating.set(false);
     }
   }
 

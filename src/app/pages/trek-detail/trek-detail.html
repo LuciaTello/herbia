@@ -112,8 +112,12 @@
     </div>
   } @else {
     <div class="action-buttons">
-      <button class="reactivate-trek-button" (click)="reactivateTrek()">
-        {{ i18n.t().myTreks.reactivateTrek }}
+      <button class="reactivate-trek-button" (click)="reactivateTrek()" [disabled]="reactivating()">
+        @if (reactivating()) {
+          <span class="btn-spinner"></span>
+        } @else {
+          {{ i18n.t().myTreks.reactivateTrek }}
+        }
       </button>
     </div>
   }
