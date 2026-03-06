@@ -38,6 +38,7 @@ export class RoutePage {
   protected readonly plants = signal<Plant[]>([]);
   protected readonly description = signal('');
   protected readonly tooFar = signal(false);
+  protected readonly exhausted = signal(false);
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly error = signal('');
@@ -73,6 +74,7 @@ export class RoutePage {
     this.plants.set([]);
     this.description.set('');
     this.tooFar.set(false);
+    this.exhausted.set(false);
     this.error.set('');
   }
 
@@ -112,8 +114,9 @@ export class RoutePage {
         this.plantCount(),
       );
       this.tooFar.set(result.tooFar);
+      this.exhausted.set(!!result.exhausted);
       this.description.set(result.description);
-      if (!result.tooFar) {
+      if (!result.tooFar && !result.exhausted) {
         const sorted = [...result.plants].sort((a, b) => (a.rarity || 'common').localeCompare(b.rarity || 'common'));
         this.plants.set(sorted);
         this.loading.set(false);

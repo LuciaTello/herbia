@@ -28,11 +28,11 @@ export function plantRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Exclude any plant suggested in the last 60 days (global, no region filtering)
-      const sixtyDaysAgo = new Date();
-      sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+      // Exclude any plant suggested in the last 30 days (global, no region filtering)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const recentPlants = await prisma.suggestedPlant.findMany({
-        where: { trek: { userId: req.userId!, createdAt: { gte: sixtyDaysAgo } } },
+        where: { trek: { userId: req.userId!, createdAt: { gte: thirtyDaysAgo } } },
         select: { scientificName: true },
         distinct: ['scientificName'],
       });
@@ -47,7 +47,9 @@ export function plantRouter(prisma: PrismaClient): Router {
         .filter((p: any) => !excludeLower.has(p.scientificName.toLowerCase()))
         .sort((a: any, b: any) => (a.rarity || 'common').localeCompare(b.rarity || 'common'));
 
-      res.json({ tooFar: result.tooFar, description: result.description, plants: filteredPlants });
+      // If no plants left after exclusion, signal exhausted
+      const exhausted = !result.tooFar && filteredPlants.length === 0;
+      res.json({ tooFar: result.tooFar, exhausted, description: result.description, plants: filteredPlants });
     } catch (error) {
       console.error('Error fetching plant suggestions:', error);
       res.status(500).json({ error: 'Failed to get plant suggestions' });

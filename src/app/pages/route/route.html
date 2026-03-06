@@ -83,6 +83,12 @@
   </section>
 }
 
+@if (exhausted()) {
+  <section class="too-far">
+    <p class="error-message">{{ i18n.t().route.exhausted }}</p>
+  </section>
+}
+
 @if (saving()) {
   <div class="loading-container">
     <div class="loading-spinner"></div>

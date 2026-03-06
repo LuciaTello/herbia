@@ -43,6 +43,7 @@ export const ES: Translations = {
     startTrek: '¡Aceptar excursión!',
     saving: 'Guardando...',
     tooFar: 'Esa ruta cruza múltiples climas — prueba con una excursión más corta para mejores resultados.',
+    exhausted: 'Ya has descubierto todas las plantas disponibles en esta zona este mes. ¡Vuelve a intentarlo el mes que viene para encontrar nuevas especies!',
     error: 'Error al buscar plantas. Verifica que el servidor está arrancado.',
     dailyLimitReached: 'Has alcanzado el límite de 30 búsquedas por hoy. ¡Vuelve mañana!',
     plantCountLabel: '¿Cuántas plantas buscar?',

@@ -40,6 +40,7 @@ export interface Translations {
     startTrek: string;
     saving: string;
     tooFar: string;
+    exhausted: string;
     error: string;
     dailyLimitReached: string;
     plantCountLabel: string;

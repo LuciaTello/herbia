@@ -43,6 +43,7 @@ export const FR: Translations = {
     startTrek: 'Accepter la balade !',
     saving: 'Enregistrement...',
     tooFar: 'Cet itinéraire traverse plusieurs climats — essayez une balade plus courte pour de meilleurs résultats.',
+    exhausted: 'Tu as déjà découvert toutes les plantes disponibles dans cette zone ce mois-ci. Reviens le mois prochain pour de nouvelles espèces !',
     error: 'Erreur lors de la recherche. Vérifiez que le serveur est démarré.',
     dailyLimitReached: 'Vous avez atteint la limite de 30 recherches pour aujourd\'hui. Revenez demain !',
     plantCountLabel: 'Combien de plantes chercher ?',
