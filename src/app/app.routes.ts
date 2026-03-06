@@ -20,6 +20,7 @@ export const routes: Routes = [
   { path: 'my-treks/:id', component: TrekDetailPage, canActivate: [authGuard] },
   { path: 'my-treks', component: MyTreksPage, canActivate: [authGuard] },
   { path: 'my-level', component: LevelPage, canActivate: [authGuard] },
+  { path: 'friends/:friendId/collection', component: CollectionPage, canActivate: [authGuard] },
   { path: 'friends', component: FriendsPage, canActivate: [authGuard] },
   { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
   { path: 'tutorials', component: TutorialsPage, canActivate: [authGuard] },

@@ -29,6 +29,45 @@ export function collectionRouter(prisma: PrismaClient): Router {
     }
   });
 
+  // GET /api/collection/:userId - friend's collection (only reference photos)
+  router.get('/:userId', async (req, res) => {
+    try {
+      const userId = parseInt(req.params['userId']);
+
+      // Verify accepted friendship exists
+      const friendship = await prisma.friendship.findFirst({
+        where: {
+          status: 'accepted',
+          OR: [
+            { senderId: req.userId!, receiverId: userId },
+            { senderId: userId, receiverId: req.userId! },
+          ],
+        },
+      });
+
+      if (!friendship) {
+        res.status(403).json({ error: 'Not friends' });
+        return;
+      }
+
+      const plants = await prisma.suggestedPlant.findMany({
+        where: {
+          found: true,
+          trek: { userId },
+        },
+        include: {
+          photos: { where: { source: { not: 'user' } } },
+          trek: { select: { origin: true, destination: true, country: true, countryCode: true, region: true, regionCode: true } },
+        },
+        orderBy: { foundAt: 'desc' },
+      });
+      res.json(plants);
+    } catch (error) {
+      console.error('Error fetching friend collection:', error);
+      res.status(500).json({ error: 'Failed to fetch friend collection' });
+    }
+  });
+
   // DELETE /api/collection/:id - soft-toggle: mark plant as not found
   // Like a soft delete - we don't remove the plant, just reset its found state
   router.delete('/:id', async (req, res) => {

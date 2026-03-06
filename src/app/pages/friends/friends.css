@@ -340,6 +340,17 @@ h2 {
   padding: 0.25rem;
 }
 
+.view-collection-btn {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: #2d7d46;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .remove-link {
   background: none;
   border: none;

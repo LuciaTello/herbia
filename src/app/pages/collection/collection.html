@@ -1,6 +1,10 @@
-<a routerLink="/" class="back-link">{{ i18n.t().collection.back }}</a>
+@if (readonly()) {
+  <a routerLink="/friends" class="back-link">{{ i18n.t().friends.back }}</a>
+} @else {
+  <a routerLink="/" class="back-link">{{ i18n.t().collection.back }}</a>
+}
 
-<h2>{{ i18n.t().collection.title }}</h2>
+<h2>{{ readonly() && friendName() ? i18n.t().collection.friendTitle(friendName()!) : i18n.t().collection.title }}</h2>
 
 @if (loading()) {
   <div class="loading-container">
@@ -9,8 +13,12 @@
   </div>
 } @else if (collection().length === 0) {
   <div class="empty">
-    <p>{{ i18n.t().collection.emptyLine1 }}</p>
-    <p>{{ i18n.t().collection.emptyLine2 }}</p>
+    @if (readonly()) {
+      <p>{{ i18n.t().collection.friendEmpty }}</p>
+    } @else {
+      <p>{{ i18n.t().collection.emptyLine1 }}</p>
+      <p>{{ i18n.t().collection.emptyLine2 }}</p>
+    }
   </div>
 } @else {
   <!-- Breadcrumb (hidden on map view) -->
@@ -47,7 +55,9 @@
         <div class="collection-list">
           @for (plant of unidentifiedPlants(); track plant.id) {
             <article class="found-card unidentified">
-              <button class="remove-button" (click)="removePlant(plant.id)">&times;</button>
+              @if (!readonly()) {
+                <button class="remove-button" (click)="removePlant(plant.id)">&times;</button>
+              }
               <div class="plant-thumbnail" (click)="openGallery(userPhotos(plant.photos), '')">
                 @if (userPhotos(plant.photos).length) {
                   <img [src]="userPhotos(plant.photos)[0].url" alt="" />
@@ -56,7 +66,9 @@
                 }
               </div>
               <div class="found-info">
-                <a class="route" [routerLink]="['/my-treks', plant.trekId]">{{ plant.trek?.origin }} → {{ plant.trek?.destination }}</a>
+                @if (!readonly()) {
+                  <a class="route" [routerLink]="['/my-treks', plant.trekId]">{{ plant.trek?.origin }} → {{ plant.trek?.destination }}</a>
+                }
                 <p class="date">{{ plant.foundAt }}</p>
               </div>
             </article>
@@ -99,7 +111,9 @@
       <div class="collection-list">
         @for (found of plantsInView(); track found.id) {
           <article class="found-card">
-            <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
+            @if (!readonly()) {
+              <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
+            }
             <div class="plant-thumbnail" (click)="openGallery(refPhotos(found.photos), found.commonName)">
               @if (refPhotos(found.photos).length) {
                 <img [src]="refPhotos(found.photos)[0].url" [alt]="found.commonName" />
@@ -115,10 +129,12 @@
               <p class="chance" [style.color]="rarity(found.rarity).color">
                 {{ rarity(found.rarity).label }}
               </p>
-              <a class="route" [routerLink]="['/my-treks', found.trekId]">{{ found.trek?.origin }} → {{ found.trek?.destination }}</a>
+              @if (!readonly()) {
+                <a class="route" [routerLink]="['/my-treks', found.trekId]">{{ found.trek?.origin }} → {{ found.trek?.destination }}</a>
+              }
               <p class="date">{{ found.foundAt }}</p>
             </div>
-            @if (userPhotos(found.photos).length) {
+            @if (!readonly() && userPhotos(found.photos).length) {
               <div class="user-photos-box">
                 @for (photo of userPhotos(found.photos); track photo.id) {
                   <div class="user-photo-wrapper">

@@ -128,6 +128,7 @@
           <span class="stat-label">{{ i18n.t().friends.plants }}</span>
         </div>
       </div>
+      <a class="view-collection-btn" [routerLink]="['/friends', selectedFriend()!.id, 'collection']">{{ i18n.t().friends.viewCollection }}</a>
       <button class="remove-link" (click)="removeFriend()">{{ i18n.t().friends.remove }}</button>
     </div>
   </div>

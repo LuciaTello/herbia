@@ -114,6 +114,8 @@ export interface Translations {
     noLocationCount: (n: number) => string;
     regionsTitle: string;
     allRegions: string;
+    friendTitle: (name: string) => string;
+    friendEmpty: string;
   };
   rarity: {
     common: string;
@@ -182,6 +184,7 @@ export interface Translations {
     treks: string;
     plants: string;
     noBio: string;
+    viewCollection: string;
   };
   profile: {
     back: string;

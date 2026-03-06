@@ -11,6 +11,8 @@ export class CollectionService {
 
   // The collection = all SuggestedPlants where found=true (your herbarium)
   private readonly collection = signal<SuggestedPlant[]>([]);
+  readonly friendCollection = signal<SuggestedPlant[]>([]);
+  readonly friendName = signal<string | null>(null);
 
   getCollection() {
     return this.collection;
@@ -21,6 +23,15 @@ export class CollectionService {
       this.http.get<SuggestedPlant[]>(this.apiUrl)
     );
     this.collection.set(plants);
+  }
+
+  async loadFriendCollection(userId: number): Promise<void> {
+    const [plants, profile] = await Promise.all([
+      firstValueFrom(this.http.get<SuggestedPlant[]>(`${this.apiUrl}/${userId}`)),
+      firstValueFrom(this.http.get<{ username: string | null }>(`${environment.apiUrl}/friends/${userId}/profile`)),
+    ]);
+    this.friendCollection.set(plants);
+    this.friendName.set(profile.username);
   }
 
   // Soft-toggle: marks the plant as not found (removes from collection, keeps in trek)

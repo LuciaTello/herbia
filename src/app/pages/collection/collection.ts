@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PlantPhoto } from '../../models/plant.model';
 import { CollectionService } from '../../services/collection.service';
 import { TrekService } from '../../services/trek.service';
@@ -25,7 +25,14 @@ export class CollectionPage implements OnInit {
   private readonly trekService = inject(TrekService);
   protected readonly i18n = inject(I18nService);
   private readonly confirmService = inject(ConfirmService);
-  protected readonly collection = this.collectionService.getCollection();
+  private readonly route = inject(ActivatedRoute);
+
+  protected readonly friendId = signal<number | null>(null);
+  protected readonly readonly = computed(() => this.friendId() !== null);
+  protected readonly friendName = this.collectionService.friendName;
+  protected readonly collection = computed(() =>
+    this.friendId() ? this.collectionService.friendCollection() : this.collectionService.getCollection()()
+  );
   protected readonly loading = signal(true);
   protected readonly galleryImages = signal<string[]>([]);
   protected readonly galleryPlantName = signal('');
@@ -169,8 +176,15 @@ export class CollectionPage implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
+    const friendIdParam = this.route.snapshot.paramMap.get('friendId');
+    const fid = friendIdParam ? parseInt(friendIdParam) : null;
+    this.friendId.set(fid);
     try {
-      await this.collectionService.loadCollection();
+      if (fid) {
+        await this.collectionService.loadFriendCollection(fid);
+      } else {
+        await this.collectionService.loadCollection();
+      }
     } finally {
       this.loading.set(false);
     }

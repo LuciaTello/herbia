@@ -128,6 +128,8 @@ export const ES: Translations = {
     noLocationCount: (n) => `${n} planta${n !== 1 ? 's' : ''} sin ubicar`,
     regionsTitle: 'Regiones',
     allRegions: 'Todas las regiones',
+    friendTitle: (name) => `Colección de ${name}`,
+    friendEmpty: 'Tu amiga aún no ha encontrado ninguna planta.',
   },
   rarity: {
     common: 'Común',
@@ -233,6 +235,7 @@ export const ES: Translations = {
     treks: 'excursiones',
     plants: 'plantas',
     noBio: 'Sin descripción',
+    viewCollection: 'Ver colección',
   },
   profile: {
     back: 'Volver al inicio',
