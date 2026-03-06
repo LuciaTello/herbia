@@ -15,13 +15,15 @@
     @if (currentQuestion(); as q) {
       <div class="question-card">
         <img [src]="q.photos[0]" [alt]="q.plantName" class="main-photo"
-             (click)="openGallery(q.photos, 0)" />
+             (click)="openGallery(q.photos, 0)"
+             (error)="onQuizPhotoError($event)" />
 
         @if (q.photos.length > 1) {
           <div class="thumb-row">
             @for (photo of q.photos.slice(1); track photo; let i = $index) {
               <img [src]="photo" [alt]="q.plantName" class="thumb-photo"
-                   (click)="openGallery(q.photos, i + 1)" />
+                   (click)="openGallery(q.photos, i + 1)"
+                   (error)="$event.target.style.display='none'" />
             }
           </div>
         }

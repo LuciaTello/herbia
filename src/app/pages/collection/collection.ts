@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { PlantPhoto } from '../../models/plant.model';
+import { PlantPhoto, SuggestedPlant } from '../../models/plant.model';
 import { CollectionService } from '../../services/collection.service';
 import { TrekService } from '../../services/trek.service';
 import { I18nService } from '../../i18n';
@@ -238,6 +238,12 @@ export class CollectionPage implements OnInit {
       this.selectedRegion.set(null);
     }
     this.view.set(action);
+  }
+
+  protected async onRefPhotoError(plant: SuggestedPlant, index: number): Promise<void> {
+    const photo = this.refPhotos(plant.photos)[index];
+    if (!photo?.id) return;
+    await this.collectionService.refreshPhoto(photo.id);
   }
 
   protected openGallery(photos: PlantPhoto[] | undefined, name: string): void {

@@ -13,7 +13,7 @@
           <div class="gallery-spinner"></div>
         }
         <img [src]="images[currentIndex()]" [alt]="plantName" class="gallery-image"
-             [class.loading]="imageLoading()" (load)="onImageLoad()" />
+             [class.loading]="imageLoading()" (load)="onImageLoad()" (error)="onImageError()" />
       </div>
 
       @if (images.length > 1) {

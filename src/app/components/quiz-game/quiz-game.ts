@@ -46,6 +46,10 @@ export class QuizGameComponent {
     return t.resultsTryAgain;
   });
 
+  protected onQuizPhotoError(event: Event): void {
+    (event.target as HTMLElement).style.display = 'none';
+  }
+
   protected openGallery(photos: string[], startIndex = 0): void {
     this.galleryImages.set(photos);
     this.galleryStartIndex.set(startIndex);

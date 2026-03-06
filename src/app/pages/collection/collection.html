@@ -60,7 +60,8 @@
               }
               <div class="plant-thumbnail" (click)="openGallery(userPhotos(plant.photos), '')">
                 @if (userPhotos(plant.photos).length) {
-                  <img [src]="userPhotos(plant.photos)[0].url" alt="" />
+                  <img [src]="userPhotos(plant.photos)[0].url" alt=""
+                       (error)="$event.target.style.display='none'" />
                 } @else {
                   <div class="no-photo">?</div>
                 }
@@ -115,10 +116,12 @@
               <button class="remove-button" (click)="removePlant(found.id)">&times;</button>
             }
             <div class="plant-thumbnail" (click)="openGallery(refPhotos(found.photos), found.commonName)">
-              @if (refPhotos(found.photos).length) {
-                <img [src]="refPhotos(found.photos)[0].url" [alt]="found.commonName" />
+              @if (refPhotos(found.photos).length && refPhotos(found.photos)[0].url) {
+                <img [src]="refPhotos(found.photos)[0].url" [alt]="found.commonName"
+                     (error)="onRefPhotoError(found, 0)" />
               } @else if (userPhotos(found.photos).length) {
-                <img [src]="userPhotos(found.photos)[0].url" [alt]="found.commonName" />
+                <img [src]="userPhotos(found.photos)[0].url" [alt]="found.commonName"
+                     (error)="$event.target.style.display='none'" />
               } @else {
                 <div class="no-photo">?</div>
               }
@@ -139,7 +142,8 @@
                 @for (photo of userPhotos(found.photos); track photo.id) {
                   <div class="user-photo-wrapper">
                     <img class="user-photo-thumb" [src]="photo.url" [alt]="found.commonName"
-                         (click)="openGallery(userPhotos(found.photos), found.commonName)" />
+                         (click)="openGallery(userPhotos(found.photos), found.commonName)"
+                         (error)="$event.target.style.display='none'" />
                     @if (!readonly()) {
                       <button class="photo-delete-btn" (click)="deletePhoto(photo.id!, found.id)">&times;</button>
                     }

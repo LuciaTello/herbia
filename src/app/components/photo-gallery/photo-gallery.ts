@@ -31,6 +31,17 @@ export class PhotoGalleryComponent {
     this.imageLoading.set(false);
   }
 
+  private errorCount = 0;
+
+  protected onImageError(): void {
+    this.errorCount++;
+    if (this.errorCount >= this.images.length) {
+      this.imageLoading.set(false);
+      return;
+    }
+    this.next();
+  }
+
   protected prev(): void {
     this.imageLoading.set(true);
     this.currentIndex.update(i => (i > 0 ? i - 1 : this.images.length - 1));

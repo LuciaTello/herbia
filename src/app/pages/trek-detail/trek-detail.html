@@ -34,8 +34,9 @@
                [class.rarity-rare]="plant.rarity === 'rare'"
                [class.rarity-veryRare]="plant.rarity === 'veryRare'">
         <div class="plant-thumbnail" (click)="openGallery(refPhotos(plant.photos), plant.commonName)">
-          @if (refPhotos(plant.photos).length) {
-            <img [src]="refPhotos(plant.photos)[0].url" [alt]="plant.commonName" />
+          @if (refPhotos(plant.photos).length && refPhotos(plant.photos)[0].url) {
+            <img [src]="refPhotos(plant.photos)[0].url" [alt]="plant.commonName"
+                 (error)="onRefPhotoError(plant, 0)" />
           } @else {
             <div class="no-photo">?</div>
           }
@@ -75,7 +76,8 @@
                 @for (photo of userPhotos(plant.photos); track photo.id) {
                   <div class="user-photo-row">
                     <img class="user-photo-thumb" [src]="photo.url" [alt]="plant.commonName"
-                         (click)="openGallery(userPhotos(plant.photos), plant.commonName)" />
+                         (click)="openGallery(userPhotos(plant.photos), plant.commonName)"
+                         (error)="$event.target.style.display='none'" />
                     <div class="photo-row-info">
                       <span class="photo-row-name">{{ photo.identifiedCommonName || plant.commonName }}</span>
                       @if (photo.identifiedAs) {
@@ -165,7 +167,8 @@
   <div class="result-overlay">
     <div class="result-card" [class.match]="r.type === 'match'" [class.no-match]="r.type === 'noMatch'">
       @if (r.photoUrl) {
-        <img class="result-photo" [src]="r.photoUrl" alt="" />
+        <img class="result-photo" [src]="r.photoUrl" alt=""
+             (error)="$event.target.style.display='none'" />
       }
       @if (r.type === 'match') {
         @if (!r.photoUrl) {
