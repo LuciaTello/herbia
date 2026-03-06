@@ -13,7 +13,7 @@ export interface QuizQuestion {
 }
 
 const MIN_PHOTOS = 5;
-const MAX_PHOTOS = 10;
+const MAX_PHOTOS = 5;
 
 @Injectable({ providedIn: 'root' })
 export class ChallengeService {
