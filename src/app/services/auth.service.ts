@@ -7,13 +7,13 @@ import { inject, Injectable, Injector, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { environment } from '../../environments/environment';
 import { AuthResponse } from '../models/auth.model';
 import { I18nService } from '../i18n';
 import { TrekService } from './trek.service';
 import { CollectionService } from './collection.service';
 
-// localStorage key where we store the JWT (like a cookie name)
 const TOKEN_KEY = 'herbia-token';
 
 @Injectable({ providedIn: 'root' })
@@ -24,9 +24,8 @@ export class AuthService {
   private readonly injector = inject(Injector);
   private readonly apiUrl = `${environment.apiUrl}/auth`;
 
-  // Signal holds the current JWT token (reactive, like CollectionService's signal)
-  // Initialize from localStorage in case the user is already logged in (page refresh)
-  private readonly token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
+  // Token signal — initialized to null, loaded from native storage by init()
+  private readonly token = signal<string | null>(null);
 
   // Computed signal: true if logged in
   // Like checking SecurityContextHolder.getContext().getAuthentication() != null
@@ -46,7 +45,12 @@ export class AuthService {
   readonly bio = signal<string | null>(null);
   readonly email = signal<string | null>(null);
 
-  // Used by the HTTP interceptor to add "Authorization: Bearer <token>" to requests
+  // Called by APP_INITIALIZER before routing — loads token from native storage
+  async init(): Promise<void> {
+    const { value } = await Preferences.get({ key: TOKEN_KEY });
+    if (value) this.token.set(value);
+  }
+
   getToken(): string | null {
     return this.token();
   }
@@ -142,7 +146,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
+    Preferences.remove({ key: TOKEN_KEY });
     this.token.set(null);
     this.username.set(null);
     this.points.set(0);
@@ -156,7 +160,7 @@ export class AuthService {
   }
 
   private setToken(token: string): void {
-    localStorage.setItem(TOKEN_KEY, token);
+    Preferences.set({ key: TOKEN_KEY, value: token });
     this.token.set(token);
   }
 }
