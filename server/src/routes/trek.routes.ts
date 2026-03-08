@@ -14,12 +14,6 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-function rarityMultiplier(rarity: string): number {
-  if (rarity === 'veryRare') return 3;
-  if (rarity === 'rare') return 2;
-  return 1;
-}
-
 const ALLOWED_MIMES = ['image/jpeg', 'image/png'];
 
 const DAILY_TREK_LIMIT = 100;
@@ -299,7 +293,7 @@ export function trekRouter(prisma: PrismaClient): Router {
             plantId: plant.id,
             commonName: plant.commonName,
             scientificName: plant.scientificName,
-            similarity: sim.similarity * rarityMultiplier(plant.rarity),
+            similarity: sim.similarity,
             alreadyCaptured: speciesPhotoCount >= 5,
           });
         }
@@ -351,12 +345,10 @@ export function trekRouter(prisma: PrismaClient): Router {
       }
 
       // Store pending similarity on plant (awarded when photo is actually uploaded)
-      // Apply rarity multiplier: rare ×2, veryRare ×3
-      const multiplied = result.similarity * rarityMultiplier(plant.rarity);
-      if (multiplied > 0) {
+      if (result.similarity > 0) {
         await prisma.suggestedPlant.update({
           where: { id: plantId },
-          data: { pendingSimilarity: multiplied },
+          data: { pendingSimilarity: result.similarity },
         });
       }
 

@@ -162,7 +162,7 @@ export const FR: Translations = {
     ],
     texts: [
       'Herbia transforme tes trajets en balades botaniques. Dis-nous où tu vas et on te dira quelles plantes poussent sur ton chemin. Il ne te reste qu\'à partir à leur recherche. Spoiler : elles sont partout.',
-      'Choisis un trajet entre deux villes ou une zone à explorer. On te préparera une balade avec les espèces que tu peux trouver dans la zone choisie — avec photos, indices et niveau de rareté.',
+      'Choisis un trajet entre deux villes ou une zone à explorer. On te préparera une balade avec les espèces que tu peux trouver dans la zone choisie — avec photos et indices.',
       'Essaie de trouver les plantes proposées dans la balade et les plantes de la même famille ou genre. Prends-les en photo et automatiquement Herbia te donnera des points.',
       'Tes points te font monter de niveau : de 🌱 Graine curieuse à 👑 Reine du jardin. Ajoute des amies pour voir leur niveau et explorer ensemble.',
       'Herbia est un outil ludique et éducatif. Les identifications peuvent contenir des erreurs. Ne consomme et n\'utilise jamais une plante en te basant uniquement sur les informations de cette app. Herbia décline toute responsabilité en cas d\'usage inapproprié des plantes.',
@@ -183,7 +183,6 @@ export const FR: Translations = {
       'Espèce exacte — 100 pts',
       'Même genre — 75 pts',
       'Même famille — 40 pts',
-      'Bonus de rareté — ×2 et ×3',
       'Tes trouvailles',
     ],
     texts: [
@@ -192,7 +191,6 @@ export const FR: Translations = {
       'L\'espèce est le niveau le plus fin : les différences entre deux espèces du même genre sont subtiles. Si la plante est exactement l\'espèce suggérée, tu gagnes 100 points.',
       'Le genre regroupe des espèces comme des frères ou cousins proches : ils partagent un ancêtre récent et gardent beaucoup de traits visibles en commun. Par exemple, Lavandula angustifolia et Lavandula stoechas font partie du même genre Lavandula.',
       'La famille, ce sont des cousins très éloignés : ils partagent un ancêtre vieux de millions d\'années. C\'est pour ça qu\'une fraise et un pommier (tous deux Rosacées) semblent si différents. Si tu ne trouves pas la plante exacte, clique sur « Famille » sous le nom scientifique pour voir d\'autres plantes que tu pourrais croiser.',
-      'Certaines plantes sont plus dures à trouver. Les plantes rares multiplient tes points par 2 et les très rares par 3. Une espèce exacte très rare vaut 300 points au lieu de 100.',
       'Tu peux garder jusqu\'à 5 photos par espèce. À partir de la sixième, tu gagneras toujours des points mais la photo ne sera pas enregistrée — tu peux en remplacer une existante. Une fois ta promenade terminée, tu peux archiver la balade.',
     ],
     imageLabels: [
