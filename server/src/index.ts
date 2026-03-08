@@ -17,6 +17,7 @@ import { configRouter } from './routes/config.routes';
 import { authMiddleware } from './middleware/auth.middleware';
 import { initPlantService } from './services/plant.service';
 import { initCloudinary } from './services/cloudinary.service';
+import { backfillQuizUnlock } from './services/quiz-unlock.service';
 
 // Load .env file (like Spring's application.properties)
 // MUST be called before anything that uses process.env!
@@ -86,4 +87,5 @@ if (process.env['RENDER_EXTERNAL_URL']) {
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
+  backfillQuizUnlock(prisma).catch(err => console.error('Quiz backfill failed:', err));
 });
