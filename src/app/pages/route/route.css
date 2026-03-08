@@ -79,27 +79,11 @@ h2 {
   border-color: #2d7d46;
 }
 
-.plant-count-toggle {
-  display: flex;
-  border: 2px solid #2d7d46;
-  border-radius: 8px;
-  overflow: hidden;
+.route-form.disabled,
+.mode-toggle.disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
-.plant-count-toggle button {
-  flex: 1;
-  padding: 0.5rem;
-  border: none;
-  background: white;
-  color: #2d7d46;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-.plant-count-toggle button.active {
-  background: #2d7d46;
-  color: white;
-}
-
 
 .primary-button {
   background: #2d7d46;

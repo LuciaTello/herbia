@@ -24,7 +24,6 @@ export class RoutePage {
   protected readonly i18n = inject(I18nService);
 
   protected readonly mode = signal<'route' | 'zone'>('route');
-  protected readonly plantCount = signal<5 | 10>(5);
   protected readonly origin = signal('');
   protected readonly destination = signal('');
   private originCountry = '';
@@ -111,7 +110,7 @@ export class RoutePage {
         dLat,
         dLng,
         this.originRegion,
-        this.plantCount(),
+        10,
       );
       this.tooFar.set(result.tooFar);
       this.exhausted.set(!!result.exhausted);

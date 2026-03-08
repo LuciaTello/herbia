@@ -2,16 +2,16 @@
 
 <h2>{{ i18n.t().route.title }}</h2>
 
-<div class="mode-toggle">
-  <button [class.active]="mode() === 'route'" (click)="setMode('route')">
+<div class="mode-toggle" [class.disabled]="loading()">
+  <button [class.active]="mode() === 'route'" (click)="setMode('route')" [disabled]="loading()">
     {{ i18n.t().route.routeTab }}
   </button>
-  <button [class.active]="mode() === 'zone'" (click)="setMode('zone')">
+  <button [class.active]="mode() === 'zone'" (click)="setMode('zone')" [disabled]="loading()">
     {{ i18n.t().route.zoneTab }}
   </button>
 </div>
 
-<form class="route-form" (ngSubmit)="onSearch()">
+<form class="route-form" [class.disabled]="loading()" (ngSubmit)="onSearch()">
   <div class="field">
     <label for="origin">{{ mode() === 'zone' ? i18n.t().route.locationLabel : i18n.t().route.originLabel }}</label>
     <input
@@ -22,6 +22,7 @@
       (ngModelChange)="origin.set($event)"
       name="origin"
       required
+      [disabled]="loading()"
       appPlaceAutocomplete
       (placeSelected)="onOriginSelected($event)"
     />
@@ -38,23 +39,12 @@
         (ngModelChange)="destination.set($event)"
         name="destination"
         required
+        [disabled]="loading()"
         appPlaceAutocomplete
         (placeSelected)="onDestinationSelected($event)"
       />
     </div>
   }
-
-  <div class="field">
-    <label>{{ i18n.t().route.plantCountLabel }}</label>
-    <div class="plant-count-toggle">
-      <button type="button" [class.active]="plantCount() === 5" (click)="plantCount.set(5)">
-        {{ i18n.t().route.plantCount5 }}
-      </button>
-      <button type="button" [class.active]="plantCount() === 10" (click)="plantCount.set(10)">
-        {{ i18n.t().route.plantCount10 }}
-      </button>
-    </div>
-  </div>
 
   <button type="submit" class="primary-button" [disabled]="loading()">
     @if (loading()) {
