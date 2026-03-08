@@ -352,7 +352,7 @@ export function trekRouter(prisma: PrismaClient): Router {
         });
       }
 
-      res.json({ ...result, similarity: multiplied });
+      res.json(result);
     } catch (error) {
       console.error('Error identifying plant:', error);
       res.status(500).json({ error: 'Identification failed' });
