@@ -3,12 +3,15 @@ import { openDB } from 'idb';
 import { Trek } from '../models/plant.model';
 
 const DB_NAME = 'herbia-offline';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_TREKS = 'treks';
 
 function getDb() {
   return openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion) {
+      if (oldVersion < 2 && db.objectStoreNames.contains('photos')) {
+        db.deleteObjectStore('photos');
+      }
       if (!db.objectStoreNames.contains('photos')) {
         db.createObjectStore('photos', { keyPath: 'id', autoIncrement: true })
           .createIndex('status', 'status');

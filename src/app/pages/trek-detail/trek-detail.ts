@@ -13,7 +13,6 @@ import { ConfirmService } from '../../components/confirm-popup/confirm.service';
 import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
 import { FamilyPopupComponent } from '../../components/family-popup/family-popup';
 import { RouteMapComponent } from '../../components/route-map/route-map';
-import { ConnectivityService } from '../../services/connectivity.service';
 import { OfflineQueueService } from '../../services/offline-queue.service';
 
 @Component({
@@ -30,7 +29,6 @@ export class TrekDetailPage implements OnInit {
   protected readonly cameraService = inject(CameraService);
   protected readonly i18n = inject(I18nService);
   private readonly confirmService = inject(ConfirmService);
-  protected readonly connectivity = inject(ConnectivityService);
   private readonly offlineQueue = inject(OfflineQueueService);
   protected readonly treks = this.trekService.getTreks();
   protected readonly loading = signal(true);
@@ -128,23 +126,22 @@ export class TrekDetailPage implements OnInit {
 
     try {
       const file = await resizeImage(raw);
-
-      if (!this.connectivity.online()) {
-        const photoUrl = URL.createObjectURL(file);
-        await this.offlineQueue.enqueue(this.trekId, file);
-        this.resultOverlay.set({ name: this.i18n.t().offline.photoQueued, points: 0, type: 'noMatch', photoUrl });
-        return;
-      }
-
       const photoUrl = URL.createObjectURL(file);
+
+      // Save to disk first — photo is safe regardless of network
+      const queueId = await this.offlineQueue.enqueue(this.trekId, file);
+
       this.pendingFile.set(file);
       this.identifyResult.set(null);
       this.identifying.set(true);
 
       try {
         const result = await this.trekService.identifyAll(this.trekId, file);
-        const pn = result.plantnetResult;
 
+        // Network succeeded — remove from queue
+        await this.offlineQueue.dequeue(queueId);
+
+        const pn = result.plantnetResult;
         const available = result.matches.filter(m => !m.alreadyCaptured);
         if (available.length === 0) {
           await this.addToCollection(file, result, photoUrl, result.matches.length > 0);
@@ -155,7 +152,8 @@ export class TrekDetailPage implements OnInit {
           URL.revokeObjectURL(photoUrl);
         }
       } catch {
-        this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch', photoUrl });
+        // Network failed — photo stays in queue, will retry later
+        this.resultOverlay.set({ name: this.i18n.t().offline.photoQueued, points: 0, type: 'noMatch', photoUrl });
       } finally {
         this.identifying.set(false);
       }
