@@ -44,6 +44,7 @@ export class AuthService {
   readonly photoUrl = signal<string | null>(null);
   readonly bio = signal<string | null>(null);
   readonly email = signal<string | null>(null);
+  readonly quizPopupShown = signal(false);
 
   // Called by APP_INITIALIZER before routing — loads token from native storage
   async init(): Promise<void> {
@@ -108,14 +109,22 @@ export class AuthService {
 
   async refreshProfile(): Promise<void> {
     const user = await firstValueFrom(
-      this.http.get<{ username: string | null; points: number; quizUnlocked: boolean; email: string; photoUrl: string | null; bio: string | null }>(`${environment.apiUrl}/users/me`)
+      this.http.get<{ username: string | null; points: number; quizUnlocked: boolean; quizPopupShown: boolean; email: string; photoUrl: string | null; bio: string | null }>(`${environment.apiUrl}/users/me`)
     );
     this.username.set(user.username);
     this.points.set(user.points);
     this.quizUnlocked.set(user.quizUnlocked);
+    this.quizPopupShown.set(user.quizPopupShown);
     this.photoUrl.set(user.photoUrl);
     this.bio.set(user.bio);
     this.email.set(user.email);
+  }
+
+  async dismissQuizPopup(): Promise<void> {
+    this.quizPopupShown.set(true);
+    await firstValueFrom(
+      this.http.patch(`${environment.apiUrl}/users/me`, { quizPopupShown: true })
+    );
   }
 
   async updateProfile(data: { email?: string; username?: string; bio?: string }): Promise<{ error?: string }> {

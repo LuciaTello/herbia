@@ -22,7 +22,8 @@ model User {
   quizUnlocked Boolean  @default(false) @map("quiz_unlocked")
   photoUrl     String?  @map("photo_url")
   bio          String?
-  trekTipCount Int @default(0) @map("mission_tip_count")
+  trekTipCount    Int @default(0) @map("mission_tip_count")
+  quizPopupShown  Boolean @default(false) @map("quiz_popup_shown")
   createdAt    DateTime @default(now())
 
   // One-to-many: a user has many treks
