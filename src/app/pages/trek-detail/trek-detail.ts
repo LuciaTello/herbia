@@ -207,6 +207,7 @@ export class TrekDetailPage implements OnInit {
         this.resultOverlay.set({ name: missionName, points: similarity, type: 'match', photoUrl, identifiedAs: pn?.identifiedAs, commonName: displayName, genus: pn?.genus, family: pn?.family });
         await this.checkAutoComplete();
       }
+      if (similarity > 0) this.auth.refreshProfile().catch(() => {});
     } catch (err: any) {
       this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch', photoUrl });
     } finally {
