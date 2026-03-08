@@ -8,6 +8,12 @@ export async function backfillQuizUnlock(prisma: PrismaClient): Promise<void> {
     data: { quizUnlocked: true },
   });
   if (count > 0) console.log(`Quiz unlock backfill: unlocked ${count} user(s)`);
+
+  const popup = await prisma.user.updateMany({
+    where: { quizUnlocked: true, quizPopupShown: false },
+    data: { quizPopupShown: true },
+  });
+  if (popup.count > 0) console.log(`Quiz popup backfill: marked ${popup.count} user(s)`);
 }
 
 export async function checkQuizUnlock(prisma: PrismaClient, userId: number): Promise<void> {
