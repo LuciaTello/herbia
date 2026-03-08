@@ -20,6 +20,12 @@ export class TrekService {
     return this.treks;
   }
 
+  clear(): void {
+    this.treks.set([]);
+    this.initialLoaded = false;
+    this.trekCache.clear().catch(() => {});
+  }
+
   async loadTreks(): Promise<void> {
     if (!this.initialLoaded) {
       this.initialLoaded = true;

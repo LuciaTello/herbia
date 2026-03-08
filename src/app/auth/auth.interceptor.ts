@@ -10,6 +10,7 @@
 
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { tap } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -18,13 +19,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // If we have a token, clone the request and add the Authorization header
   // "Clone" because HTTP requests are immutable in Angular (like Java's immutable objects)
-  if (token) {
-    const authReq = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` },
-    });
-    return next(authReq);
-  }
+  const request = token
+    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+    : req;
 
-  // No token? Pass the request through unchanged (for login/register calls)
-  return next(req);
+  return next(request).pipe(
+    tap({
+      error: (err) => {
+        // Auto-logout on expired/invalid token (skip login/register endpoints)
+        if (err.status === 401 && token && !req.url.includes('/auth/')) {
+          authService.logout();
+        }
+      },
+    })
+  );
 };

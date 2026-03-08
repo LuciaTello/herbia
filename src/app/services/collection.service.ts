@@ -18,6 +18,12 @@ export class CollectionService {
     return this.collection;
   }
 
+  clear(): void {
+    this.collection.set([]);
+    this.friendCollection.set([]);
+    this.friendName.set(null);
+  }
+
   async loadCollection(): Promise<void> {
     const plants = await firstValueFrom(
       this.http.get<SuggestedPlant[]>(this.apiUrl)

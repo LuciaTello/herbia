@@ -32,4 +32,9 @@ export class TrekCacheService {
     const entry = await db.get(STORE_TREKS, 'data');
     return entry?.treks ?? null;
   }
+
+  async clear(): Promise<void> {
+    const db = await getDb();
+    await db.clear(STORE_TREKS);
+  }
 }

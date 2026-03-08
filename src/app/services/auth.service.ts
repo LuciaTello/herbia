@@ -3,13 +3,15 @@
 //
 // Same patterns as CollectionService: inject(), signals, firstValueFrom()
 
-import { inject, Injectable, signal, computed } from '@angular/core';
+import { inject, Injectable, Injector, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { AuthResponse } from '../models/auth.model';
 import { I18nService } from '../i18n';
+import { TrekService } from './trek.service';
+import { CollectionService } from './collection.service';
 
 // localStorage key where we store the JWT (like a cookie name)
 const TOKEN_KEY = 'herbia-token';
@@ -19,6 +21,7 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly i18n = inject(I18nService);
+  private readonly injector = inject(Injector);
   private readonly apiUrl = `${environment.apiUrl}/auth`;
 
   // Signal holds the current JWT token (reactive, like CollectionService's signal)
@@ -141,6 +144,14 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     this.token.set(null);
+    this.username.set(null);
+    this.points.set(0);
+    this.quizUnlocked.set(false);
+    this.photoUrl.set(null);
+    this.bio.set(null);
+    this.email.set(null);
+    this.injector.get(TrekService).clear();
+    this.injector.get(CollectionService).clear();
     this.router.navigate(['/login']);
   }
 
