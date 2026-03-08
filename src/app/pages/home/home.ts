@@ -1,5 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { I18nService } from '../../i18n';
 import { AuthService } from '../../services/auth.service';
 
@@ -19,13 +20,14 @@ export class HomePage implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.auth.refreshProfile();
-    if (this.auth.quizUnlocked() && !localStorage.getItem(QUIZ_POPUP_KEY)) {
-      this.showQuizPopup.set(true);
+    if (this.auth.quizUnlocked()) {
+      const { value } = await Preferences.get({ key: QUIZ_POPUP_KEY });
+      if (!value) this.showQuizPopup.set(true);
     }
   }
 
   protected dismissQuizPopup(): void {
-    localStorage.setItem(QUIZ_POPUP_KEY, '1');
+    Preferences.set({ key: QUIZ_POPUP_KEY, value: '1' });
     this.showQuizPopup.set(false);
   }
 
