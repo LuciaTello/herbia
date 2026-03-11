@@ -5,7 +5,7 @@ import { uploadAvatar, deleteAvatar } from '../services/cloudinary.service';
 
 const upload = multer({
   storage: memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 15 * 1024 * 1024 },
 });
 
 const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
