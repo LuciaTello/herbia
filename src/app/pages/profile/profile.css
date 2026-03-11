@@ -155,16 +155,21 @@ h2 {
 .btn-edit {
   background: none;
   border: none;
-  font-size: 1.1rem;
-  cursor: pointer;
   padding: 0.25rem;
-  opacity: 0.5;
+  cursor: pointer;
   flex-shrink: 0;
-  line-height: 1;
+  color: #b2bec3;
+  display: flex;
+  align-items: center;
 }
 
-.btn-edit:hover { opacity: 1; }
-.btn-edit:disabled { opacity: 0.2; cursor: not-allowed; }
+.btn-edit svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.btn-edit:hover { color: #636e72; }
+.btn-edit:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .error {
   color: #e74c3c;
