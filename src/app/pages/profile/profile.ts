@@ -15,7 +15,6 @@ export class ProfilePage {
   protected readonly auth = inject(AuthService);
 
   protected username = '';
-  protected email = '';
   protected bio = '';
   protected saving = signal(false);
   protected saved = signal(false);
@@ -24,7 +23,6 @@ export class ProfilePage {
 
   constructor() {
     this.username = this.auth.username() ?? '';
-    this.email = this.auth.email() ?? '';
     this.bio = this.auth.bio() ?? '';
   }
 
@@ -35,16 +33,13 @@ export class ProfilePage {
 
     const result = await this.auth.updateProfile({
       username: this.username,
-      email: this.email,
       bio: this.bio,
     });
 
     this.saving.set(false);
 
     if (result.error) {
-      if (result.error === 'email_taken') {
-        this.error.set(this.i18n.t().profile.emailTaken);
-      } else if (result.error === 'username_taken') {
+      if (result.error === 'username_taken') {
         this.error.set(this.i18n.t().profile.usernameTaken);
       } else {
         this.error.set(result.error);
