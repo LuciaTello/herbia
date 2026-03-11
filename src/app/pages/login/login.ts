@@ -48,15 +48,10 @@ export class LoginPage {
   protected readonly loading = signal(false);
   protected readonly showPassword = signal(false);
 
-  // Holds the pending Clerk sign-up between step 2b and step 3
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private pendingSignUp: any = null;
-
   goBack(): void {
     this.step.set('email');
     this.password.set('');
     this.error.set('');
-    this.pendingSignUp = null;
   }
 
   async onCheckEmail(): Promise<void> {
@@ -110,38 +105,42 @@ export class LoginPage {
     this.loading.set(true);
     this.error.set('');
     try {
-      const signUp = await this.clerkService.clerk.client!.signUp.create({
+      await this.clerkService.clerk.client!.signUp.create({
         emailAddress: this.email(),
         password: this.password(),
       });
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-      this.pendingSignUp = signUp;
+      // Use the live clerk.client.signUp reference for OTP — always up to date
+      await this.clerkService.clerk.client!.signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       this.step.set('otp');
     } catch (e: any) {
-      this.error.set(e?.errors?.[0]?.message || this.i18n.t().login.genericError);
+      console.error('Register error:', e);
+      this.error.set(e?.errors?.[0]?.longMessage || e?.errors?.[0]?.message || this.i18n.t().login.genericError);
     } finally {
       this.loading.set(false);
     }
   }
 
   async onVerifyOtp(): Promise<void> {
-    if (!this.pendingSignUp) return;
     this.loading.set(true);
     this.error.set('');
     try {
-      const result = await this.pendingSignUp.attemptEmailAddressVerification({
+      // Always use the live clerk.client.signUp (not a stored stale reference)
+      const result = await this.clerkService.clerk.client!.signUp.attemptEmailAddressVerification({
         code: this.otpCode(),
       });
+      console.log('OTP result status:', result.status);
       if (result.status === 'complete') {
         await this.clerkService.clerk.setActive({ session: result.createdSessionId });
         this.clerkService.user.set(this.clerkService.clerk.user);
         await this.authService.syncAfterRegister(this.selectedLang(), this.username().trim() || undefined);
         this.router.navigate(['/']);
       } else {
-        this.error.set(this.i18n.t().login.genericError);
+        console.error('OTP incomplete, status:', result.status, result);
+        this.error.set(`Status: ${result.status}`);
       }
     } catch (e: any) {
-      this.error.set(e?.errors?.[0]?.message || this.i18n.t().login.genericError);
+      console.error('OTP error:', e);
+      this.error.set(e?.errors?.[0]?.longMessage || e?.errors?.[0]?.message || this.i18n.t().login.genericError);
     } finally {
       this.loading.set(false);
     }
