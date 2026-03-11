@@ -91,4 +91,8 @@
 
 </div>
 
+@if (error() && editing() === null) {
+  <p class="error global-error">{{ error() }}</p>
+}
+
 <button class="logout-btn" (click)="auth.logout()">{{ i18n.t().nav.logout }}</button>

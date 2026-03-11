@@ -177,6 +177,11 @@ h2 {
   margin: 0;
 }
 
+.global-error {
+  text-align: center;
+  margin-top: 1rem;
+}
+
 /* Logout */
 .logout-btn {
   display: block;

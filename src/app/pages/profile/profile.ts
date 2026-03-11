@@ -65,9 +65,12 @@ export class ProfilePage {
     const file = input.files?.[0];
     if (!file) return;
     this.uploading.set(true);
+    this.error.set(null);
     try {
       await this.auth.uploadAvatar(file);
-    } catch { /* silently fail */ }
+    } catch {
+      this.error.set('Photo upload failed');
+    }
     this.uploading.set(false);
     input.value = '';
   }

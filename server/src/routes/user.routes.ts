@@ -92,13 +92,13 @@ export function userRouter(prisma: PrismaClient): Router {
         return;
       }
 
-      // Delete old avatar if exists
+      // Delete old avatar if exists (best-effort — don't fail if it's already gone)
       const current = await prisma.user.findUnique({
         where: { id: req.userId! },
         select: { photoUrl: true },
       });
       if (current?.photoUrl) {
-        await deleteAvatar(current.photoUrl);
+        try { await deleteAvatar(current.photoUrl); } catch { /* already gone */ }
       }
 
       const url = await uploadAvatar(file.buffer, req.userId!);
