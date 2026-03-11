@@ -109,9 +109,9 @@ export function userRouter(prisma: PrismaClient): Router {
       });
 
       res.json({ photoUrl: url });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading avatar:', error);
-      res.status(500).json({ error: 'Failed to upload avatar' });
+      res.status(500).json({ error: error?.message || 'Failed to upload avatar' });
     }
   });
 

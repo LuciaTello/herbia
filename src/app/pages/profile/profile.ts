@@ -68,8 +68,8 @@ export class ProfilePage {
     this.error.set(null);
     try {
       await this.auth.uploadAvatar(file);
-    } catch {
-      this.error.set('Photo upload failed');
+    } catch (e: any) {
+      this.error.set(e?.message || 'Photo upload failed');
     }
     this.uploading.set(false);
     input.value = '';

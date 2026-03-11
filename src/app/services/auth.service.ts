@@ -106,11 +106,16 @@ export class AuthService {
   async uploadAvatar(file: File): Promise<string | null> {
     const formData = new FormData();
     formData.append('photo', file);
-    const result = await firstValueFrom(
-      this.http.post<{ photoUrl: string }>(`${environment.apiUrl}/users/me/photo`, formData)
-    );
-    this.photoUrl.set(result.photoUrl);
-    return result.photoUrl;
+    try {
+      const result = await firstValueFrom(
+        this.http.post<{ photoUrl: string }>(`${environment.apiUrl}/users/me/photo`, formData)
+      );
+      this.photoUrl.set(result.photoUrl);
+      return result.photoUrl;
+    } catch (e: any) {
+      const msg = e?.error?.error || e?.message || 'Upload failed';
+      throw new Error(msg);
+    }
   }
 
   async logout(): Promise<void> {
