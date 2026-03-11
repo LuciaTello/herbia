@@ -2,6 +2,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18nService } from '../../i18n';
 import { AuthService } from '../../services/auth.service';
+import { FriendService } from '../../services/friend.service';
 
 const LEVEL_THRESHOLDS = [0, 750, 1500, 3750, 7500, 25000];
 
@@ -14,6 +15,7 @@ const LEVEL_THRESHOLDS = [0, 750, 1500, 3750, 7500, 25000];
 export class HomePage implements OnInit {
   protected readonly i18n = inject(I18nService);
   protected readonly auth = inject(AuthService);
+  protected readonly friendService = inject(FriendService);
   protected readonly showQuizPopup = signal(false);
 
   async ngOnInit(): Promise<void> {

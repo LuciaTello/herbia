@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -38,6 +38,7 @@ export class FriendService {
 
   readonly friends = signal<FriendInfo[]>([]);
   readonly pending = signal<PendingRequest[]>([]);
+  readonly pendingCount = computed(() => this.pending().length);
 
   async loadFriends(): Promise<void> {
     const friends = await firstValueFrom(this.http.get<FriendInfo[]>(this.apiUrl));

@@ -9,6 +9,7 @@ import { environment } from '../../environments/environment';
 import { I18nService } from '../i18n';
 import { TrekService } from './trek.service';
 import { CollectionService } from './collection.service';
+import { FriendService } from './friend.service';
 import { ClerkService } from './clerk.service';
 
 @Injectable({ providedIn: 'root' })
@@ -39,6 +40,7 @@ export class AuthService {
   async init(): Promise<void> {
     if (this.clerkService.clerk.user) {
       await this.refreshProfile();
+      this.injector.get(FriendService).loadPending().catch(() => {});
     }
   }
 
