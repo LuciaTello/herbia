@@ -267,6 +267,7 @@ export const ES: Translations = {
     removePlant: '¿Segura que quieres quitar esta planta de tu colección?',
     removeFriend: '¿Segura que quieres eliminar a esta amiga?',
     acceptFriend: '¿Segura que quieres aceptarla? Podrá ver tus fotos de plantas.',
+    rejectFriend: '¿Segura que quieres rechazar esta solicitud?',
   },
   tutorials: {
     back: 'Volver al inicio',

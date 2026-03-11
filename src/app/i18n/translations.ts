@@ -216,6 +216,7 @@ export interface Translations {
     completeTrek: string;
     removeFriend: string;
     acceptFriend: string;
+    rejectFriend: string;
   };
   tutorials: {
     back: string;

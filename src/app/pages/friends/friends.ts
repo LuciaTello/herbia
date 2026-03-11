@@ -97,6 +97,8 @@ export class FriendsPage implements OnInit {
   }
 
   async reject(friendshipId: number): Promise<void> {
+    const ok = await this.confirmService.confirm(this.i18n.t().confirm.rejectFriend);
+    if (!ok) return;
     await this.friendService.rejectRequest(friendshipId);
   }
 
