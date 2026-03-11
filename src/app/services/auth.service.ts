@@ -104,8 +104,9 @@ export class AuthService {
   }
 
   async uploadAvatar(file: File): Promise<string | null> {
+    const compressed = await compressImage(file, 512, 0.82);
     const formData = new FormData();
-    formData.append('photo', file);
+    formData.append('photo', compressed, 'avatar.jpg');
     try {
       const result = await firstValueFrom(
         this.http.post<{ photoUrl: string }>(`${environment.apiUrl}/users/me/photo`, formData)
@@ -153,4 +154,25 @@ interface UserProfile {
   photoUrl: string | null;
   bio: string | null;
   trekTipCount: number;
+}
+
+// Resize + compress an image to JPEG using Canvas (stays well under Cloudinary's 10 MB limit)
+function compressImage(file: File, maxSize: number, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Canvas toBlob failed')), 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+    img.src = url;
+  });
 }
