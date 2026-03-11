@@ -88,7 +88,7 @@
           <circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="8" r="3"/><path d="M2 21v-1a5 5 0 0 1 10 0v1"/><path d="M14 21v-1a4.5 4.5 0 0 1 7 0v1"/>
         </svg>
         @if (friendService.pendingCount() > 0) {
-          <span class="nav-badge">{{ friendService.pendingCount() }}</span>
+          <span class="nav-badge"></span>
         }
       </span>
       <span>{{ i18n.t().nav.friends }}</span>
