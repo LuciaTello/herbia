@@ -2,12 +2,14 @@
 // Initialized via APP_INITIALIZER before routing starts.
 
 import { Injectable, signal } from '@angular/core';
-import Clerk from '@clerk/clerk-js';
+import { Clerk } from '@clerk/clerk-js';
 import { environment } from '../../environments/environment';
+
+type ClerkInstance = InstanceType<typeof Clerk>;
 
 @Injectable({ providedIn: 'root' })
 export class ClerkService {
-  clerk!: Clerk;
+  clerk!: ClerkInstance;
 
   // Mirrors clerk.user — updated after load, signIn, signOut so Angular signals stay reactive
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
