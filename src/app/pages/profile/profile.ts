@@ -14,39 +14,49 @@ export class ProfilePage {
   protected readonly i18n = inject(I18nService);
   protected readonly auth = inject(AuthService);
 
-  protected username = '';
-  protected bio = '';
+  // Which field is currently being edited
+  protected readonly editing = signal<'username' | 'bio' | null>(null);
+
+  // Temporary values while editing
+  protected draftUsername = '';
+  protected draftBio = '';
+
   protected saving = signal(false);
-  protected saved = signal(false);
   protected error = signal<string | null>(null);
   protected uploading = signal(false);
 
-  constructor() {
-    this.username = this.auth.username() ?? '';
-    this.bio = this.auth.bio() ?? '';
+  protected startEdit(field: 'username' | 'bio'): void {
+    this.error.set(null);
+    if (field === 'username') this.draftUsername = this.auth.username() ?? '';
+    if (field === 'bio') this.draftBio = this.auth.bio() ?? '';
+    this.editing.set(field);
   }
 
-  protected async onSave(): Promise<void> {
+  protected cancelEdit(): void {
+    this.editing.set(null);
+    this.error.set(null);
+  }
+
+  protected async saveField(field: 'username' | 'bio'): Promise<void> {
     this.saving.set(true);
-    this.saved.set(false);
     this.error.set(null);
 
-    const result = await this.auth.updateProfile({
-      username: this.username,
-      bio: this.bio,
-    });
+    const data = field === 'username'
+      ? { username: this.draftUsername }
+      : { bio: this.draftBio };
+
+    const result = await this.auth.updateProfile(data);
 
     this.saving.set(false);
 
     if (result.error) {
-      if (result.error === 'username_taken') {
-        this.error.set(this.i18n.t().profile.usernameTaken);
-      } else {
-        this.error.set(result.error);
-      }
+      this.error.set(
+        result.error === 'username_taken'
+          ? this.i18n.t().profile.usernameTaken
+          : result.error
+      );
     } else {
-      this.saved.set(true);
-      setTimeout(() => this.saved.set(false), 2000);
+      this.editing.set(null);
     }
   }
 
@@ -54,13 +64,10 @@ export class ProfilePage {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-
     this.uploading.set(true);
     try {
       await this.auth.uploadAvatar(file);
-    } catch {
-      // silently fail
-    }
+    } catch { /* silently fail */ }
     this.uploading.set(false);
     input.value = '';
   }

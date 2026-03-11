@@ -2,6 +2,7 @@
 
 <h2>{{ i18n.t().profile.title }}</h2>
 
+<!-- Avatar -->
 <div class="avatar-section">
   <div class="avatar">
     @if (auth.photoUrl()) {
@@ -11,39 +12,79 @@
     }
   </div>
   <label class="change-photo-btn">
-    @if (uploading()) {
-      ...
-    } @else {
-      {{ i18n.t().profile.changePhoto }}
-    }
+    @if (uploading()) { ... } @else { {{ i18n.t().profile.changePhoto }} }
     <input type="file" accept="image/jpeg,image/png" (change)="onPhotoChange($event)" hidden />
   </label>
 </div>
 
-<form (ngSubmit)="onSave()" class="profile-form">
-  <label class="field">
-    <span>{{ i18n.t().profile.usernameLabel }}</span>
-    <input type="text" [(ngModel)]="username" name="username" />
-  </label>
+<!-- Fields -->
+<div class="fields">
 
-  <label class="field">
-    <span>{{ i18n.t().profile.bioLabel }}</span>
-    <textarea [(ngModel)]="bio" name="bio" rows="5" [placeholder]="i18n.t().profile.bioPlaceholder"></textarea>
-  </label>
+  <!-- Email (read-only) -->
+  <div class="field-row">
+    <div class="field-content">
+      <span class="field-label">{{ i18n.t().profile.emailLabel }}</span>
+      <span class="field-value muted">{{ auth.email() }}</span>
+    </div>
+  </div>
 
-  @if (error()) {
-    <p class="error">{{ error() }}</p>
-  }
-
-  <button type="submit" class="save-btn" [disabled]="saving()">
-    @if (saving()) {
-      ...
-    } @else if (saved()) {
-      {{ i18n.t().profile.saved }}
+  <!-- Username -->
+  <div class="field-row">
+    @if (editing() === 'username') {
+      <div class="field-edit">
+        <span class="field-label">{{ i18n.t().profile.usernameLabel }}</span>
+        <input
+          type="text"
+          [(ngModel)]="draftUsername"
+          name="username"
+          autofocus
+        />
+        @if (error()) { <p class="error">{{ error() }}</p> }
+        <div class="edit-actions">
+          <button class="btn-cancel" type="button" (click)="cancelEdit()" [disabled]="saving()">✕</button>
+          <button class="btn-save" type="button" (click)="saveField('username')" [disabled]="saving()">
+            @if (saving()) { ... } @else { ✓ }
+          </button>
+        </div>
+      </div>
     } @else {
-      {{ i18n.t().profile.save }}
+      <div class="field-content">
+        <span class="field-label">{{ i18n.t().profile.usernameLabel }}</span>
+        <span class="field-value">{{ auth.username() || '—' }}</span>
+      </div>
+      <button class="btn-edit" type="button" (click)="startEdit('username')" [disabled]="editing() !== null">✏️</button>
     }
-  </button>
-</form>
+  </div>
+
+  <!-- Bio -->
+  <div class="field-row">
+    @if (editing() === 'bio') {
+      <div class="field-edit">
+        <span class="field-label">{{ i18n.t().profile.bioLabel }}</span>
+        <textarea
+          [(ngModel)]="draftBio"
+          name="bio"
+          rows="4"
+          [placeholder]="i18n.t().profile.bioPlaceholder"
+          autofocus
+        ></textarea>
+        @if (error()) { <p class="error">{{ error() }}</p> }
+        <div class="edit-actions">
+          <button class="btn-cancel" type="button" (click)="cancelEdit()" [disabled]="saving()">✕</button>
+          <button class="btn-save" type="button" (click)="saveField('bio')" [disabled]="saving()">
+            @if (saving()) { ... } @else { ✓ }
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="field-content">
+        <span class="field-label">{{ i18n.t().profile.bioLabel }}</span>
+        <span class="field-value">{{ auth.bio() || '—' }}</span>
+      </div>
+      <button class="btn-edit" type="button" (click)="startEdit('bio')" [disabled]="editing() !== null">✏️</button>
+    }
+  </div>
+
+</div>
 
 <button class="logout-btn" (click)="auth.logout()">{{ i18n.t().nav.logout }}</button>
