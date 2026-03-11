@@ -151,6 +151,7 @@ export const ES: Translations = {
     noAccount: '¿No tienes cuenta? ',
     switchToRegister: 'Regístrate',
     genericError: 'Ha ocurrido un error. Inténtalo de nuevo.',
+    verifyTitle: 'Verificar email',
   },
   onboarding: {
     titles: [

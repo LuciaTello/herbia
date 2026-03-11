@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './auth/auth.interceptor';
+import { ClerkService } from './services/clerk.service';
 import { AuthService } from './services/auth.service';
 
 export const appConfig: ApplicationConfig = {
@@ -14,8 +15,12 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       useFactory: () => {
-        const auth = inject(AuthService);
-        return () => auth.init();
+        const clerkService = inject(ClerkService);
+        const authService = inject(AuthService);
+        return async () => {
+          await clerkService.init();
+          await authService.init();
+        };
       },
       multi: true,
     },

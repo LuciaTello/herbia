@@ -15,7 +15,7 @@ datasource db {
 model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique                        // Like @Column(unique = true)
-  passwordHash String   @map("password_hash")          // NEVER store plain passwords!
+  clerkId      String?  @unique @map("clerk_id")        // Clerk user ID (replaces passwordHash)
   lang         String   @default("es")                  // "es" | "fr"
   username     String?  @unique
   points       Int      @default(0)

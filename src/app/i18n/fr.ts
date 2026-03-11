@@ -151,6 +151,7 @@ export const FR: Translations = {
     noAccount: 'Pas encore de compte ? ',
     switchToRegister: 'Inscrivez-vous',
     genericError: 'Une erreur est survenue. Réessayez.',
+    verifyTitle: 'Vérifier l\'email',
   },
   onboarding: {
     titles: [

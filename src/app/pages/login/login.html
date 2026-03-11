@@ -122,4 +122,30 @@
     </div>
   }
 
+  <!-- Step 3: OTP verification (registration only) -->
+  @if (step() === 'otp') {
+    <div class="card">
+      <button type="button" class="back-button" (click)="goBack()">&#8592;</button>
+      <p class="step-email">{{ email() }}</p>
+      <h2>{{ i18n.t().login.verifyTitle }}</h2>
+      <form (ngSubmit)="onVerifyOtp()">
+        <input
+          id="otp-code"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          [placeholder]="selectedLang() === 'fr' ? BI.otpPlaceholderFr : BI.otpPlaceholderEs"
+          [ngModel]="otpCode()"
+          (ngModelChange)="otpCode.set($event)"
+          name="otp"
+          required
+          autofocus
+        />
+        <button type="submit" class="primary-button" [disabled]="loading()">
+          @if (loading()) { {{ i18n.t().login.submitting }} } @else { {{ BI.next }} }
+        </button>
+      </form>
+    </div>
+  }
+
 </div>

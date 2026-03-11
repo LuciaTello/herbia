@@ -4,6 +4,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { clerkMiddleware } from '@clerk/express';
 import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { plantRouter } from './routes/plant.routes';
@@ -55,6 +56,7 @@ app.use(cors({
   },
 }));
 app.use(express.json());
+app.use(clerkMiddleware());
 
 // --- Route registration (like @ComponentScan finding your @RestControllers) ---
 // Think of this as Spring Security's SecurityFilterChain:
@@ -65,14 +67,13 @@ app.use(express.json());
 app.use('/api/auth', authRouter(prisma));
 app.use('/api/config', configRouter(prisma));
 
-// Protected routes (like .authenticated() - authMiddleware checks JWT first)
-// If JWT is invalid, authMiddleware returns 401 and the route handler never runs
-app.use('/api/users', authMiddleware, userRouter(prisma));
-app.use('/api/plants', authMiddleware, plantRouter(prisma));
-app.use('/api/collection', authMiddleware, collectionRouter(prisma));
-app.use('/api/treks', authMiddleware, trekRouter(prisma));
-app.use('/api/friends', authMiddleware, friendRouter(prisma));
-app.use('/api/challenges', authMiddleware, challengeRouter(prisma));
+// Protected routes (authMiddleware checks Clerk token, then looks up user in DB)
+app.use('/api/users', authMiddleware(prisma), userRouter(prisma));
+app.use('/api/plants', authMiddleware(prisma), plantRouter(prisma));
+app.use('/api/collection', authMiddleware(prisma), collectionRouter(prisma));
+app.use('/api/treks', authMiddleware(prisma), trekRouter(prisma));
+app.use('/api/friends', authMiddleware(prisma), friendRouter(prisma));
+app.use('/api/challenges', authMiddleware(prisma), challengeRouter(prisma));
 
 // --- Health endpoint (public, no auth) ---
 app.get('/api/health', (_req, res) => res.json({ ok: true }));

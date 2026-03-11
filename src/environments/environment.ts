@@ -3,4 +3,5 @@
 export const environment = {
   production: false,
   apiUrl: '/api',  // Proxied to localhost:3000 by proxy.conf.json
+  clerkPublishableKey: 'pk_test_a2Vlbi1mb3hob3VuZC0yMC5jbGVyay5hY2NvdW50cy5kZXYk',
 };
