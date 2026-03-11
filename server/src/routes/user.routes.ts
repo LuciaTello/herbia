@@ -8,7 +8,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-const ALLOWED_MIMES = ['image/jpeg', 'image/png'];
+const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
 
 export function userRouter(prisma: PrismaClient): Router {
   const router = Router();

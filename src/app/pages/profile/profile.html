@@ -13,7 +13,7 @@
   </div>
   <label class="change-photo-btn">
     @if (uploading()) { ... } @else { {{ i18n.t().profile.changePhoto }} }
-    <input type="file" accept="image/jpeg,image/png" (change)="onPhotoChange($event)" hidden />
+    <input type="file" accept="image/*" (change)="onPhotoChange($event)" hidden />
   </label>
 </div>
 
