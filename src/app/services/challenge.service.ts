@@ -140,7 +140,9 @@ export class ChallengeService {
 
   /** Collect photos: user photos first, then reference (wikipedia/inaturalist), up to MAX_PHOTOS */
   private collectPhotos(plant: SuggestedPlant): string[] {
-    const userPhotos = plant.photos.filter(ph => ph.source === 'user').map(ph => ph.url);
+    const userPhotos = plant.photos
+      .filter(ph => ph.source === 'user' && (!ph.identifiedAs || ph.identifiedAs === plant.scientificName))
+      .map(ph => ph.url);
     const refPhotos = plant.photos.filter(ph => ph.source !== 'user').map(ph => ph.url);
     const combined = [...userPhotos, ...refPhotos];
     return combined.slice(0, MAX_PHOTOS);
