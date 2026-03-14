@@ -138,14 +138,18 @@ export class ChallengeService {
     return result.points;
   }
 
-  /** Collect photos: user photos first, then reference (wikipedia/inaturalist), up to MAX_PHOTOS */
+  /** Collect photos: confirmed user photos first, then reference (wikipedia/inaturalist),
+   *  then mismatch user photos (identifiedAs points to a different species), up to MAX_PHOTOS */
   private collectPhotos(plant: SuggestedPlant): string[] {
-    const userPhotos = plant.photos
-      .filter(ph => ph.source === 'user' && (!ph.identifiedAs || ph.identifiedAs === plant.scientificName))
+    const userPhotos = plant.photos.filter(ph => ph.source === 'user');
+    const confirmedUserPhotos = userPhotos
+      .filter(ph => !ph.identifiedAs || ph.identifiedAs === plant.scientificName)
+      .map(ph => ph.url);
+    const mismatchUserPhotos = userPhotos
+      .filter(ph => ph.identifiedAs && ph.identifiedAs !== plant.scientificName)
       .map(ph => ph.url);
     const refPhotos = plant.photos.filter(ph => ph.source !== 'user').map(ph => ph.url);
-    const combined = [...userPhotos, ...refPhotos];
-    return combined.slice(0, MAX_PHOTOS);
+    return [...confirmedUserPhotos, ...refPhotos, ...mismatchUserPhotos].slice(0, MAX_PHOTOS);
   }
 
   private formatName(plant: SuggestedPlant): string {

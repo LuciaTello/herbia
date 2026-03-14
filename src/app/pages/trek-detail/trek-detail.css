@@ -540,6 +540,31 @@ h2 {
   transform: scale(1.08);
 }
 
+.fab-offline-chip {
+  position: fixed;
+  bottom: calc(1.5rem + 48px + 0.6rem);
+  right: 1.5rem;
+  background: #e17055;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem 0.3rem 0.5rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(225, 112, 85, 0.45);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.fab-offline-chip svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
 .fab-badge {
   position: absolute;
   top: -4px;
