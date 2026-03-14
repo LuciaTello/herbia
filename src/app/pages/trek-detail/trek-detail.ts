@@ -14,6 +14,7 @@ import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-po
 import { FamilyPopupComponent } from '../../components/family-popup/family-popup';
 import { RouteMapComponent } from '../../components/route-map/route-map';
 import { OfflineQueueService } from '../../services/offline-queue.service';
+import { ConnectivityService } from '../../services/connectivity.service';
 
 @Component({
   selector: 'app-trek-detail',
@@ -30,6 +31,7 @@ export class TrekDetailPage implements OnInit {
   protected readonly i18n = inject(I18nService);
   private readonly confirmService = inject(ConfirmService);
   private readonly offlineQueue = inject(OfflineQueueService);
+  protected readonly connectivity = inject(ConnectivityService);
   protected readonly treks = this.trekService.getTreks();
   protected readonly loading = signal(true);
   protected readonly galleryImages = signal<string[]>([]);
@@ -44,6 +46,8 @@ export class TrekDetailPage implements OnInit {
   protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
   private readonly matchedPlantId = signal<number | null>(null);
+  protected readonly showOfflinePrompt = signal(false);
+  private pendingOfflineQueueId: number | null = null;
   protected readonly uploadingPhoto = signal(false);
   protected readonly reactivating = signal(false);
   protected readonly pendingCount = this.offlineQueue.pendingCount;
@@ -132,6 +136,12 @@ export class TrekDetailPage implements OnInit {
       // Save to disk first — photo is safe regardless of network
       const queueId = await this.offlineQueue.enqueue(this.trekId, file);
 
+      // Offline mode: skip network entirely, just confirm saved
+      if (this.connectivity.isOffline()) {
+        this.resultOverlay.set({ name: this.i18n.t().offline.photoQueued, points: 0, type: 'noMatch', photoUrl });
+        return;
+      }
+
       this.pendingFile.set(file);
       this.identifyResult.set(null);
       this.identifying.set(true);
@@ -153,14 +163,31 @@ export class TrekDetailPage implements OnInit {
           URL.revokeObjectURL(photoUrl);
         }
       } catch {
-        // Network failed — photo stays in queue, will retry later
-        this.resultOverlay.set({ name: this.i18n.t().offline.photoQueued, points: 0, type: 'noMatch', photoUrl });
+        // Network failed — propose switching to offline mode
+        this.pendingOfflineQueueId = queueId;
+        this.showOfflinePrompt.set(true);
+        URL.revokeObjectURL(photoUrl);
       } finally {
         this.identifying.set(false);
       }
     } catch {
       this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch' });
     }
+  }
+
+  protected async acceptOfflineMode(): Promise<void> {
+    this.showOfflinePrompt.set(false);
+    await this.connectivity.setManualOffline(true);
+    this.resultOverlay.set({ name: this.i18n.t().offline.photoQueued, points: 0, type: 'noMatch' });
+  }
+
+  protected dismissOfflinePrompt(): void {
+    // User declined — remove the queued photo
+    if (this.pendingOfflineQueueId !== null) {
+      this.offlineQueue.dequeue(this.pendingOfflineQueueId).catch(() => {});
+      this.pendingOfflineQueueId = null;
+    }
+    this.showOfflinePrompt.set(false);
   }
 
   private async addToCollection(file: File, result: IdentifyAllResult, photoUrl?: string, matchesFull = false): Promise<void> {

@@ -6,6 +6,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from './auth/auth.interceptor';
 import { ClerkService } from './services/clerk.service';
 import { AuthService } from './services/auth.service';
+import { ConnectivityService } from './services/connectivity.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,9 +18,11 @@ export const appConfig: ApplicationConfig = {
       useFactory: () => {
         const clerkService = inject(ClerkService);
         const authService = inject(AuthService);
+        const connectivityService = inject(ConnectivityService);
         return async () => {
           await clerkService.init();
           await authService.init();
+          await connectivityService.initManualMode();
         };
       },
       multi: true,

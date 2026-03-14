@@ -2,12 +2,8 @@
   <app-onboarding (done)="onOnboardingDone()" />
 }
 
-@if (!connectivity.online()) {
+@if (connectivity.manualOfflineMode()) {
   <div class="offline-banner">{{ i18n.t().offline.banner }}</div>
-}
-
-@if (syncMessage()) {
-  <div class="sync-toast">{{ syncMessage() }}</div>
 }
 
 <main>

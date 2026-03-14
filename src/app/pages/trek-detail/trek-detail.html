@@ -217,6 +217,17 @@
 
 <app-confirm-popup />
 
+@if (showOfflinePrompt()) {
+  <div class="offline-prompt-backdrop" (click)="dismissOfflinePrompt()">
+    <div class="offline-prompt" (click)="$event.stopPropagation()">
+      <p class="offline-prompt-title">{{ i18n.t().offline.promptTitle }}</p>
+      <p class="offline-prompt-message">{{ i18n.t().offline.promptMessage }}</p>
+      <button class="offline-prompt-confirm" (click)="acceptOfflineMode()">{{ i18n.t().offline.promptConfirm }}</button>
+      <button class="offline-prompt-cancel" (click)="dismissOfflinePrompt()">{{ i18n.t().confirm.cancel }}</button>
+    </div>
+  </div>
+}
+
 @if (selectedFamily()) {
   <app-family-popup
     [family]="selectedFamily()!"

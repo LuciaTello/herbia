@@ -1,0 +1,113 @@
+<!-- LIST -->
+@if (state() === 'list') {
+  <div class="sync-header">
+    <button class="back-link" (click)="goBack()">← {{ i18n.t().myTreks.back }}</button>
+    <h2>{{ i18n.t().sync.title }}</h2>
+  </div>
+
+  @if (items().length === 0) {
+    <p class="sync-empty">{{ i18n.t().sync.noPhotos }}</p>
+  } @else {
+    <p class="sync-subtitle">{{ i18n.t().sync.subtitle(items().length) }}</p>
+
+    <button class="sync-select-all" (click)="toggleAll()">
+      {{ allSelected ? i18n.t().sync.deselectAll : i18n.t().sync.selectAll }}
+    </button>
+
+    <div class="sync-list">
+      @for (item of items(); track item.queued.id; let i = $index) {
+        <div class="sync-item" [class.selected]="item.selected" (click)="toggleSelect(i)">
+          <div class="sync-thumb">
+            @if (item.thumbnailUrl) {
+              <img [src]="item.thumbnailUrl" alt="" />
+            } @else {
+              <div class="sync-thumb-placeholder">?</div>
+            }
+          </div>
+          <div class="sync-item-info">
+            <span class="sync-trek-name">{{ item.trekName }}</span>
+            <span class="sync-item-time">{{ item.queued.createdAt | date:'dd/MM · HH:mm' }}</span>
+          </div>
+          <div class="sync-checkbox" [class.checked]="item.selected">
+            @if (item.selected) { ✓ }
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (selectedCount > 0) {
+      <button class="sync-start-btn" (click)="startSync()">
+        {{ i18n.t().sync.syncButton(selectedCount) }}
+      </button>
+    }
+  }
+}
+
+<!-- SYNCING -->
+@if (state() === 'syncing') {
+  <div class="syncing-screen">
+    <p class="sync-progress">{{ i18n.t().sync.progress(currentIndex(), totalToProcess()) }}</p>
+    @if (processing()) {
+      <div class="sync-spinner-wrap">
+        <div class="sync-spinner"></div>
+        <p class="sync-identifying">{{ i18n.t().sync.identifying }}</p>
+      </div>
+    }
+    @if (networkError()) {
+      <p class="sync-network-error">{{ i18n.t().sync.networkError }}</p>
+      <button class="sync-start-btn" (click)="goBack()">{{ i18n.t().sync.backToTreks }}</button>
+    }
+  </div>
+}
+
+<!-- RESULT -->
+@if (state() === 'result' && currentResult(); as r) {
+  <div class="sync-result-overlay">
+    <div class="sync-result-card" [class.match]="r.type === 'match'" [class.no-match]="r.type !== 'match'">
+      @if (r.photoUrl) {
+        <img class="result-photo" [src]="r.photoUrl" alt="" />
+      }
+
+      @if (r.type === 'match') {
+        @if (r.commonName) { <p class="result-name">{{ r.commonName }}</p> }
+        @if (r.identifiedAs) { <p class="result-scientific">{{ r.identifiedAs }}</p> }
+        <p class="result-points">+{{ r.points }} pts</p>
+        <button class="result-confirm-btn" (click)="confirmMatch(r.matches![0].plantId, r.matches![0].similarity)">
+          {{ i18n.t().sync.addMatch(r.points) }}
+        </button>
+        <button class="result-skip-btn" (click)="skip()">{{ i18n.t().sync.skip }}</button>
+      }
+
+      @if (r.type === 'multipleMatches') {
+        <p class="result-name">{{ r.identifiedAs }}</p>
+        <p class="result-subtitle">{{ i18n.t().myTreks.selectPlant }}</p>
+        @for (match of r.matches; track match.plantId) {
+          <button class="match-option" (click)="confirmMatch(match.plantId, match.similarity)">
+            {{ i18n.t().myTreks.pointsFor(match.commonName, match.similarity) }}
+          </button>
+        }
+        <button class="result-skip-btn" (click)="skip()">{{ i18n.t().sync.skip }}</button>
+      }
+
+      @if (r.type === 'noMatch') {
+        @if (r.identifiedAs) { <p class="result-identified">{{ r.identifiedAs }}</p> }
+        @if (r.commonName) { <p class="result-common">{{ r.commonName }}</p> }
+        <p class="result-no-match-label">{{ i18n.t().myTreks.noMatchInTrek }}</p>
+        <button class="result-confirm-btn secondary" (click)="confirmAddToCollection()">
+          {{ i18n.t().sync.addToCollection }}
+        </button>
+        <button class="result-skip-btn" (click)="skip()">{{ i18n.t().sync.skip }}</button>
+      }
+    </div>
+  </div>
+}
+
+<!-- DONE -->
+@if (state() === 'done') {
+  <div class="sync-done-screen">
+    <span class="sync-done-icon">✓</span>
+    <h2>{{ i18n.t().sync.doneTitle }}</h2>
+    <p class="sync-done-summary">{{ i18n.t().sync.doneSummary(addedCount(), skippedCount()) }}</p>
+    <button class="sync-start-btn" (click)="goBack()">{{ i18n.t().sync.backToTreks }}</button>
+  </div>
+}

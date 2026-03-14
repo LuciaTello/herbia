@@ -10,6 +10,7 @@ import { ProfilePage } from './pages/profile/profile';
 import { LoginPage } from './pages/login/login';
 import { TutorialsPage } from './pages/tutorials/tutorials';
 import { ChallengesPage } from './pages/challenges/challenges';
+import { SyncPage } from './pages/sync/sync';
 import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
@@ -25,4 +26,5 @@ export const routes: Routes = [
   { path: 'profile', component: ProfilePage, canActivate: [authGuard] },
   { path: 'tutorials', component: TutorialsPage, canActivate: [authGuard] },
   { path: 'challenges', component: ChallengesPage, canActivate: [authGuard] },
+  { path: 'sync', component: SyncPage, canActivate: [authGuard] },
 ];

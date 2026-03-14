@@ -8,6 +8,8 @@ export interface Translations {
     friends: string;
     tutorial: string;
     logout: string;
+    offline: string;
+    online: string;
   };
   home: {
     greeting: (name: string) => string;
@@ -283,6 +285,26 @@ export interface Translations {
     syncing: (n: number) => string;
     syncDone: (n: number) => string;
     syncFailed: (n: number) => string;
+    promptTitle: string;
+    promptMessage: string;
+    promptConfirm: string;
+  };
+  sync: {
+    title: string;
+    subtitle: (n: number) => string;
+    syncButton: (n: number) => string;
+    progress: (current: number, total: number) => string;
+    identifying: string;
+    addMatch: (points: number) => string;
+    addToCollection: string;
+    skip: string;
+    doneTitle: string;
+    doneSummary: (added: number, skipped: number) => string;
+    backToTreks: string;
+    networkError: string;
+    noPhotos: string;
+    selectAll: string;
+    deselectAll: string;
   };
 }
 

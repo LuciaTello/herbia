@@ -1,8 +1,10 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { I18nService } from '../../i18n';
 import { AuthService } from '../../services/auth.service';
 import { FriendService } from '../../services/friend.service';
+import { ConnectivityService } from '../../services/connectivity.service';
+import { OfflineQueueService } from '../../services/offline-queue.service';
 
 const LEVEL_THRESHOLDS = [0, 750, 1500, 3750, 7500, 25000];
 
@@ -16,6 +18,9 @@ export class HomePage implements OnInit {
   protected readonly i18n = inject(I18nService);
   protected readonly auth = inject(AuthService);
   protected readonly friendService = inject(FriendService);
+  protected readonly connectivity = inject(ConnectivityService);
+  protected readonly offlineQueue = inject(OfflineQueueService);
+  private readonly router = inject(Router);
   protected readonly showQuizPopup = signal(false);
 
   async ngOnInit(): Promise<void> {
@@ -28,6 +33,14 @@ export class HomePage implements OnInit {
   protected dismissQuizPopup(): void {
     this.showQuizPopup.set(false);
     this.auth.dismissQuizPopup().catch(() => {});
+  }
+
+  protected async toggleOfflineMode(): Promise<void> {
+    const goingOnline = this.connectivity.manualOfflineMode();
+    await this.connectivity.setManualOffline(!goingOnline);
+    if (goingOnline && this.offlineQueue.pendingCount() > 0) {
+      this.router.navigate(['/sync']);
+    }
   }
 
   protected readonly currentLevel = computed(() => {
