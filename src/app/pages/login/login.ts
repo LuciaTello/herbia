@@ -69,9 +69,10 @@ export class LoginPage {
     } catch (e: any) {
       console.error('[login] checkEmail error:', e);
       const isTimeout = e?.name === 'TimeoutError' || e?.name === 'EmptyError';
+      const body = e?.error?.text ?? e?.error?.message ?? JSON.stringify(e?.error);
       this.error.set(isTimeout
         ? this.i18n.t().login.serverSlow
-        : `email-check: ${e?.status ?? e?.name ?? '?'} ${String(e?.error).slice(0,40)}`);
+        : `email-check: ${e?.status} | ${String(body).slice(0,80)}`);
     } finally {
       this.loading.set(false);
     }
