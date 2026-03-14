@@ -24,7 +24,10 @@ export class HomePage implements OnInit {
   protected readonly showQuizPopup = signal(false);
 
   async ngOnInit(): Promise<void> {
-    await this.auth.refreshProfile();
+    // If profile was not yet loaded by the background init, load it now
+    if (!this.auth.profileLoaded()) {
+      await this.auth.refreshProfile().catch(() => {});
+    }
     if (this.auth.quizUnlocked() && !this.auth.quizPopupShown()) {
       this.showQuizPopup.set(true);
     }

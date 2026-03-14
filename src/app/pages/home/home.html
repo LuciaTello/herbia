@@ -1,4 +1,9 @@
 @if (auth.isLoggedIn()) {
+  @if (!auth.profileLoaded()) {
+    <div class="profile-loading">
+      <div class="profile-spinner"></div>
+    </div>
+  } @else {
   <section class="greeting">
     <h2>{{ i18n.t().home.greeting(auth.username() ?? '') }}</h2>
   </section>
@@ -15,6 +20,7 @@
       }
     </div>
   </section>
+  }
 
   <section class="actions">
     <a routerLink="/route" class="action-card" [class.action-disabled]="connectivity.manualOfflineMode()">

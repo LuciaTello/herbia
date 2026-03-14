@@ -23,6 +23,8 @@ export class AuthService {
 
   // In-memory only: true right after register, false otherwise
   readonly justRegistered = signal(false);
+  // True once the user profile has been fetched from the backend at least once
+  readonly profileLoaded = signal(false);
 
   readonly trekTipCount = signal(4); // default 4 = don't show
   readonly username = signal<string | null>(null);
@@ -144,6 +146,7 @@ export class AuthService {
     this.photoUrl.set(user.photoUrl);
     this.bio.set(user.bio);
     this.email.set(user.email);
+    this.profileLoaded.set(true);
   }
 }
 
