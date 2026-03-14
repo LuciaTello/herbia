@@ -67,6 +67,7 @@ export class LoginPage {
         this.step.set('register');
       }
     } catch (e: any) {
+      console.error('[login] checkEmail error:', e);
       const isTimeout = e?.name === 'TimeoutError' || e?.name === 'EmptyError';
       this.error.set(isTimeout
         ? this.i18n.t().login.serverSlow
@@ -85,6 +86,12 @@ export class LoginPage {
     this.loading.set(true);
     this.error.set('');
     try {
+      // Re-init Clerk if it failed to load on app start
+      if (!this.clerkService.clerk?.client) {
+        console.log('[login] Clerk client not ready, re-initialising...');
+        await this.clerkService.init();
+      }
+      console.log('[login] clerk.client:', !!this.clerkService.clerk?.client);
       const signIn = await this.clerkService.clerk.client!.signIn.create({
         identifier: this.email(),
         password: this.password(),
@@ -98,6 +105,7 @@ export class LoginPage {
         this.error.set(this.i18n.t().login.genericError);
       }
     } catch (e: any) {
+      console.error('[login] onLogin error:', e);
       this.error.set(e?.errors?.[0]?.message || this.i18n.t().login.genericError);
     } finally {
       this.loading.set(false);
