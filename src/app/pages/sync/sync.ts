@@ -6,6 +6,8 @@ import { AuthService } from '../../services/auth.service';
 import { TrekService } from '../../services/trek.service';
 import { OfflineQueueService, QueuedPhoto } from '../../services/offline-queue.service';
 import { IdentifyAllResult } from '../../models/plant.model';
+import { ConfirmService } from '../../components/confirm-popup/confirm.service';
+import { ConfirmPopupComponent } from '../../components/confirm-popup/confirm-popup';
 
 interface SyncItem {
   queued: QueuedPhoto;
@@ -31,7 +33,7 @@ interface ResultOverlay {
 
 @Component({
   selector: 'app-sync',
-  imports: [DatePipe],
+  imports: [DatePipe, ConfirmPopupComponent],
   templateUrl: './sync.html',
   styleUrl: './sync.css',
 })
@@ -41,6 +43,7 @@ export class SyncPage implements OnInit {
   private readonly trekService = inject(TrekService);
   private readonly offlineQueue = inject(OfflineQueueService);
   private readonly router = inject(Router);
+  private readonly confirmService = inject(ConfirmService);
 
   protected readonly state = signal<SyncState>('list');
   protected readonly items = signal<SyncItem[]>([]);
@@ -107,7 +110,38 @@ export class SyncPage implements OnInit {
     return this.items().length > 0 && this.items().every(i => i.selected);
   }
 
+  protected async goBackFromList(): Promise<void> {
+    if (this.items().length === 0) {
+      this.router.navigate(['/my-treks']);
+      return;
+    }
+    const ok = await this.confirmService.confirm(
+      this.i18n.t().sync.backWarning,
+      true,
+      this.i18n.t().sync.confirmLeave,
+    );
+    if (!ok) return;
+    for (const item of this.items()) {
+      await this.offlineQueue.dequeue(item.queued.id!);
+    }
+    this.router.navigate(['/my-treks']);
+  }
+
   protected async startSync(): Promise<void> {
+    const unselected = this.items().filter(i => !i.selected);
+    if (unselected.length > 0) {
+      const ok = await this.confirmService.confirm(
+        this.i18n.t().sync.unsyncedWarning(unselected.length),
+        true,
+        this.i18n.t().sync.confirmSync,
+      );
+      if (!ok) return;
+      for (const item of unselected) {
+        await this.offlineQueue.dequeue(item.queued.id!);
+      }
+      this.items.update(list => list.filter(i => i.selected));
+    }
+
     this.toProcess = this.items().filter(i => i.selected);
     if (!this.toProcess.length) return;
 

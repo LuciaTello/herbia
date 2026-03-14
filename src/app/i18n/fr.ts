@@ -351,6 +351,10 @@ export const FR: Translations = {
     noPhotos: 'Aucune photo en attente',
     selectAll: 'Tout sélectionner',
     deselectAll: 'Tout désélectionner',
+    backWarning: 'Si tu quittes sans synchroniser, toutes tes photos en attente seront supprimées définitivement.',
+    confirmLeave: 'Quitter et supprimer',
+    unsyncedWarning: (n) => `Les ${n} photo${n > 1 ? 's' : ''} non sélectionnée${n > 1 ? 's' : ''} seront supprimées définitivement. Continue ?`,
+    confirmSync: 'Continuer',
   },
   familiesTutorial: {
     titles: [

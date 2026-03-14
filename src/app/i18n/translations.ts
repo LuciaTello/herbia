@@ -310,6 +310,10 @@ export interface Translations {
     noPhotos: string;
     selectAll: string;
     deselectAll: string;
+    backWarning: string;
+    confirmLeave: string;
+    unsyncedWarning: (n: number) => string;
+    confirmSync: string;
   };
 }
 

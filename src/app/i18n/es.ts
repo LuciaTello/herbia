@@ -351,6 +351,10 @@ export const ES: Translations = {
     noPhotos: 'No hay fotos pendientes',
     selectAll: 'Seleccionar todo',
     deselectAll: 'Deseleccionar todo',
+    backWarning: 'Si sales sin sincronizar, todas tus fotos pendientes se eliminarán definitivamente.',
+    confirmLeave: 'Salir y eliminar',
+    unsyncedWarning: (n) => `Las ${n} foto${n !== 1 ? 's' : ''} no seleccionada${n !== 1 ? 's' : ''} se eliminarán definitivamente. ¿Continuar?`,
+    confirmSync: 'Continuar',
   },
   familiesTutorial: {
     titles: [

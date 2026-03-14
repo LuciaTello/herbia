@@ -1,7 +1,7 @@
 <!-- LIST -->
 @if (state() === 'list') {
   <div class="sync-header">
-    <button class="back-link" (click)="goBack()">← {{ i18n.t().myTreks.back }}</button>
+    <button class="back-link" (click)="goBackFromList()">← {{ i18n.t().myTreks.back }}</button>
     <h2>{{ i18n.t().sync.title }}</h2>
   </div>
 
@@ -101,6 +101,8 @@
     </div>
   </div>
 }
+
+<app-confirm-popup />
 
 <!-- DONE -->
 @if (state() === 'done') {
