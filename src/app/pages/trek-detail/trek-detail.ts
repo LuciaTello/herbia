@@ -43,6 +43,7 @@ export class TrekDetailPage implements OnInit {
   protected readonly resultOverlay = signal<{ name: string; points: number; type: 'match' | 'noMatch'; photoUrl?: string; identifiedAs?: string; commonName?: string; genus?: string; family?: string } | null>(null);
   protected readonly completedPopup = signal(false);
   protected readonly completingId = signal<number | null>(null);
+  private readonly matchedPlantId = signal<number | null>(null);
   protected readonly uploadingPhoto = signal(false);
   protected readonly reactivating = signal(false);
   protected readonly pendingCount = this.offlineQueue.pendingCount;
@@ -203,6 +204,7 @@ export class TrekDetailPage implements OnInit {
         const missionName = plantName || this.treks().flatMap(m => m.plants).find(p => p.id === plantId)?.commonName || '';
         const displayName = pn?.commonName || missionName;
         this.resultOverlay.set({ name: missionName, points: similarity, type: 'match', photoUrl, identifiedAs: pn?.identifiedAs, commonName: displayName, genus: pn?.genus, family: pn?.family });
+        this.matchedPlantId.set(plantId);
         await this.checkAutoComplete();
       }
       if (similarity > 0) this.auth.refreshProfile().catch(() => {});
@@ -223,6 +225,13 @@ export class TrekDetailPage implements OnInit {
     const r = this.resultOverlay();
     if (r?.photoUrl) URL.revokeObjectURL(r.photoUrl);
     this.resultOverlay.set(null);
+    const id = this.matchedPlantId();
+    if (id !== null) {
+      this.matchedPlantId.set(null);
+      setTimeout(() => {
+        document.getElementById('plant-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
   }
 
   protected matchReason(points: number): string {

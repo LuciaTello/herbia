@@ -29,7 +29,7 @@
 
   <div class="trek-plants">
     @for (plant of aiPlants(); track plant.id) {
-      <article class="plant-card" [class.found]="plant.found"
+      <article class="plant-card" [id]="'plant-' + plant.id" [class.found]="plant.found"
                [class.rarity-common]="plant.rarity === 'common' || !plant.rarity"
                [class.rarity-rare]="plant.rarity === 'rare'"
                [class.rarity-veryRare]="plant.rarity === 'veryRare'">
