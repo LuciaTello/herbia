@@ -153,6 +153,7 @@ export const ES: Translations = {
     noAccount: '¿No tienes cuenta? ',
     switchToRegister: 'Regístrate',
     genericError: 'Ha ocurrido un error. Inténtalo de nuevo.',
+    serverSlow: 'El servidor tarda en arrancar. Vuelve a intentarlo en unos segundos.',
     verifyTitle: 'Verificar email',
   },
   onboarding: {

@@ -66,8 +66,11 @@ export class LoginPage {
         this.i18n.setLang(this.selectedLang());
         this.step.set('register');
       }
-    } catch {
-      this.error.set('Error');
+    } catch (e: any) {
+      const isTimeout = e?.name === 'TimeoutError' || e?.name === 'EmptyError';
+      this.error.set(isTimeout
+        ? this.i18n.t().login.serverSlow
+        : this.i18n.t().login.genericError);
     } finally {
       this.loading.set(false);
     }

@@ -3,7 +3,7 @@
 
 import { inject, Injectable, Injector, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { I18nService } from '../i18n';
@@ -48,7 +48,9 @@ export class AuthService {
 
   async checkEmail(email: string): Promise<{ exists: boolean; lang?: string }> {
     return firstValueFrom(
-      this.http.post<{ exists: boolean; lang?: string }>(`${this.apiUrl}/check-email`, { email })
+      this.http.post<{ exists: boolean; lang?: string }>(`${this.apiUrl}/check-email`, { email }).pipe(
+        timeout(15000)
+      )
     );
   }
 

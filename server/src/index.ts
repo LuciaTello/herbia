@@ -43,7 +43,8 @@ const prisma = new PrismaClient({ adapter });
 // In Spring this would be @CrossOrigin or a CorsFilter
 const allowedOrigins = [
   process.env['FRONTEND_URL'] || 'http://localhost:4200',
-  'https://localhost',    // Capacitor Android
+  'http://localhost',      // Capacitor Android
+  'https://localhost',     // Capacitor Android (some configs)
   'capacitor://localhost', // Capacitor iOS
 ];
 app.use(cors({

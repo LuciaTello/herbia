@@ -139,6 +139,7 @@ export interface Translations {
     noAccount: string;
     switchToRegister: string;
     genericError: string;
+    serverSlow: string;
     verifyTitle: string;
   };
   onboarding: {
