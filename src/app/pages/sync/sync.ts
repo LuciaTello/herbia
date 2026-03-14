@@ -273,9 +273,9 @@ export class SyncPage implements OnInit {
   }
 
   protected skip(): void {
-    const r = this.currentResult();
-    if (r?.photoUrl) URL.revokeObjectURL(r.photoUrl);
-    this.currentResult.set(null);
+    if (this.currentQueuedId !== null) {
+      this.offlineQueue.dequeue(this.currentQueuedId).catch(() => {});
+    }
     this.skippedCount.update(n => n + 1);
     this.advance();
   }
