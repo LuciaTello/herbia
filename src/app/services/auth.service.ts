@@ -77,10 +77,15 @@ export class AuthService {
   }
 
   async refreshProfile(): Promise<void> {
-    const user = await firstValueFrom(
-      this.http.get<UserProfile>(`${environment.apiUrl}/users/me`)
-    );
-    this.applyProfile(user);
+    try {
+      const user = await firstValueFrom(
+        this.http.get<UserProfile>(`${environment.apiUrl}/users/me`)
+      );
+      this.applyProfile(user);
+    } catch (e) {
+      this.profileLoaded.set(true); // unblock UI even on network/auth error
+      throw e;
+    }
   }
 
   async dismissQuizPopup(): Promise<void> {
