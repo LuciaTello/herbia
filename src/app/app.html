@@ -2,9 +2,6 @@
   <app-onboarding (done)="onOnboardingDone()" />
 }
 
-@if (connectivity.manualOfflineMode()) {
-  <div class="offline-banner">{{ i18n.t().offline.banner }}</div>
-}
 
 <main>
   <router-outlet />
