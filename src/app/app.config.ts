@@ -20,9 +20,11 @@ export const appConfig: ApplicationConfig = {
         const authService = inject(AuthService);
         const connectivityService = inject(ConnectivityService);
         return async () => {
-          await clerkService.init();
-          await authService.init();
-          await connectivityService.initManualMode();
+          try { await clerkService.init(); } catch (e) { console.error('Clerk init failed', e); }
+          await connectivityService.initManualMode().catch(() => {});
+          // authService.init() calls the backend — fire-and-forget so the app
+          // renders immediately even on Render cold start
+          authService.init().catch(() => {});
         };
       },
       multi: true,
