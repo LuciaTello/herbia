@@ -22,6 +22,8 @@ export class HomePage implements OnInit {
   protected readonly offlineQueue = inject(OfflineQueueService);
   private readonly router = inject(Router);
   protected readonly showQuizPopup = signal(false);
+  protected readonly noConnectionToast = signal(false);
+  private noConnectionTimer: ReturnType<typeof setTimeout> | null = null;
 
   async ngOnInit(): Promise<void> {
     // If profile was not yet loaded by the background init, load it now
@@ -40,6 +42,13 @@ export class HomePage implements OnInit {
 
   protected async toggleOfflineMode(): Promise<void> {
     const goingOnline = this.connectivity.manualOfflineMode();
+    if (goingOnline && !this.connectivity.online()) {
+      // No real internet — show toast and stay offline
+      this.noConnectionToast.set(true);
+      if (this.noConnectionTimer) clearTimeout(this.noConnectionTimer);
+      this.noConnectionTimer = setTimeout(() => this.noConnectionToast.set(false), 3000);
+      return;
+    }
     await this.connectivity.setManualOffline(!goingOnline);
     if (goingOnline && this.offlineQueue.pendingCount() > 0) {
       this.router.navigate(['/sync']);

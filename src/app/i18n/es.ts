@@ -334,6 +334,7 @@ export const ES: Translations = {
     promptTitle: 'Sin conexión',
     promptMessage: 'Activa el modo sin conexión para seguir fotografiando. Tus fotos se enviarán más tarde.',
     promptConfirm: 'Activar modo sin conexión',
+    noConnection: 'Todavía sin conexión…',
   },
   sync: {
     title: 'Sincronizar',

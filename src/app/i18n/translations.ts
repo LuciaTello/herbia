@@ -293,6 +293,7 @@ export interface Translations {
     promptTitle: string;
     promptMessage: string;
     promptConfirm: string;
+    noConnection: string;
   };
   sync: {
     title: string;

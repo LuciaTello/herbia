@@ -334,6 +334,7 @@ export const FR: Translations = {
     promptTitle: 'Pas de connexion',
     promptMessage: 'Active le mode hors ligne pour continuer à photographier. Tes photos seront envoyées plus tard.',
     promptConfirm: 'Activer le mode hors ligne',
+    noConnection: 'Pas encore de connexion…',
   },
   sync: {
     title: 'Synchroniser',
