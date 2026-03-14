@@ -17,7 +17,7 @@
   </section>
 
   <section class="actions">
-    <a routerLink="/route" class="action-card">
+    <a routerLink="/route" class="action-card" [class.action-disabled]="connectivity.manualOfflineMode()">
       <span class="action-emoji">🧭</span>
       <div class="action-text">
         <strong>{{ i18n.t().home.startRoute }}</strong>
@@ -31,14 +31,14 @@
         <span>{{ i18n.t().home.treksSubtitle }}</span>
       </div>
     </a>
-    <a routerLink="/collection" class="action-card">
+    <a routerLink="/collection" class="action-card" [class.action-disabled]="connectivity.manualOfflineMode()">
       <span class="action-emoji">🍃</span>
       <div class="action-text">
         <strong>{{ i18n.t().home.myCollection }}</strong>
         <span>{{ i18n.t().home.collectionSubtitle }}</span>
       </div>
     </a>
-    <a routerLink="/challenges" class="action-card">
+    <a routerLink="/challenges" class="action-card" [class.action-disabled]="connectivity.manualOfflineMode()">
       <span class="action-emoji">🦫</span>
       <div class="action-text">
         <strong>{{ i18n.t().home.challenges }}</strong>

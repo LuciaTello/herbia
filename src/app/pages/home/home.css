@@ -94,6 +94,11 @@
   box-shadow: 0 2px 8px rgba(45, 125, 70, 0.1);
 }
 
+.action-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 .action-emoji {
   font-size: 2rem;
   line-height: 1;
