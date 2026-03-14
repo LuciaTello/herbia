@@ -71,7 +71,7 @@ export class LoginPage {
       const isTimeout = e?.name === 'TimeoutError' || e?.name === 'EmptyError';
       this.error.set(isTimeout
         ? this.i18n.t().login.serverSlow
-        : this.i18n.t().login.genericError);
+        : `${this.i18n.t().login.genericError} [${e?.status ?? e?.name ?? 'net'}]`);
     } finally {
       this.loading.set(false);
     }
@@ -106,7 +106,7 @@ export class LoginPage {
       }
     } catch (e: any) {
       console.error('[login] onLogin error:', e);
-      this.error.set(e?.errors?.[0]?.message || this.i18n.t().login.genericError);
+      this.error.set(e?.errors?.[0]?.message || `${this.i18n.t().login.genericError} [${e?.status ?? e?.name ?? 'net'}]`);
     } finally {
       this.loading.set(false);
     }
