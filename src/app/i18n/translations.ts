@@ -223,6 +223,10 @@ export interface Translations {
   tutorials: {
     back: string;
     title: string;
+    intro: {
+      title: string;
+      description: string;
+    };
     treks: {
       title: string;
       description: string;

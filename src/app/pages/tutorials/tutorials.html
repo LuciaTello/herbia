@@ -3,6 +3,14 @@
 <h2 class="page-title">{{ i18n.t().tutorials.title }}</h2>
 
 <div class="tutorial-cards">
+  <button class="tutorial-card" (click)="open('intro')">
+    <span class="card-emoji">🌿</span>
+    <div class="card-text">
+      <strong>{{ i18n.t().tutorials.intro.title }}</strong>
+      <span>{{ i18n.t().tutorials.intro.description }}</span>
+    </div>
+  </button>
+
   <button class="tutorial-card" (click)="open('treks')">
     <span class="card-emoji">🎯</span>
     <div class="card-text">
@@ -27,6 +35,10 @@
     </div>
   </button>
 </div>
+
+@if (activeTutorial() === 'intro') {
+  <app-onboarding (done)="close()" />
+}
 
 @if (activeTutorial() === 'treks') {
   <app-trek-tutorial (done)="close()" />

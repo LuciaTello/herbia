@@ -161,6 +161,7 @@ export const ES: Translations = {
       'Excursiones',
       'Captura y puntos',
       'Tu nivel',
+      'Modo sin conexión',
       'Aviso importante',
     ],
     texts: [
@@ -168,6 +169,7 @@ export const ES: Translations = {
       'Elige una ruta entre dos ciudades o una zona que quieras explorar. Te prepararemos una excursión con las especies que puedes encontrar en la zona elegida — con fotos y pistas.',
       'Intenta encontrar las plantas propuestas en la excursión y las plantas de la misma familia o género. Hazles una foto y automáticamente Herbia te dará puntos.',
       'Tus puntos te hacen subir de nivel: de 🌱 Semilla curiosa a 👑 Reina del jardín. Añade amigas para ver su nivel y explorar juntas.',
+      'Puedes estar en plena naturaleza sin cobertura. Activa el modo sin conexión desde el icono WiFi de la barra de navegación. Tus fotos se guardarán en tu teléfono y podrás sincronizarlas desde la pantalla de sincronización cuando recuperes la conexión.',
       'Herbia es una herramienta lúdica y educativa. Las identificaciones pueden contener errores. No consumas ni utilices ninguna planta basándote únicamente en la información de esta app. Herbia no se hace responsable del uso indebido de las plantas.',
     ],
     next: 'Siguiente',
@@ -274,6 +276,10 @@ export const ES: Translations = {
   tutorials: {
     back: 'Volver al inicio',
     title: 'Tutoriales',
+    intro: {
+      title: 'Introducción a Herbia',
+      description: 'Repasar lo básico: excursiones, puntos, niveles y modo sin conexión.',
+    },
     treks: {
       title: 'Cómo ganar puntos en las excursiones',
       description: 'Aprende cómo funcionan las especies, géneros y familias para ganar más puntos.',

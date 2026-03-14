@@ -161,6 +161,7 @@ export const FR: Translations = {
       'Balades',
       'Capture et points',
       'Ton niveau',
+      'Mode hors ligne',
       'Avis important',
     ],
     texts: [
@@ -168,6 +169,7 @@ export const FR: Translations = {
       'Choisis un trajet entre deux villes ou une zone à explorer. On te préparera une balade avec les espèces que tu peux trouver dans la zone choisie — avec photos et indices.',
       'Essaie de trouver les plantes proposées dans la balade et les plantes de la même famille ou genre. Prends-les en photo et automatiquement Herbia te donnera des points.',
       'Tes points te font monter de niveau : de 🌱 Graine curieuse à 👑 Reine du jardin. Ajoute des amies pour voir leur niveau et explorer ensemble.',
+      'Tu peux être en pleine nature sans réseau. Active le mode hors ligne depuis l\'icône WiFi dans la barre de navigation. Tes photos seront sauvegardées sur ton téléphone et tu pourras les synchroniser depuis l\'écran de synchronisation quand tu retrouves du réseau.',
       'Herbia est un outil ludique et éducatif. Les identifications peuvent contenir des erreurs. Ne consomme et n\'utilise jamais une plante en te basant uniquement sur les informations de cette app. Herbia décline toute responsabilité en cas d\'usage inapproprié des plantes.',
     ],
     next: 'Suivant',
@@ -274,6 +276,10 @@ export const FR: Translations = {
   tutorials: {
     back: 'Retour à l\'accueil',
     title: 'Tutoriels',
+    intro: {
+      title: 'Introduction à Herbia',
+      description: 'Revoir les bases : balades, points, niveaux et mode hors ligne.',
+    },
     treks: {
       title: 'Comment gagner des points en balade',
       description: 'Apprends comment fonctionnent les espèces, genres et familles pour gagner plus de points.',

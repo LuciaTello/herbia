@@ -11,8 +11,8 @@ export class OnboardingComponent {
 
   protected readonly i18n = inject(I18nService);
   protected readonly currentSlide = signal(0);
-  protected readonly emojis = ['🌿', '🗺️', '📸', '🏆', '⚠️'];
-  protected readonly totalSlides = 5;
+  protected readonly emojis = ['🌿', '🗺️', '📸', '🏆', '📶', '⚠️'];
+  protected readonly totalSlides = 6;
 
   private touchStartX = 0;
 
