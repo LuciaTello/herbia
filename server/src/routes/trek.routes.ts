@@ -280,21 +280,15 @@ export function trekRouter(prisma: PrismaClient): Router {
           plant.family,
         );
         if (sim.similarity > 0) {
-          const speciesPhotoCount = await prisma.plantPhoto.count({
-            where: {
-              source: 'user',
-              plant: {
-                scientificName: plant.scientificName,
-                trek: { userId: req.userId! },
-              },
-            },
+          const plantPhotoCount = await prisma.plantPhoto.count({
+            where: { source: 'user', plantId: plant.id },
           });
           matches.push({
             plantId: plant.id,
             commonName: plant.commonName,
             scientificName: plant.scientificName,
             similarity: sim.similarity,
-            alreadyCaptured: speciesPhotoCount >= 5,
+            alreadyCaptured: plantPhotoCount >= 1,
           });
         }
       }
@@ -391,6 +385,15 @@ export function trekRouter(prisma: PrismaClient): Router {
           where: { scientificName: plant.scientificName, trek: { userId: req.userId! }, found: false },
           data: { found: true, foundAt: now, foundInTrekId: plant.trekId },
         });
+      }
+
+      // Safety check: max 1 user photo per plant per trek
+      const existingPhotoCount = await prisma.plantPhoto.count({
+        where: { source: 'user', plantId },
+      });
+      if (existingPhotoCount >= 1) {
+        res.status(409).json({ error: 'already_captured' });
+        return;
       }
 
       // Award similarity points: use body param if provided (from identify-all), else pendingSimilarity

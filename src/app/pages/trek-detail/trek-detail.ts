@@ -209,7 +209,10 @@ export class TrekDetailPage implements OnInit {
       }
       if (similarity > 0) this.auth.refreshProfile().catch(() => {});
     } catch (err: any) {
-      this.resultOverlay.set({ name: this.i18n.t().myTreks.uploadError, points: 0, type: 'noMatch', photoUrl });
+      const msg = err?.status === 409
+        ? this.i18n.t().myTreks.alreadyCaptured
+        : this.i18n.t().myTreks.uploadError;
+      this.resultOverlay.set({ name: msg, points: 0, type: 'noMatch', photoUrl });
     } finally {
       this.uploadingPhoto.set(false);
       this.pendingFile.set(null);
